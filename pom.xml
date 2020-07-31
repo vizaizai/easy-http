@@ -8,13 +8,43 @@
     <artifactId>easy-http</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <description>一个基于注解和接口的Http客户端</description>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
     <contributors>
         <contributor>
-            <name>廖重威</name>
+            <name>liaoChongwei</name>
             <email>liaochongwei666@163.com</email>
         </contributor>
     </contributors>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>liaoChongwei</name>
+            <email>liaochongwei666@163.com</email>
+            <organization>https://github.com/firelcw</organization>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/firelcw/easy-http</url>
+        <connection>https://github.com/firelcw/easy-http.git</connection>
+        <developerConnection>https://github.com/firelcw/easy-http</developerConnection>
+    </scm>
+
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
         <dependency>
@@ -59,6 +89,7 @@
         </dependency>
 
     </dependencies>
+
     <build>
         <plugins>
             <!-- 指定jdk -->
