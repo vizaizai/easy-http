@@ -6,8 +6,10 @@
 
     <groupId>com.github.firelcw</groupId>
     <artifactId>easy-http</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+    <name>easy-http</name>
+    <url>https://github.com/firelcw/easy-http</url>
     <description>一个基于注解和接口的Http客户端</description>
 
     <parent>
