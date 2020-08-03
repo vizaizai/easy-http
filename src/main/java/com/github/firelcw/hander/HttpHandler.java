@@ -3,11 +3,12 @@ package com.github.firelcw.hander;
 import com.github.firelcw.codec.Decoder;
 import com.github.firelcw.exception.HttpInterceptorException;
 import com.github.firelcw.interceptor.HttpInterceptor;
-import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
+import com.github.firelcw.model.HttpRequest;
 import org.apache.commons.collections.CollectionUtils;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -29,13 +30,13 @@ public class HttpHandler {
         this.interceptors = Collections.emptyList();
     }
 
-    public <T> Object handle(RequestHandler requestHandler, Decoder decoder, Class<T> returnType) {
+    public Object handle(RequestHandler requestHandler, Decoder decoder, Type returnType) {
         // 执行前置拦截
         this.doPreInterceptors(requestHandler.getRequest(),requestHandler.getConfig());
         HttpResponse response = requestHandler.handle();
         // 执行后置拦截
         this.doPostInterceptors(requestHandler.getRequest(),response);
-        return new DecodeHandler<>(response, decoder, returnType).handle();
+        return new DecodeHandler(response, decoder, returnType).handle();
     }
 
     /**
@@ -56,20 +57,25 @@ public class HttpHandler {
      * @param request
      * @param response
      */
-    private void doPostInterceptors(HttpRequest request,HttpResponse response) {
+    private void doPostInterceptors(HttpRequest request, HttpResponse response) {
         interceptors.forEach(e->e.postHandle(request, response));
     }
 
     /**
-     * 排序
+     * 拦截器排序
      * @param interceptors
      */
     private void ordered(List<HttpInterceptor> interceptors) {
         if (CollectionUtils.isEmpty(interceptors)) {
             return;
         }
-        this.interceptors = interceptors.stream().sorted(Comparator.comparing(HttpInterceptor::order)).collect(Collectors.toList());
+        this.interceptors = interceptors.stream()
+                .sorted(Comparator.comparing(HttpInterceptor::order))
+                .collect(Collectors.toList());
     }
+
+
+
     public List<HttpInterceptor> getInterceptors() {
         return interceptors;
     }

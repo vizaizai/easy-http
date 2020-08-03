@@ -3,9 +3,9 @@ package com.github.firelcw.util;
 
 import com.github.firelcw.exception.EasyHttpException;
 import com.github.firelcw.model.HttpMethod;
-import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
+import com.github.firelcw.model.HttpRequest;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;

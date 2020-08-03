@@ -4,9 +4,9 @@ package com.github.firelcw.proxy;
 import com.github.firelcw.codec.Decoder;
 import com.github.firelcw.codec.Encoder;
 import com.github.firelcw.hander.HttpHandler;
-import com.github.firelcw.hander.RequestHandler;
 import com.github.firelcw.interceptor.HttpInterceptor;
 import com.github.firelcw.model.HttpRequestConfig;
+import com.github.firelcw.hander.RequestHandler;
 import com.github.firelcw.parser.ArgParser;
 import com.github.firelcw.parser.MethodParser;
 
@@ -56,7 +56,7 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
         HttpHandler httpHandler = new HttpHandler();
         httpHandler.setInterceptors(interceptors);
 
-        return httpHandler.handle(requestHandler,decoder, method.getReturnType());
+        return httpHandler.handle(requestHandler,decoder, method.getGenericReturnType());
     }
 
     public HttpInvocationHandler<T> url(String url) {

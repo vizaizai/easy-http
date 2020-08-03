@@ -1,5 +1,6 @@
 package com.github.firelcw.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,15 +24,31 @@ public class HttpRequest {
     /**
      * 请求头
      */
-    private Map<String,String> headers;
+    private Map<String, String> headers;
     /**
      * 请求参数 ?param1=1
      */
-    private Map<String,String> params;
+    private Map<String, String> params;
     /**
      * 请求体文本内容
      */
     private String content;
+
+    public void addHeader(String name, String value) {
+        if (this.headers == null) {
+            this.headers = new HashMap<>();
+        }
+        this.headers.put(name, value);
+    }
+
+    public void addHeaders(Map<String, String> headers) {
+        if (this.headers == null) {
+            this.headers = headers;
+        }else {
+            this.headers.putAll(headers);
+        }
+    }
+
 
     public HttpMethod getMethod() {
         return method;
@@ -51,10 +68,6 @@ public class HttpRequest {
 
     public Map<String, String> getHeaders() {
         return headers;
-    }
-
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
     }
 
     public Map<String, String> getParams() {

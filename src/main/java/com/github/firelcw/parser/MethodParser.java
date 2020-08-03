@@ -89,7 +89,7 @@ public class MethodParser {
      * @param path
      */
     private void calVarCount(String path) {
-        Pattern p = Pattern.compile("\\{\\w+}",Pattern.CASE_INSENSITIVE);
+        Pattern p = Pattern.compile("\\{\\w+}", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(path);
         int count = 0;
         while(m.find()){

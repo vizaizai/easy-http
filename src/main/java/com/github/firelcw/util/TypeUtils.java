@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class TypeUtils {
     public static final String[] SIMPLE_TYPES =
             new String[] {"integer","short", "byte","long","char",
-                    "float", "double","boolean","string"};
+                    "float", "double","boolean","string", "void"};
 
     private TypeUtils() {
     }
@@ -18,20 +18,20 @@ public class TypeUtils {
 
     /**
      * 获取简单类型
-     * @param clazz
+     * @param typeName
      * @return
      */
-    public static String getType(Class<?> clazz) {
-        String typeLower = clazz.getTypeName().toLowerCase();
+    public static String getType(String typeName) {
+        String typeLower = typeName.toLowerCase();
         return Stream.of(SIMPLE_TYPES).filter(typeLower::contains).findFirst().orElse(null);
     }
     /**
      * 是否为简单参数
-     * @param clazz
+     * @param typeName
      * @return
      */
-    public static boolean isSimple(Class<?> clazz) {
-        String typeLower = clazz.getTypeName().toLowerCase();
+    public static boolean isSimple(String typeName) {
+        String typeLower = typeName.toLowerCase();
         return Stream.of(SIMPLE_TYPES).anyMatch(typeLower::contains);
     }
 
@@ -69,5 +69,8 @@ public class TypeUtils {
     }
     public static String getStringType() {
         return SIMPLE_TYPES[8];
+    }
+    public static String getVoidType() {
+        return SIMPLE_TYPES[9];
     }
 }

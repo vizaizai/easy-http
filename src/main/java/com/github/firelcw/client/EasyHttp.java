@@ -1,6 +1,5 @@
 package com.github.firelcw.client;
 
-import com.github.codec.*;
 import com.github.firelcw.codec.Decoder;
 import com.github.firelcw.codec.DefaultDecoder;
 import com.github.firelcw.codec.DefaultEncoder;
@@ -20,8 +19,8 @@ public class EasyHttp {
     private EasyHttp() {
     }
 
-    public static EasyHttp.Builder builder() {
-        return new EasyHttp.Builder();
+    public static Builder builder() {
+        return new Builder();
     }
     public static class Builder {
         private HttpRequestConfig config;
@@ -53,9 +52,12 @@ public class EasyHttp {
             return this;
         }
         public Builder withInterceptor(HttpInterceptor interceptor) {
-            this.interceptors.add(interceptor);
+            if (!this.interceptorIsExists(interceptor)) {
+                this.interceptors.add(interceptor);
+            }
             return this;
         }
+
 
         public <T> T build(Class<T> clazz) {
             HttpInvocationHandler<T> invocationHandler = new HttpInvocationHandler<>(clazz);
@@ -67,5 +69,15 @@ public class EasyHttp {
             return invocationHandler.getProxy();
         }
 
+        /**
+         * 判断拦截器是否存在
+         * @param interceptor
+         * @return
+         */
+        private boolean interceptorIsExists(HttpInterceptor interceptor){
+            String name = interceptor.getClass().getName();
+            return this.interceptors.stream()
+                             .anyMatch(e -> e.getClass().getName().equals(name));
+        }
     }
 }

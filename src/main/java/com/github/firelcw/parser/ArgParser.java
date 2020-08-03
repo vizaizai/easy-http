@@ -60,7 +60,7 @@ public class ArgParser {
         Class<?> argClazz = target.getClass();
         this.argClass =  argClazz;
         // 是否为简单参数
-        this.isSimple = TypeUtils.isSimple(argClazz);
+        this.isSimple = TypeUtils.isSimple(argClazz.getTypeName());
         Annotation[] annotations = this.getParameterAnnotation();
 
         // 一个参数最多一个注解

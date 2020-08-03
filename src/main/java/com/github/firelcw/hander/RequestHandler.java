@@ -5,12 +5,12 @@ import com.github.firelcw.annotation.Headers;
 import com.github.firelcw.annotation.Params;
 import com.github.firelcw.annotation.Var;
 import com.github.firelcw.codec.Encoder;
-import com.github.firelcw.parser.ArgParser;
-import com.github.firelcw.parser.MethodParser;
-import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 import com.github.firelcw.util.HttpUtils;
+import com.github.firelcw.model.HttpRequest;
+import com.github.firelcw.parser.ArgParser;
+import com.github.firelcw.parser.MethodParser;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
@@ -131,7 +131,7 @@ public class RequestHandler {
     private void handleHeaders() {
         for (ArgParser argParser : this.argParsers) {
             if (Headers.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
-                this.request.setHeaders(encoder.encodeMap(argParser.getTarget()));
+                this.request.addHeaders(encoder.encodeMap(argParser.getTarget()));
                 return;
             }
         }
