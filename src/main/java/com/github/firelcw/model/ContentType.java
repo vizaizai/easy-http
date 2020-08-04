@@ -5,7 +5,10 @@ package com.github.firelcw.model;
  * @date 2020/7/31 11:00
  */
 public class ContentType {
-    
+
+    private ContentType() {
+    }
+
     public static  final String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
     public static  final String APPLICATION_JSON = "application/json";

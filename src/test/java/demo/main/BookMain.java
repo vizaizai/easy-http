@@ -3,6 +3,10 @@ package demo.main;
 
 
 import com.github.firelcw.client.EasyHttp;
+import com.github.firelcw.interceptor.TimeInterceptor;
+import demo.codec.CustomDecoder;
+import demo.codec.CustomEncoder;
+import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
 import demo.service.BookHttpService;
@@ -55,6 +59,10 @@ public class BookMain {
     void addBook(){
         BookHttpService bookHttpService = EasyHttp.builder()
                 .url("127.0.0.1:8888")
+                .encoder(new CustomEncoder())
+                .decoder(new CustomDecoder())
+                .withInterceptor(new ResultInterceptor())
+                .withInterceptor(new TimeInterceptor())
                 .build(BookHttpService.class);
 
         Book book = new Book();

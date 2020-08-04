@@ -33,6 +33,6 @@ public interface BookHttpService {
 
 
     @Post("/books")
-    ApiResult<Void> addBook(@Headers Map<String, String> headers);
+    ApiResult<Void> addBook(@Data Book book,  @Headers Map<String, String> headers);
 
 }
