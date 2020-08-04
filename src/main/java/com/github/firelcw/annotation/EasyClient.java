@@ -1,6 +1,10 @@
 package com.github.firelcw.annotation;
 
 
+import com.github.firelcw.codec.Decoder;
+import com.github.firelcw.codec.DefaultDecoder;
+import com.github.firelcw.interceptor.HttpInterceptor;
+
 import java.lang.annotation.*;
 
 @Target({ElementType.TYPE})
@@ -15,11 +19,11 @@ public @interface EasyClient {
     /**
      * @return 拦截器
      */
-    Class<?>[] interceptors() default {};
+    Class<? extends HttpInterceptor>[] interceptors() default {};
 
     /**
      * @return 解码器
      */
-    Class<?> decoder() default Void.class;
+    Class<? extends Decoder> decoder() default DefaultDecoder.class;
 
 }
