@@ -21,6 +21,8 @@
    </dependency>
    ```
 
+spring-boot版本移步: [easy-http-boot-starter](https://github.com/firelcw/easy-http-spring)
+
 ##### 3. 使用
 
    首先定义一个接口:
@@ -204,6 +206,8 @@ public class ResultInterceptor implements HttpInterceptor {
                                                     .withInterceptor(new TimeInterceptor())
                                                     .build(BookHttpService.class);
 ```
+
+
 
 #### 联系作者
 
