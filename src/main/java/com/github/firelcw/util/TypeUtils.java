@@ -19,7 +19,7 @@ public class TypeUtils {
     /**
      * 获取简单类型
      * @param typeName
-     * @return
+     * @return type
      */
     public static String getType(String typeName) {
         String typeLower = typeName.toLowerCase();
@@ -28,7 +28,7 @@ public class TypeUtils {
     /**
      * 是否为简单参数
      * @param typeName
-     * @return
+     * @return isSimple
      */
     public static boolean isSimple(String typeName) {
         String typeLower = typeName.toLowerCase();
@@ -37,7 +37,7 @@ public class TypeUtils {
 
     /**
      * 获取所有简单类型
-     * @return
+     * @return allTypes
      */
     public static String[] getTypes() {
         return SIMPLE_TYPES;

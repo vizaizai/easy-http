@@ -16,7 +16,7 @@ public interface HttpInterceptor {
      * 前置拦截
      * @param config 请求配置
      * @param request 后置拦截
-     * @return
+     * @return boolean
      */
     boolean preHandle(HttpRequest request, HttpRequestConfig config);
 
@@ -29,7 +29,7 @@ public interface HttpInterceptor {
 
     /**
      * 执行顺序(值越小越先执行)
-     * @return
+     * @return int
      */
     int order();
 }

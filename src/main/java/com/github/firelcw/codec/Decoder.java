@@ -14,7 +14,7 @@ public interface Decoder {
      * 响应解码
      * @param response 响应参数
      * @param type body类型
-     * @return
+     * @return Object
      */
     Object decode(HttpResponse response, Type type);
 }

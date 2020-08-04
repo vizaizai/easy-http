@@ -10,14 +10,14 @@ public interface Encoder {
     /**
      * 编码成map(用于params 和 headers)
      * @param object 待编码对象
-     * @return
+     * @return Map
      */
      Map<String,String> encodeMap(Object object);
 
     /**
      * 编码成String（用于body）
      * @param object
-     * @return
+     * @return String
      */
      String encodeString(Object object);
 }

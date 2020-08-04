@@ -97,7 +97,7 @@ public class ArgParser {
 
     /**
      * 获取方法参数注解
-     * @return
+     * @return Annotation[]
      */
     private Annotation[] getParameterAnnotation() {
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();

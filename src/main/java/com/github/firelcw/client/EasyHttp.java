@@ -72,7 +72,7 @@ public class EasyHttp {
         /**
          * 判断拦截器是否存在
          * @param interceptor
-         * @return
+         * @return boolean
          */
         private boolean interceptorIsExists(HttpInterceptor interceptor){
             String name = interceptor.getClass().getName();
