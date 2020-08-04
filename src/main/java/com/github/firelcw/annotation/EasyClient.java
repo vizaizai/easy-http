@@ -15,12 +15,11 @@ public @interface EasyClient {
     /**
      * @return 拦截器
      */
-    Class<?>[] interceptors();
+    Class<?>[] interceptors() default {};
 
     /**
      * @return 解码器
      */
-    Class<?> decoder();
-
+    Class<?> decoder() default Void.class;
 
 }
