@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
     <name>easy-http</name>
     <url>https://github.com/firelcw/easy-http</url>
-    <description>a simple http client for java</description>
+    <description>A simple HTTP client for Java</description>
 
 
     <contributors>
