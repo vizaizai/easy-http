@@ -59,8 +59,6 @@ public class BookMain {
     void addBook(){
         BookHttpService bookHttpService = EasyHttp.builder()
                 .url("127.0.0.1:8888")
-                .encoder(new CustomEncoder())
-                .decoder(new CustomDecoder())
                 .withInterceptor(new ResultInterceptor())
                 .withInterceptor(new TimeInterceptor())
                 .build(BookHttpService.class);

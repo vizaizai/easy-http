@@ -20,19 +20,19 @@ public interface BookHttpService {
     ApiResult<List<Book>> listBooksByAuthor(@Var("author") String author);
 
     @Get("/books")
-    ApiResult<List<Book>> listBooksByAuthor(@Params Map<String, String> params);
+    ApiResult<List<Book>> listBooksByAuthor(@Query Map<String, String> params);
 
     @Post("/books")
-    void addBook(@Data Book book);
+    void addBook(@Body Book book);
 
     @Delete("/books/{id}")
     ApiResult<Void> deleteBookById(@Var("id") String id);
 
     @Put("/books")
-    ApiResult<Void> editBook(@Data Book book);
+    ApiResult<Void> editBook(@Body Book book);
 
 
     @Post("/books")
-    ApiResult<Void> addBook(@Data Book book,  @Headers Map<String, String> headers);
+    ApiResult<Void> addBook(@Body Book book, @Headers Map<String, String> headers);
 
 }
