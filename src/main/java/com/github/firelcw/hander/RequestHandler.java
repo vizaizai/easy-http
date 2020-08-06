@@ -1,8 +1,8 @@
 package com.github.firelcw.hander;
 
-import com.github.firelcw.annotation.Data;
+import com.github.firelcw.annotation.Body;
 import com.github.firelcw.annotation.Headers;
-import com.github.firelcw.annotation.Params;
+import com.github.firelcw.annotation.Query;
 import com.github.firelcw.annotation.Var;
 import com.github.firelcw.codec.Encoder;
 import com.github.firelcw.model.HttpRequestConfig;
@@ -69,10 +69,10 @@ public class RequestHandler {
         if (CollectionUtils.isNotEmpty(argParsers)) {
             // 处理请求路径
             this.handlePath();
-            // 处理请求查询参数
-            this.handleParams();
+            // 处理请求query参数
+            this.handleQuery();
             // 处理请求body参数
-            this.handleData();
+            this.handleBody();
             // 处理请求headers
             this.handleHeaders();
 
@@ -102,12 +102,12 @@ public class RequestHandler {
     }
 
     /**
-     * 处理查询参数
+     * 处理query参数
      */
-    private void handleParams() {
+    private void handleQuery() {
         for (ArgParser argParser : this.argParsers) {
-            if (Params.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
-                this.request.setParams(encoder.encodeMap(argParser.getTarget()));
+            if (Query.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
+                this.request.addQueryParams(encoder.encodeMap(argParser.getTarget()));
                 return;
             }
         }
@@ -116,10 +116,10 @@ public class RequestHandler {
     /**
      * 处理查询body参数
      */
-    private void handleData() {
+    private void handleBody() {
         for (ArgParser argParser : this.argParsers) {
-            if (Data.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
-                this.request.setContent(encoder.encodeString(argParser.getTarget()));
+            if (Body.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
+                this.request.setBody(encoder.encodeString(argParser.getTarget()));
                 return;
             }
         }
@@ -149,23 +149,23 @@ public class RequestHandler {
         if (this.encoder == null) {
             throw new IllegalArgumentException("no default encoder");
         }
-        // 1. 只能包含一个@params
-        // 2. 只能包含一个@data
-        // 3. 只能包含一个@headers
+        // 1. 只能包含一个@Query
+        // 2. 只能包含一个@Body
+        // 3. 只能包含一个@Headers
         int has1 = 0;
         int has2 = 0;
         int has3 = 0;
         for (ArgParser argParser : this.argParsers) {
-            if (Params.TYPE.equals(argParser.getType())) {
+            if (Query.TYPE.equals(argParser.getType())) {
                 has1 ++;
                 if (has1 > 1) {
-                    throw new IllegalArgumentException("Only one @Params can be included");
+                    throw new IllegalArgumentException("Only one @Query can be included");
                 }
             }
-            if (Data.TYPE.equals(argParser.getType())) {
+            if (Body.TYPE.equals(argParser.getType())) {
                 has2 ++;
                 if (has2 > 1) {
-                    throw new IllegalArgumentException("Only one @Data can be included");
+                    throw new IllegalArgumentException("Only one @Body can be included");
                 }
             }
             if (Headers.TYPE.equals(argParser.getType())) {

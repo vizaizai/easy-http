@@ -6,6 +6,6 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Data {
-    String TYPE = "data";
+public @interface Body {
+    String TYPE = "body";
 }

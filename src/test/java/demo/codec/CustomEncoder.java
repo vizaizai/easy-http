@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class CustomEncoder implements Encoder {
     /**
-     * 将对象转化成成Map<String,String> 用于编码@Params和@Headers注解的对象
+     * 将对象转化成成Map<String,String> 用于编码@Query和@Headers注解的对象
      * @param object 待编码对象
      * @return map
      */
@@ -20,7 +20,7 @@ public class CustomEncoder implements Encoder {
     }
 
     /**
-     * 将对象转化成string，用于编码 @Data注解的对象（默认是解析成json字符串）
+     * 将对象转化成string，用于编码 @Body注解的对象（默认是解析成json字符串）
      * @param object
      * @return string
      */

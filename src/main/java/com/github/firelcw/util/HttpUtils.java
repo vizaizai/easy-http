@@ -50,8 +50,8 @@ public class HttpUtils {
         HttpMethod method = param.getMethod();
         String url = param.getUrl();
         Map<String,String> headers = param.getHeaders();
-        Map<String,String> params = param.getParams();
-        String content = param.getContent();
+        Map<String,String> params = param.getQueryParams();
+        String content = param.getBody();
 
         if (config == null) {
             throw new EasyHttpException("request configuration is null");

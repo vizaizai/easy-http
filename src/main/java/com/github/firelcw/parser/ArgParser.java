@@ -1,9 +1,9 @@
 package com.github.firelcw.parser;
 
 
-import com.github.firelcw.annotation.Data;
+import com.github.firelcw.annotation.Body;
 import com.github.firelcw.annotation.Headers;
-import com.github.firelcw.annotation.Params;
+import com.github.firelcw.annotation.Query;
 import com.github.firelcw.annotation.Var;
 import com.github.firelcw.exception.EasyHttpException;
 import com.github.firelcw.util.TypeUtils;
@@ -68,16 +68,16 @@ public class ArgParser {
             throw new EasyHttpException("The number of annotations for a arg  is at most 1");
         }
         if (annotations.length == 0) {
-            this.type = Params.TYPE;
+            this.type = Query.TYPE;
         }else {
             Annotation annotation = annotations[0];
             if (annotation instanceof Var) {
                 this.varName = ((Var) annotation).value();
                 this.type = Var.TYPE;
-            }else if (annotation instanceof Params) {
-                this.type = Params.TYPE;
-            }else if (annotation instanceof Data) {
-                this.type = Data.TYPE;
+            }else if (annotation instanceof Query) {
+                this.type = Query.TYPE;
+            }else if (annotation instanceof Body) {
+                this.type = Body.TYPE;
             }else if (annotation instanceof Headers) {
                 this.type = Headers.TYPE;
             }else {

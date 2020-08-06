@@ -32,7 +32,7 @@ public class HttpRequest {
     /**
      * 请求体文本内容
      */
-    private String content;
+    private String body;
 
     public void addHeader(String name, String value) {
         if (this.headers == null) {
@@ -49,6 +49,28 @@ public class HttpRequest {
         }
     }
 
+    public void addQueryParam(String key, String value) {
+        if (this.params == null) {
+            this.params = new HashMap<>();
+        }
+        this.params.put(key, value);
+    }
+
+    public void addQueryParams(Map<String, String> query) {
+        if (this.params == null) {
+            this.params = query;
+        }else {
+            this.params.putAll(query);
+        }
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public Map<String, String> getQueryParams() {
+        return params;
+    }
 
     public HttpMethod getMethod() {
         return method;
@@ -66,31 +88,19 @@ public class HttpRequest {
         this.url = url;
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
-    public Map<String, String> getParams() {
-        return params;
-    }
-
-    public void setParams(Map<String, String> params) {
-        this.params = params;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String getContentType() {
         return contentType;
     }
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 }

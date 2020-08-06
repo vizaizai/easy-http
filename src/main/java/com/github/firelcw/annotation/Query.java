@@ -6,6 +6,6 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Params {
-    String TYPE = "params";
+public @interface Query {
+    String TYPE = "query";
 }
