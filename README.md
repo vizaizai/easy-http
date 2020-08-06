@@ -6,7 +6,7 @@
 
 ##### 1. 特性
 
-   + 注解简单： 遵循国内人的编码习惯，@Data、@Params、@Var等注解见名之意。
+   + 注解简单： 遵循大家的命名习惯，@Body、@Query、@Var等注解见名之意。
    + 无侵入： 接口不需要继承。
    + 支持自定义编解码：默认已经内置了JSON编解码(返回参数支持泛型)，如需支持xml，可自定义。
    + 支持自定义拦截器：请求前，和请求后的拦截。拦截器可满足大部分业务需求，如：计算请求耗时，动态添加公共请求头，返回错误统一处理等等。
@@ -17,7 +17,7 @@
    <dependency>
      <groupId>com.github.firelcw</groupId>
      <artifactId>easy-http</artifactId>
-     <version>1.0.0</version>
+     <version>1.1.0</version>
    </dependency>
    ```
 
@@ -59,25 +59,25 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/firelcw/eas
      ApiResult<Book> getBookById(@Var("author") String author);
      ```
 
-   + @Params
+   + @Query
 
      被注解的参数是复杂类型，是参数的model或者map，因为它生成的是查询参数，会拼接到路径后面。缺省默认为查询参数。
 
      ``` java
      @Get("/books")
-     ApiResult<List<Book>> listBooksByAuthor(@Params Map<String, String> params);
+     ApiResult<List<Book>> listBooksByAuthor(@Query Map<String, String> params);
      // 和上面效果一样
      @Get("/books")
      ApiResult<List<Book>> listBooksByAuthor(Map<String, String> params);
      ```
 
-   + @Data
+   + @Body
 
-     被注解的参数会根据编码器处理放到请求body里面。
+     body参数，被注解的参数会根据编码器处理放到请求body里面。
 
      ``` java
      @Post("/books")
-     void addBook(@Data Book book);
+     void addBook(@Body Book book);
      ```
 
    + @Headers
@@ -86,7 +86,7 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/firelcw/eas
 
      ``` java
       @Post("/books")
-      ApiResult<Void> addBook(@Data Book book,  @Headers Map<String, String> headers);
+      ApiResult<Void> addBook(@Body Book book,  @Headers Map<String, String> headers);
      ```
 
 ##### 5. 自定义编码器
@@ -98,7 +98,7 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/firelcw/eas
 ``` java
 public class CustomEncoder implements Encoder {
      /**
-     * 将对象转化成成Map<String,String> 用于编码@Params和@Headers
+     * 将对象转化成成Map<String,String> 用于编码@Query和@Headers
      * @param object 待编码对象
      * @return map
      */
@@ -107,7 +107,7 @@ public class CustomEncoder implements Encoder {
         return null;
     }
 	 /**
-     * 将对象转化成string，用于编码 @Data注解的对象（默认是解析成json字符串）
+     * 将对象转化成string，用于编码 @Body注解的对象（默认是解析成json字符串）
      * @param object
      * @return string
      */
