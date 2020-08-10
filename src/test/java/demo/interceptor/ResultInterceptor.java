@@ -21,7 +21,7 @@ public class ResultInterceptor implements HttpInterceptor {
 
     @Override
     public void postHandle(HttpRequest request, HttpResponse response) {
-        if (!response.isSuccess()) {
+        if (!response.isOk()) {
             throw new EasyHttpException("请求错误~");
         }
         if (StringUtils.isBlank(response.getBody())) {

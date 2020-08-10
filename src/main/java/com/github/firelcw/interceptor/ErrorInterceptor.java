@@ -24,9 +24,9 @@ public class ErrorInterceptor implements HttpInterceptor{
 
     @Override
     public void postHandle(HttpRequest request, HttpResponse response) {
-        if (!response.isSuccess()) {
-            log.info("请求错误 => {}, 状态码:{},原因:{}",request.getUrl(),response.getStatusCode(),response.getMessage());
-            throw new EasyHttpException("Request error");
+        if (!response.isOk()) {
+            log.info("请求 => {}错误 ,状态码:{},原因:{}",request.getUrl(),response.getStatusCode(),response.getMessage());
+            throw new EasyHttpException("Http Request error");
         }
     }
 
