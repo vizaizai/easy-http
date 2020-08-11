@@ -1,7 +1,5 @@
 package com.github.firelcw.model;
 
-import java.lang.reflect.Type;
-
 /**
  * 响应
  * @author liaochongwei
