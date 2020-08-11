@@ -3,9 +3,10 @@ package com.github.firelcw.hander;
 import com.github.firelcw.codec.Decoder;
 import com.github.firelcw.exception.HttpInterceptorException;
 import com.github.firelcw.interceptor.HttpInterceptor;
+import com.github.firelcw.model.HttpMethod;
+import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
-import com.github.firelcw.model.HttpRequest;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.lang.reflect.Type;
@@ -31,6 +32,10 @@ public class HttpHandler {
     }
 
     public Object handle(RequestHandler requestHandler, Decoder decoder, Type returnType) {
+        // 处理拦截器 排除，排序
+        this.exclude(requestHandler.getRequest().getUrl(),requestHandler.getRequest().getMethod());
+        this.ordered();
+
         // 执行前置拦截
         this.doPreInterceptors(requestHandler.getRequest(),requestHandler.getConfig());
         HttpResponse response = requestHandler.handle();
@@ -62,14 +67,22 @@ public class HttpHandler {
     }
 
     /**
-     * 拦截器排序
-     * @param interceptors
+     * 拦截器排除
      */
-    private void ordered(List<HttpInterceptor> interceptors) {
+    private void exclude(String url, HttpMethod method) {
         if (CollectionUtils.isEmpty(interceptors)) {
             return;
         }
-        this.interceptors = interceptors.stream()
+        interceptors.removeIf(e-> e.excludes().stream().anyMatch( n -> n.match(url, method)));
+    }
+    /**
+     * 拦截器排序
+     */
+    private void ordered() {
+        if (CollectionUtils.isEmpty(interceptors)) {
+            return;
+        }
+        this.interceptors = this.interceptors.stream()
                 .sorted(Comparator.comparing(HttpInterceptor::order))
                 .collect(Collectors.toList());
     }
@@ -81,6 +94,6 @@ public class HttpHandler {
     }
 
     public void setInterceptors(List<HttpInterceptor> interceptors) {
-        this.ordered(interceptors);
+       this.interceptors = interceptors;
     }
 }

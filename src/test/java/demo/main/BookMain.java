@@ -22,15 +22,16 @@ import java.util.Map;
 public class BookMain {
     public static void main(String[] args) {
         BookMain main = new BookMain();
-        // main.getBookById();
+        main.getBookById();
         // main.listBooksByAuthor1();
         // main.listBooksByAuthor2();
-        main.addBook();
+        // main.addBook();
     }
 
     void getBookById() {
         BookHttpService bookHttpService = EasyHttp.builder()
                                                     .url("127.0.0.1:8888")
+                                                    .withInterceptor(new TimeInterceptor())
                                                     .build(BookHttpService.class);
         ApiResult<Book> bookRet = bookHttpService.getBookById("166895");
         System.out.println(bookRet.getData().getName());

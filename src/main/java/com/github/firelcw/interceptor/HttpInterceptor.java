@@ -1,9 +1,13 @@
 package com.github.firelcw.interceptor;
 
 
+import com.github.firelcw.model.ExcludePath;
 import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 响应拦截器
@@ -31,5 +35,14 @@ public interface HttpInterceptor {
      * 执行顺序(值越小越先执行)
      * @return int
      */
-    int order();
+    default int order() {
+        return 0;
+    }
+    /**
+     *  排除路径
+     * @return List<ExcludePath>
+     */
+    default List<ExcludePath> excludes() {
+        return Collections.emptyList();
+    }
 }

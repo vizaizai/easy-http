@@ -1,5 +1,7 @@
 package com.github.firelcw.model;
 
+import java.lang.reflect.Type;
+
 /**
  * 响应
  * @author liaochongwei
@@ -20,7 +22,8 @@ public class HttpResponse {
      */
     private String message;
 
-    public boolean isSuccess() {
+
+    public boolean isOk() {
         return statusCode >= 200 && statusCode <= 300 ;
     }
     public String getBody() {
