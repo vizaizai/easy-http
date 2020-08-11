@@ -28,9 +28,4 @@ public class TimeInterceptor implements HttpInterceptor{
         long endTime = System.currentTimeMillis();
         log.info("请求 => {},耗时为{}毫秒",request.getUrl(), endTime - startTime);
     }
-
-    @Override
-    public int order() {
-        return 0;
-    }
 }
