@@ -17,7 +17,7 @@
    <dependency>
      <groupId>com.github.firelcw</groupId>
      <artifactId>easy-http</artifactId>
-     <version>1.1.0</version>
+     <version>1.2.0</version>
    </dependency>
    ```
 
@@ -190,10 +190,14 @@ public class ResultInterceptor implements HttpInterceptor {
     public int order() {
         return 4;
     }
+    @Override
+    public List<ExcludePath> excludes() {
+        return Arrays.asList(ExcludePath.instance("/books/**", HttpMethod.DELETE, HttpMethod.POST));
+    }
 }
 ```
 
-`preHandle` 请求前拦截，返回true则通过，反之则被拦截。`postHandle` 响应后拦截。`order`定义拦截器的顺序，值越小，越靠前。这里`ResultInterceptor`对统一的返回作了处理。不仅判断了请求和业务是否成功，并且还统一包装了返回体，去掉了通过返回部分，具体根据业务定制。
+`preHandle` 请求前拦截，返回true则通过，反之则被拦截。`postHandle` 响应后拦截。`order`定义拦截器的顺序，值越小，越靠前。`excludes`定义需要排除使用拦截器的路径列表。这里`ResultInterceptor`对统一的返回作了处理。不仅判断了请求和业务是否成功，并且还统一包装了返回体，去掉了通过返回部分，具体根据业务定制。
 
 在构建对象是加入拦截器列表
 
