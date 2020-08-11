@@ -22,8 +22,8 @@ import java.util.Map;
 public class BookMain {
     public static void main(String[] args) {
         BookMain main = new BookMain();
-        main.getBookById();
-        // main.listBooksByAuthor1();
+        //main.getBookById();
+         main.listBooksByAuthor1();
         // main.listBooksByAuthor2();
         // main.addBook();
     }

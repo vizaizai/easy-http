@@ -4,8 +4,14 @@ package demo.main;
 import com.github.firelcw.client.EasyHttp;
 import com.github.firelcw.interceptor.TimeInterceptor;
 import demo.interceptor.ResultInterceptor;
+import demo.model.ApiResult;
 import demo.model.Book;
+import demo.service.BookHttpService;
 import demo.service.BookHttpService2;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author liaochongwei
@@ -14,7 +20,8 @@ import demo.service.BookHttpService2;
 public class BookMain2 {
     public static void main(String[] args) {
         BookMain2 main = new BookMain2();
-        main.getBookById();
+        //main.getBookById();
+        main.listBooksByAuthor1();
     }
 
     void getBookById() {
@@ -28,6 +35,14 @@ public class BookMain2 {
 
     }
 
-
+    void listBooksByAuthor1(){
+        BookHttpService2 bookHttpService = EasyHttp.builder()
+                .url("127.0.0.1:8888")
+                .withInterceptor(new TimeInterceptor())
+                .withInterceptor(new ResultInterceptor())
+                .build(BookHttpService2.class);
+        List<Book> books = bookHttpService.listBooksByAuthor("tom");
+        System.out.println(books);
+    }
 
 }
