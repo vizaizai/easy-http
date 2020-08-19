@@ -17,7 +17,7 @@
    <dependency>
      <groupId>com.github.firelcw</groupId>
      <artifactId>easy-http</artifactId>
-     <version>1.2.0</version>
+     <version>1.3.0</version>
    </dependency>
    ```
 
