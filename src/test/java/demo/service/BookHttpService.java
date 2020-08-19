@@ -1,6 +1,7 @@
 package demo.service;
 
 import com.github.firelcw.annotation.*;
+import com.github.firelcw.model.ContentType;
 import demo.model.ApiResult;
 import demo.model.Book;
 
@@ -19,8 +20,8 @@ public interface BookHttpService {
     @Get("/books?author={author}")
     ApiResult<List<Book>> listBooksByAuthor(@Var("author") String author);
 
-    @Get("/books")
-    ApiResult<List<Book>> listBooksByAuthor(@Query Map<String, String> params);
+    @Post(value = "/books/getByAuthor")
+    ApiResult<List<Book>> listBooksByAuthor(Map<String, String> params,@Body Book book);
 
     @Post("/books")
     void addBook(@Body Book book);

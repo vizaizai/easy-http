@@ -65,10 +65,10 @@ public class RequestHandler {
         this.request.setMethod(methodParser.getHttpMethod());
         // 设置ContentType
         this.request.setContentType(methodParser.getContentType());
+        // 处理请求路径
+        this.handlePath();
         // 参数解析列表不为空，则需要解析方法参数
         if (CollectionUtils.isNotEmpty(argParsers)) {
-            // 处理请求路径
-            this.handlePath();
             // 处理请求query参数
             this.handleQuery();
             // 处理请求body参数

@@ -22,10 +22,10 @@ import java.util.Map;
 public class BookMain {
     public static void main(String[] args) {
         BookMain main = new BookMain();
-        main.getBookById();
+        //main.getBookById();
         // main.listBooksByAuthor1();
         // main.listBooksByAuthor2();
-        // main.addBook();
+         main.addBook();
     }
 
     void getBookById() {
@@ -45,8 +45,13 @@ public class BookMain {
                 .build(BookHttpService.class);
         Map<String, String> params = new HashMap<>();
         params.put("author","tom");
-        ApiResult<List<Book>> listApiResult = bookHttpService.listBooksByAuthor(params);
-        System.out.println(listApiResult.getData().get(0).getName());
+
+
+        Book book = new Book();
+        book.setName("name");
+        book.setAuthor("author");
+        ApiResult<List<Book>> listApiResult = bookHttpService.listBooksByAuthor(params,book);
+        System.out.println(listApiResult.getData().get(1).getName());
     }
 
     void listBooksByAuthor2(){

@@ -2,10 +2,8 @@ package com.github.firelcw.util;
 
 
 import com.github.firelcw.exception.EasyHttpException;
-import com.github.firelcw.model.HttpMethod;
-import com.github.firelcw.model.HttpRequestConfig;
-import com.github.firelcw.model.HttpResponse;
-import com.github.firelcw.model.HttpRequest;
+import com.github.firelcw.model.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -39,9 +37,9 @@ public class HttpUtils {
     public static void buildConfig(HttpRequestConfig httpConfig) {
        if (config == null) {
            config = RequestConfig.custom()
-                   .setConnectTimeout(httpConfig.getConnectTimeout())
-                   .setConnectionRequestTimeout(httpConfig.getConnectionRequestTimeout())
-                   .setSocketTimeout(httpConfig.getSocketTimeout())
+                   .setConnectTimeout(httpConfig.getConnectTimeout()) //设置连接超时时间
+                   .setConnectionRequestTimeout(15000) // 获取连接超时时间
+                   .setSocketTimeout(httpConfig.getSocketTimeout()) //请求超时时间
                    .build();
        }
     }
@@ -54,61 +52,40 @@ public class HttpUtils {
         String content = param.getBody();
 
         if (config == null) {
-            throw new EasyHttpException("request configuration is null");
+            throw new EasyHttpException("HttpClient request configuration is null");
         }
         if (method == null) {
-            throw new EasyHttpException("request method is not supported");
+            throw new EasyHttpException("HttpClient request method is not supported");
         }
 
+        List<BasicNameValuePair> queryParams = new ArrayList<>();
         HttpResponse result = new HttpResponse();
         if (params != null && params.size() > 0) {
-            List<BasicNameValuePair> paramList = new ArrayList<>();
-            params.forEach((k,v)-> paramList.add(new BasicNameValuePair(k, v)));
-
-           try {
-               String urlParam = EntityUtils.toString(new UrlEncodedFormEntity(paramList, Consts.UTF_8));
-               if (url.contains("?")) {
-                   url = url + "&" + urlParam;
-               }else {
-                   url = url + "?" + urlParam;
-               }
-           }catch (IOException e) {
-               result.setMessage("param setting error:" + e.getMessage());
-               return result;
-           }
-
+            params.forEach((k,v)-> queryParams.add(new BasicNameValuePair(k, v)));
         }
         HttpUriRequest request;
-
         switch (method) {
 
             case GET:
-                HttpGet httpGet = new HttpGet(url);
+                HttpGet httpGet = new HttpGet(convertUrl(url,queryParams));
                 httpGet.setConfig(config);
                 request = httpGet;
                 break;
             case POST:
-                HttpPost httpPost = new HttpPost(url);
-                if (content != null) {
-                    StringEntity stringEntity = new StringEntity(content, Consts.UTF_8);
-                    stringEntity.setContentType(param.getContentType());
-                    httpPost.setEntity(stringEntity);
-                }
+                HttpPost httpPost = new HttpPost(convertUrl(url, queryParams, param.getContentType()));
+                httpPost.setEntity(genEntity(queryParams,content,param.getContentType()));
                 httpPost.setConfig(config);
                 request = httpPost;
+
                 break;
             case PUT:
-                HttpPut httpPut = new HttpPut(url);
-                if (content != null) {
-                    StringEntity stringEntity = new StringEntity(content,Consts.UTF_8);
-                    stringEntity.setContentType(param.getContentType());
-                    httpPut.setEntity(stringEntity);
-                }
+                HttpPut httpPut = new HttpPut(convertUrl(url, queryParams, param.getContentType()));
+                httpPut.setEntity(genEntity(queryParams,content,param.getContentType()));
                 httpPut.setConfig(config);
                 request = httpPut;
                 break;
             case DELETE:
-                HttpDelete httpDelete = new HttpDelete(url);
+                HttpDelete httpDelete = new HttpDelete(convertUrl(url,queryParams));
                 httpDelete.setConfig(config);
                 request = httpDelete;
                 break;
@@ -139,5 +116,60 @@ public class HttpUtils {
 
         return result;
 
+    }
+
+    /**
+     * 转化url
+     * @param url 原url
+     * @param queryParams 待拼接参数
+     * @return String
+     */
+    private static String convertUrl(String url,  List<BasicNameValuePair> queryParams) {
+        if (CollectionUtils.isEmpty(queryParams)) {
+            return url;
+        }
+        try {
+            String urlParam = EntityUtils.toString(new UrlEncodedFormEntity(queryParams, Consts.UTF_8));
+            if (url.contains("?")) {
+                url = url + "&" + urlParam;
+            }else {
+                url = url + "?" + urlParam;
+            }
+            return url;
+        }catch (IOException e) {
+            return url;
+        }
+    }
+
+    /**
+     * 转化url
+     * @param url 原url
+     * @param queryParams 待拼接参数
+     * @param contentType contentType
+     * @return String
+     */
+    private static String convertUrl(String url,  List<BasicNameValuePair> queryParams, String contentType) {
+        if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
+            return url;
+        }
+        return convertUrl(url, queryParams);
+    }
+    /**
+     * 生成Entity
+     * @param contentType contentType
+     * @param queryParams 请求参数
+     * @param content 请求体字符串
+     * @return HttpEntity
+     */
+    private static HttpEntity genEntity(List<BasicNameValuePair> queryParams, String content,String contentType) {
+        if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
+           return new UrlEncodedFormEntity(queryParams, Consts.UTF_8);
+        }
+        if (content != null) {
+            StringEntity stringEntity = new StringEntity(content, Consts.UTF_8);
+            stringEntity.setContentType(contentType);
+            return stringEntity;
+        }
+        return null;
     }
 }

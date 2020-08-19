@@ -42,7 +42,7 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
 
         MethodParser methodParser = new MethodParser(method);
         List<ArgParser> argParsers = new ArrayList<>();
-        for (int i = 0; i < args.length; i++) {
+        for (int i = 0; args!=null && i < args.length; i++) {
             argParsers.add(new ArgParser(args[i],method, i));
         }
         RequestHandler requestHandler = new RequestHandler();
