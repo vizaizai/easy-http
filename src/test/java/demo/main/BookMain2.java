@@ -1,17 +1,13 @@
 package demo.main;
 
 
-import com.github.firelcw.client.EasyHttp;
+import com.github.firelcw.EasyHttp;
 import com.github.firelcw.interceptor.TimeInterceptor;
 import demo.interceptor.ResultInterceptor;
-import demo.model.ApiResult;
 import demo.model.Book;
-import demo.service.BookHttpService;
 import demo.service.BookHttpService2;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author liaochongwei

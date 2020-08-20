@@ -1,7 +1,7 @@
 package com.github.firelcw.interceptor;
 
 
-import com.github.firelcw.exception.EasyHttpException;
+import com.github.firelcw.exception.CodeStatusException;
 import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ErrorInterceptor implements HttpInterceptor{
 
-
     private static final Logger log = LoggerFactory.getLogger(ErrorInterceptor.class);
     @Override
     public boolean preHandle(HttpRequest request, HttpRequestConfig config) {
@@ -24,10 +23,13 @@ public class ErrorInterceptor implements HttpInterceptor{
 
     @Override
     public void postHandle(HttpRequest request, HttpResponse response) {
-        if (!response.isOk()) {
-            log.info("请求 => {}错误 ,状态码:{},原因:{}",request.getUrl(),response.getStatusCode(),response.getMessage());
-            throw new EasyHttpException("Http Request error");
+        if (response.isOk()) {
+            return;
         }
+        if (log.isErrorEnabled()) {
+            log.error("请求错误 => {}, 状态码:{}, 原因:{}",request.getUrl(),response.getStatusCode(),response.getMessage());
+        }
+        throw new CodeStatusException(response.getStatusCode(), response.getMessage());
     }
 
     @Override

@@ -7,14 +7,14 @@ package com.github.firelcw.model;
  */
 public class HttpRequestConfig {
     private Integer connectTimeout = 15000;
-    private Integer socketTimeout = 15000;
+    private Integer requestTimeout = 15000;
 
     public HttpRequestConfig() {
     }
 
-    public HttpRequestConfig(Integer connectTimeout, Integer socketTimeout) {
+    public HttpRequestConfig(Integer connectTimeout, Integer requestTimeout) {
         this.connectTimeout = connectTimeout;
-        this.socketTimeout = socketTimeout;
+        this.requestTimeout = requestTimeout;
     }
 
     public Integer getConnectTimeout() {
@@ -25,11 +25,11 @@ public class HttpRequestConfig {
         this.connectTimeout = connectTimeout;
     }
 
-    public Integer getSocketTimeout() {
-        return socketTimeout;
+    public Integer getRequestTimeout() {
+        return requestTimeout;
     }
 
-    public void setSocketTimeout(Integer socketTimeout) {
-        this.socketTimeout = socketTimeout;
+    public void setRequestTimeout(Integer requestTimeout) {
+        this.requestTimeout = requestTimeout;
     }
 }
