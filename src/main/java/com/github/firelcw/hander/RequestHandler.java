@@ -4,11 +4,12 @@ import com.github.firelcw.annotation.Body;
 import com.github.firelcw.annotation.Headers;
 import com.github.firelcw.annotation.Query;
 import com.github.firelcw.annotation.Var;
+import com.github.firelcw.client.ApacheHttpClient;
+import com.github.firelcw.client.AbstractClient;
 import com.github.firelcw.codec.Encoder;
+import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
-import com.github.firelcw.util.HttpUtils;
-import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.parser.ArgParser;
 import com.github.firelcw.parser.MethodParser;
 import org.apache.commons.collections.CollectionUtils;
@@ -47,12 +48,17 @@ public class RequestHandler {
      */
     private HttpRequestConfig config;
     /**
-     * 配置请求
+     * 请求客户端
+     */
+    private AbstractClient client;
+    /**
+     * 添加请求配置
      * @param config
      */
-    public void config(HttpRequestConfig config) {
+    public void addConfig(HttpRequestConfig config) {
         this.config = config;
-        HttpUtils.buildConfig(config);
+        // 默认ApacheHttpClient
+        client = ApacheHttpClient.getInstance(config);
     }
 
     private void initRequest() {
@@ -83,7 +89,7 @@ public class RequestHandler {
         if (this.request == null) {
             this.initRequest();
         }
-        return HttpUtils.request(this.request);
+        return client.request(this.request);
     }
 
 

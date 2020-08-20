@@ -46,7 +46,7 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
             argParsers.add(new ArgParser(args[i],method, i));
         }
         RequestHandler requestHandler = new RequestHandler();
-        requestHandler.config(requestConfig);
+        requestHandler.addConfig(requestConfig);
 
         requestHandler.setArgParsers(argParsers);
         requestHandler.setMethodParser(methodParser);

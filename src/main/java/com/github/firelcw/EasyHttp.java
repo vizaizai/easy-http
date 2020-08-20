@@ -1,4 +1,4 @@
-package com.github.firelcw.client;
+package com.github.firelcw;
 
 import com.github.firelcw.codec.Decoder;
 import com.github.firelcw.codec.DefaultDecoder;

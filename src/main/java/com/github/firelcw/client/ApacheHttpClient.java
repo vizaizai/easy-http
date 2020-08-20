@@ -1,4 +1,4 @@
-package com.github.firelcw.util;
+package com.github.firelcw.client;
 
 
 import com.github.firelcw.exception.EasyHttpException;
@@ -24,27 +24,40 @@ import java.util.Map;
  * @author liaochongwei
  * @date 2020/7/30 17:28
  */
-public class HttpUtils {
-    private static RequestConfig config;
+public class ApacheHttpClient extends AbstractClient {
+    private  RequestConfig config;
+    private final CloseableHttpClient httpClient;
 
-    private static final CloseableHttpClient httpClient;
-    static {
+    private ApacheHttpClient() {
         httpClient = HttpClientBuilder.create().build();
     }
-    private HttpUtils() {
+
+    public static ApacheHttpClient getInstance(HttpRequestConfig httpConfig) {
+        ApacheHttpClient instance = ClientInstance.INSTANCE;
+        instance.setConfig(httpConfig);
+        return instance;
+
     }
 
-    public static void buildConfig(HttpRequestConfig httpConfig) {
+    public static class ClientInstance {
+        private ClientInstance() {
+        }
+        private static final ApacheHttpClient INSTANCE = new ApacheHttpClient();
+    }
+
+
+    public void setConfig(HttpRequestConfig httpConfig) {
+       super.setConfig(httpConfig);
        if (config == null) {
            config = RequestConfig.custom()
                    .setConnectTimeout(httpConfig.getConnectTimeout()) //设置连接超时时间
                    .setConnectionRequestTimeout(15000) // 获取连接超时时间
-                   .setSocketTimeout(httpConfig.getSocketTimeout()) //请求超时时间
+                   .setSocketTimeout(httpConfig.getRequestTimeout()) //请求超时时间
                    .build();
        }
     }
 
-    public static HttpResponse request(HttpRequest param) {
+    public HttpResponse request(HttpRequest param) {
         HttpMethod method = param.getMethod();
         String url = param.getUrl();
         Map<String,String> headers = param.getHeaders();
@@ -117,6 +130,8 @@ public class HttpUtils {
         return result;
 
     }
+
+
 
     /**
      * 转化url
