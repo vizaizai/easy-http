@@ -4,7 +4,6 @@ import com.github.firelcw.annotation.Body;
 import com.github.firelcw.annotation.Headers;
 import com.github.firelcw.annotation.Query;
 import com.github.firelcw.annotation.Var;
-import com.github.firelcw.client.ApacheHttpClient;
 import com.github.firelcw.client.AbstractClient;
 import com.github.firelcw.codec.Encoder;
 import com.github.firelcw.model.HttpRequest;
@@ -55,10 +54,10 @@ public class RequestHandler {
      * 添加请求配置
      * @param config
      */
-    public void addConfig(HttpRequestConfig config) {
+    public void client(AbstractClient client, HttpRequestConfig config) {
         this.config = config;
-        // 默认ApacheHttpClient
-        client = ApacheHttpClient.getInstance(config);
+        this.client = client;
+        client.setConfig(config);
     }
 
     private void initRequest() {

@@ -1,5 +1,6 @@
 package com.github.firelcw.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class HttpRequest {
     }
 
     public Map<String, String> getHeaders() {
-        return headers;
+        return headers == null ? Collections.emptyMap() : headers;
     }
 
     public Map<String, String> getQueryParams() {

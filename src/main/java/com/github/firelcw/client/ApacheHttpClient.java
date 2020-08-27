@@ -25,17 +25,15 @@ import java.util.Map;
  * @date 2020/7/30 17:28
  */
 public class ApacheHttpClient extends AbstractClient {
-    private  RequestConfig config;
+    private RequestConfig config;
     private final CloseableHttpClient httpClient;
 
     private ApacheHttpClient() {
         httpClient = HttpClientBuilder.create().build();
     }
 
-    public static ApacheHttpClient getInstance(HttpRequestConfig httpConfig) {
-        ApacheHttpClient instance = ClientInstance.INSTANCE;
-        instance.setConfig(httpConfig);
-        return instance;
+    public static ApacheHttpClient getInstance() {
+        return ClientInstance.INSTANCE;
 
     }
 
@@ -121,6 +119,7 @@ public class ApacheHttpClient extends AbstractClient {
             String ret = EntityUtils.toString(httpEntity);
             result.setBody(ret);
             result.setStatusCode(response.getStatusLine().getStatusCode());
+            result.setContentLength(response.getEntity().getContentLength());
             result.setMessage(response.getStatusLine().getReasonPhrase());
         } catch (IOException e) {
             result.setMessage("request error:"+e.getMessage());

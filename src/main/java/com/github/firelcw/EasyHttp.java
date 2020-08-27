@@ -1,5 +1,7 @@
 package com.github.firelcw;
 
+import com.github.firelcw.client.AbstractClient;
+import com.github.firelcw.client.ApacheHttpClient;
 import com.github.firelcw.codec.Decoder;
 import com.github.firelcw.codec.DefaultDecoder;
 import com.github.firelcw.codec.DefaultEncoder;
@@ -23,6 +25,7 @@ public class EasyHttp {
         return new Builder();
     }
     public static class Builder {
+        private AbstractClient client;
         private HttpRequestConfig config;
         private Decoder decoder;
         private Encoder encoder;
@@ -30,10 +33,15 @@ public class EasyHttp {
         private final List<HttpInterceptor> interceptors;
 
         public Builder() {
+            this.client = ApacheHttpClient.getInstance();
             this.encoder = new DefaultEncoder();
             this.decoder = new DefaultDecoder();
-            this.config = new HttpRequestConfig();
+            this.config =  HttpRequestConfig.defaultConfig();
             this.interceptors = new ArrayList<>();
+        }
+        public Builder client(AbstractClient client) {
+            this.client = client;
+            return this;
         }
         public Builder decoder(Decoder decoder) {
             this.decoder = decoder;
@@ -61,6 +69,7 @@ public class EasyHttp {
 
         public <T> T build(Class<T> clazz) {
             HttpInvocationHandler<T> invocationHandler = new HttpInvocationHandler<>(clazz);
+            invocationHandler.client(client);
             invocationHandler.url(url);
             invocationHandler.decoder(decoder);
             invocationHandler.encoder(encoder);
