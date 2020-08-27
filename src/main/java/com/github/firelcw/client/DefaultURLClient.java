@@ -106,15 +106,11 @@ public class DefaultURLClient extends AbstractClient{
     /**
      * 添加默认
      * @param request
-     * @param entity
      */
     private void addDefaultHeaders(HttpRequest request) {
 
         if (request.getContentType() != null) {
             request.addHeader(CONTENT_TYPE, request.getContentType());
-        }
-        if (request.getHeaders().get(CONTENT_ENCODING) == null) {
-            request.addHeader(CONTENT_ENCODING, ENCODING_GZIP);
         }
         if (request.getHeaders().get(ACCEPT) == null) {
             request.addHeader(ACCEPT,"*/*");
