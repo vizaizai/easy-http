@@ -19,9 +19,9 @@ import java.lang.reflect.Method;
 public class ArgParser {
 
     /**
-     * 目标参数
+     * 参数源
      */
-    private Object target;
+    private Object source;
     /**
      * 参数类型
      */
@@ -43,12 +43,12 @@ public class ArgParser {
      */
     private String type;
     /**
-     * 路径变量名
+     * 变量名
      */
     private String varName;
 
-    public ArgParser(Object target, Method method, int index) {
-        this.target = target;
+    public ArgParser(Object source, Method method, int index) {
+        this.source = source;
         this.method = method;
         this.index = index;
         this.parse();
@@ -56,8 +56,8 @@ public class ArgParser {
 
     private void parse() {
 
-        // 判断参数时简单参数还是复合参数
-        Class<?> argClazz = target.getClass();
+        // 判断参数时简单参数还是对象参数
+        Class<?> argClazz = source.getClass();
         this.argClass =  argClazz;
         // 是否为简单参数
         this.isSimple = TypeUtils.isSimple(argClazz.getTypeName());
@@ -75,6 +75,7 @@ public class ArgParser {
                 this.varName = ((Var) annotation).value();
                 this.type = Var.TYPE;
             }else if (annotation instanceof Query) {
+                this.varName = ((Query) annotation).value();
                 this.type = Query.TYPE;
             }else if (annotation instanceof Body) {
                 this.type = Body.TYPE;
@@ -85,14 +86,15 @@ public class ArgParser {
             }
         }
 
-        // 规则校验1: 简单参数只能用@Var
-        if (this.isSimple && !this.type.equals(Var.TYPE)) {
-            throw new EasyHttpException("You can only use @var for simple argument");
+        // 规则校验1: @Var只能注解在简单类型上
+        if (Var.TYPE.equals(this.type) && !this.isSimple) {
+            throw new EasyHttpException("@var only can annotate on a simple argument");
         }
-        // 贵州校验2： 复杂参数不能使用@Var
-        if (!this.isSimple && this.type.equals(Var.TYPE)) {
-            throw new EasyHttpException("You can't use @var for complex argument");
+        // 规则校验2: @Headers只能注解在复杂类型上
+        if (Headers.TYPE.equals(this.type) && this.isSimple) {
+            throw new EasyHttpException("@Headers only can annotate on a complex argument");
         }
+
     }
 
     /**
@@ -106,12 +108,12 @@ public class ArgParser {
         }
         return parameterAnnotations[index];
     }
-    public Object getTarget() {
-        return target;
+    public Object getSource() {
+        return source;
     }
 
-    public void setTarget(Object target) {
-        this.target = target;
+    public void setSource(Object source) {
+        this.source = source;
     }
 
     public Class<?> getArgClass() {

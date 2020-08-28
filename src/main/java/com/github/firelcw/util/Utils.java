@@ -1,8 +1,9 @@
 package com.github.firelcw.util;
 
-import com.github.firelcw.exception.EasyHttpException;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URLEncoder;
@@ -48,6 +49,12 @@ public class Utils {
 
     private static final int BUF_SIZE = 0x800; // 2K chars (4K bytes)
 
+    public static final String PLACEHOLDER_PREFIX = "{";
+    public static final String PLACEHOLDER_SUFFIX = "}";
+
+
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+
 
 
     public static String asUrlEncoded(Map<String, String> source) {
@@ -72,19 +79,22 @@ public class Utils {
             if (StringUtils.isBlank(value)){
                 continue;
             }
-            try {
-                // URL 编码
-                if (encode != null)
-                    value = URLEncoder.encode(value, encode);
-            } catch (UnsupportedEncodingException e) {
-                throw new EasyHttpException("URLEncoder error");
+            if (encode != null) {
+                urlEncode(value,encode);
             }
-
             sb.append("&").append(key).append("=").append(value);
         }
         return sb.substring(1);
     }
 
+    public static String urlEncode(String source, String encode) {
+        try {
+            return URLEncoder.encode(source, encode);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("URL encode error: {}", e.getMessage());
+            return source;
+        }
+    }
 
     public static void ensureClosed(Closeable closeable) {
         if (closeable != null) {
@@ -115,4 +125,38 @@ public class Utils {
         }
     }
 
+    /**
+     * 格式化占位符
+     * /books?name={name}&author={author}
+     * @param source
+     * @param params
+     * @return
+     */
+    public static String formatPlaceholder(String source, Map<String,String> params) {
+        if (MapUtils.isEmpty(params)) {
+            return source;
+        }
+        StringBuilder buf = new StringBuilder(source);
+        int startIndex = buf.indexOf(PLACEHOLDER_PREFIX);
+        while (startIndex != -1) {
+            int endIndex = buf.indexOf(PLACEHOLDER_SUFFIX, startIndex + PLACEHOLDER_PREFIX.length());
+            if (endIndex != -1) {
+                String placeholder = buf.substring(startIndex + PLACEHOLDER_PREFIX.length(), endIndex);
+                int nextIndex = endIndex + PLACEHOLDER_SUFFIX.length();
+
+                String propVal = params.get(placeholder);
+                if (propVal != null) {
+                    buf.replace(startIndex, endIndex + PLACEHOLDER_SUFFIX.length(), propVal);
+                    nextIndex = startIndex + propVal.length();
+                } else {
+                    logger.warn("Could not resolve placeholder {} in [{}]", placeholder, source);
+                }
+                startIndex = buf.indexOf(PLACEHOLDER_PREFIX, nextIndex);
+            } else {
+                startIndex = -1;
+            }
+        }
+        return buf.toString();
+
+    }
 }

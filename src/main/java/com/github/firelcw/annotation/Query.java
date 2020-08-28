@@ -8,4 +8,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface Query {
     String TYPE = "query";
+    // 查询参数名
+    String value() default "";
 }

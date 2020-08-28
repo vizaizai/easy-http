@@ -24,7 +24,8 @@ public class BookMain {
         //main.getBookById();
          //main.listBooksByAuthor1();
         // main.listBooksByAuthor2();
-        main.addBook();
+        //main.addBook();
+        main.listBooks();
     }
 
     void getBookById() {
@@ -77,6 +78,18 @@ public class BookMain {
 
         System.out.println(1);
 
+    }
+
+    void listBooks() {
+        BookHttpService bookHttpService = EasyHttp.builder()
+                .url("127.0.0.1:8888")
+                .build(BookHttpService.class);
+//        Book book = new Book();
+//        book.setId("123443");
+//        book.setName("name");
+//        book.setAuthor("author");
+        ApiResult<List<Book>> listApiResult = bookHttpService.listBooks();
+        System.out.println(listApiResult.getData().get(0).getName());
     }
 
     void deleteBookById(){
