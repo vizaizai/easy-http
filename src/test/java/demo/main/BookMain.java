@@ -3,6 +3,7 @@ package demo.main;
 
 
 import com.github.firelcw.EasyHttp;
+import com.github.firelcw.client.ApacheHttpClient;
 import com.github.firelcw.interceptor.ErrorInterceptor;
 import com.github.firelcw.interceptor.TimeInterceptor;
 import demo.model.ApiResult;
@@ -21,9 +22,10 @@ public class BookMain {
     public static void main(String[] args) {
         BookMain main = new BookMain();
         //main.getBookById();
-        // main.listBooksByAuthor1();
+         //main.listBooksByAuthor1();
         // main.listBooksByAuthor2();
-         main.addBook();
+        //main.addBook();
+        main.listBooks();
     }
 
     void getBookById() {
@@ -39,6 +41,7 @@ public class BookMain {
 
     void listBooksByAuthor1(){
         BookHttpService bookHttpService = EasyHttp.builder()
+                .client(ApacheHttpClient.getInstance())
                 .url("127.0.0.1:8888")
                 .build(BookHttpService.class);
         Map<String, String> params = new HashMap<>();
@@ -48,6 +51,7 @@ public class BookMain {
         Book book = new Book();
         book.setName("name");
         book.setAuthor("author");
+
         ApiResult<List<Book>> listApiResult = bookHttpService.listBooksByAuthor(params,book);
         System.out.println(listApiResult.getData().get(1).getName());
     }
@@ -74,6 +78,18 @@ public class BookMain {
 
         System.out.println(1);
 
+    }
+
+    void listBooks() {
+        BookHttpService bookHttpService = EasyHttp.builder()
+                .url("127.0.0.1:8888")
+                .build(BookHttpService.class);
+//        Book book = new Book();
+//        book.setId("123443");
+//        book.setName("name");
+//        book.setAuthor("author");
+        ApiResult<List<Book>> listApiResult = bookHttpService.listBooks();
+        System.out.println(listApiResult.getData().get(0).getName());
     }
 
     void deleteBookById(){

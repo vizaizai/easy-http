@@ -1,6 +1,7 @@
 package com.github.firelcw.proxy;
 
 
+import com.github.firelcw.client.AbstractClient;
 import com.github.firelcw.codec.Decoder;
 import com.github.firelcw.codec.Encoder;
 import com.github.firelcw.hander.HttpHandler;
@@ -23,6 +24,7 @@ import java.util.List;
 public class HttpInvocationHandler<T> implements InvocationHandler {
 
     private final Class<T> targetClazz;
+    private AbstractClient client;
     private String url;
     private Encoder encoder;
     private Decoder decoder;
@@ -46,7 +48,7 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
             argParsers.add(new ArgParser(args[i],method, i));
         }
         RequestHandler requestHandler = new RequestHandler();
-        requestHandler.addConfig(requestConfig);
+        requestHandler.client(client, requestConfig);
 
         requestHandler.setArgParsers(argParsers);
         requestHandler.setMethodParser(methodParser);
@@ -58,7 +60,10 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
 
         return httpHandler.handle(requestHandler,decoder, method.getGenericReturnType());
     }
-
+    public HttpInvocationHandler<T> client(AbstractClient client) {
+        this.client = client;
+        return this;
+    }
     public HttpInvocationHandler<T> url(String url) {
         this.url = url;
         return this;

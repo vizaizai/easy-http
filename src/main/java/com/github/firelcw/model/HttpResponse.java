@@ -16,6 +16,10 @@ public class HttpResponse {
      */
     private int statusCode = -1;
     /**
+     * 响应大小
+     */
+    private long contentLength;
+    /**
      * 消息
      */
     private String message;
@@ -46,5 +50,13 @@ public class HttpResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public long getContentLength() {
+        return contentLength;
+    }
+
+    public void setContentLength(long contentLength) {
+        this.contentLength = contentLength;
     }
 }

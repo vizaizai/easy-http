@@ -27,7 +27,12 @@ public class DefaultEncoder implements Encoder {
         }else {
             map = new BeanMap(object);
         }
-        map.forEach((k, v)-> result.put(k.toString(), v.toString()));
+        map.forEach((k, v)-> {
+            String key = k.toString();
+            if (v != null && !key.equals("class")) {
+                result.put(key, v.toString());
+            }
+        });
         return result;
     }
 

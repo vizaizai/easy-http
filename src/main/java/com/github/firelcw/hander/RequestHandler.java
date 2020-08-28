@@ -4,7 +4,6 @@ import com.github.firelcw.annotation.Body;
 import com.github.firelcw.annotation.Headers;
 import com.github.firelcw.annotation.Query;
 import com.github.firelcw.annotation.Var;
-import com.github.firelcw.client.ApacheHttpClient;
 import com.github.firelcw.client.AbstractClient;
 import com.github.firelcw.codec.Encoder;
 import com.github.firelcw.model.HttpRequest;
@@ -12,9 +11,13 @@ import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 import com.github.firelcw.parser.ArgParser;
 import com.github.firelcw.parser.MethodParser;
+import com.github.firelcw.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 请求处理器
@@ -55,10 +58,10 @@ public class RequestHandler {
      * 添加请求配置
      * @param config
      */
-    public void addConfig(HttpRequestConfig config) {
+    public void client(AbstractClient client, HttpRequestConfig config) {
         this.config = config;
-        // 默认ApacheHttpClient
-        client = ApacheHttpClient.getInstance(config);
+        this.client = client;
+        client.setConfig(config);
     }
 
     private void initRequest() {
@@ -98,13 +101,16 @@ public class RequestHandler {
      */
     private void handlePath() {
         String path = this.methodParser.getPath();
+        Map<String,String> pathParams = new HashMap<>();
         for (ArgParser argParser : this.argParsers) {
             // var替换路径
             if (Var.TYPE.equals(argParser.getType()) && this.methodParser.getVarCount() > 0) {
-                path = this.replacePath(path, argParser.getVarName(),argParser.getTarget().toString());
+                String key = Utils.urlEncode(argParser.getVarName(),Utils.UTF_8.name());
+                String value = Utils.urlEncode(argParser.getSource().toString(),Utils.UTF_8.name());
+                pathParams.put(key,value);
             }
         }
-        this.request.setUrl(this.url + path);
+        this.request.setUrl(this.url + Utils.formatPlaceholder(path,pathParams));
     }
 
     /**
@@ -112,9 +118,15 @@ public class RequestHandler {
      */
     private void handleQuery() {
         for (ArgParser argParser : this.argParsers) {
-            if (Query.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
-                this.request.addQueryParams(encoder.encodeMap(argParser.getTarget()));
-                return;
+            if(Query.TYPE.equals(argParser.getType())) {
+                if (argParser.isSimple() && StringUtils.isBlank(argParser.getVarName())) {
+                   throw new IllegalArgumentException("The value of @Query is empty");
+                }
+                if (argParser.isSimple()) {
+                    this.request.addQueryParam(argParser.getVarName(), argParser.getSource().toString());
+                }else {
+                    this.request.addQueryParams(encoder.encodeMap(argParser.getSource()));
+                }
             }
         }
     }
@@ -124,8 +136,12 @@ public class RequestHandler {
      */
     private void handleBody() {
         for (ArgParser argParser : this.argParsers) {
-            if (Body.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
-                this.request.setBody(encoder.encodeString(argParser.getTarget()));
+            if (Body.TYPE.equals(argParser.getType())) {
+                if (argParser.isSimple()) {
+                    this.request.setBody(argParser.getSource().toString());
+                }else {
+                    this.request.setBody(encoder.encodeString(argParser.getSource()));
+                }
                 return;
             }
         }
@@ -137,7 +153,7 @@ public class RequestHandler {
     private void handleHeaders() {
         for (ArgParser argParser : this.argParsers) {
             if (Headers.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
-                this.request.addHeaders(encoder.encodeMap(argParser.getTarget()));
+                this.request.addHeaders(encoder.encodeMap(argParser.getSource()));
                 return;
             }
         }
@@ -151,32 +167,23 @@ public class RequestHandler {
         if (this.methodParser == null) {
             throw new IllegalArgumentException("The method is null");
         }
-
         if (this.encoder == null) {
             throw new IllegalArgumentException("no default encoder");
         }
-        // 1. 只能包含一个@Query
-        // 2. 只能包含一个@Body
-        // 3. 只能包含一个@Headers
+        // 1. 只能包含一个@Body
+        // 2. 只能包含一个@Headers
         int has1 = 0;
         int has2 = 0;
-        int has3 = 0;
         for (ArgParser argParser : this.argParsers) {
-            if (Query.TYPE.equals(argParser.getType())) {
+            if (Body.TYPE.equals(argParser.getType())) {
                 has1 ++;
                 if (has1 > 1) {
-                    throw new IllegalArgumentException("Only one @Query can be included");
-                }
-            }
-            if (Body.TYPE.equals(argParser.getType())) {
-                has2 ++;
-                if (has2 > 1) {
                     throw new IllegalArgumentException("Only one @Body can be included");
                 }
             }
             if (Headers.TYPE.equals(argParser.getType())) {
-                has3 ++;
-                if (has3 > 1) {
+                has2 ++;
+                if (has2 > 1) {
                     throw new IllegalArgumentException("Only one @Headers can be included");
                 }
             }
@@ -189,9 +196,7 @@ public class RequestHandler {
             url = "http://" + url;
         }
     }
-    private String replacePath(String path, String varName, String varValue) {
-        return path.replace("{" + varName + "}", varValue);
-    }
+
 
     public String getUrl() {
         return url;

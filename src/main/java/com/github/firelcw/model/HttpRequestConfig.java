@@ -6,10 +6,17 @@ package com.github.firelcw.model;
  * @date 2020/7/31 12:43
  */
 public class HttpRequestConfig {
-    private Integer connectTimeout = 15000;
-    private Integer requestTimeout = 15000;
+    private Integer connectTimeout;
+    private Integer requestTimeout;
 
     public HttpRequestConfig() {
+    }
+
+    public static HttpRequestConfig defaultConfig() {
+        HttpRequestConfig config = new HttpRequestConfig();
+        config.setConnectTimeout(15000);
+        config.setRequestTimeout(30000);
+        return config;
     }
 
     public HttpRequestConfig(Integer connectTimeout, Integer requestTimeout) {

@@ -15,7 +15,7 @@ public interface Encoder {
      Map<String,String> encodeMap(Object object);
 
     /**
-     * 将对象转化成string，用于编码 @Body注解的对象（默认是解析成json字符串）
+     * 将对象转化成string（如果参数类型本身为简单类型，则直接转化成string），用于编码 @Body注解的对象（默认是解析成json字符串）
      * @param object 待编码对象
      * @return string
      */
