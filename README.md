@@ -8,8 +8,11 @@
 
    + 注解简单： 遵循大家的命名习惯，@Body、@Query、@Var等注解见名之意。
    + 无侵入： 接口不需要继承。
+   + 多客户端实现: 底层支持多种客户端，默认已实现Java原生URL和HttpClient，也可以自己实现。
    + 支持自定义编解码：默认已经内置了JSON编解码(返回参数支持泛型)，如需支持xml，可自定义。
    + 支持自定义拦截器：请求前，和请求后的拦截。拦截器可满足大部分业务需求，如：计算请求耗时，动态添加公共请求头，返回错误统一处理等等。
+   + 提供spring-boot版本，使用更简单。
+   + 未实现：规划实现异步请求、响应式模式、以及Java11的客户端。
 
 ##### 2. 安装
 
@@ -61,19 +64,20 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/firelcw/eas
 
    + @Query
 
-     被注解的参数是复杂类型，是参数的model或者map，因为它生成的是查询参数，会拼接到路径后面。缺省默认为查询参数。
+     被注解的参数可以是任意类型，如果被注解的参数是简单类型，那么必须指定value(查询参数的key)。当一个参数没有任何注解时默认为查询参数。
 
      ``` java
      @Get("/books")
+     ApiResult<List<Book>> listBooksByAuthor(@Query("author") String author);
+     @Get("/books")
      ApiResult<List<Book>> listBooksByAuthor(@Query Map<String, String> params);
-     // 和上面效果一样
      @Get("/books")
      ApiResult<List<Book>> listBooksByAuthor(Map<String, String> params);
      ```
 
    + @Body
 
-     body参数，被注解的参数会根据编码器处理放到请求body里面。
+     body参数，被注解的参数会根据编码器处理放到请求body里面, 如果被注解的参数是简单类型，则不会进行编码。
 
      ``` java
      @Post("/books")
@@ -82,9 +86,10 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/firelcw/eas
 
    + @Headers
 
-     被注解的参数为请求头。
+     请求头注解，可用于接口、方法和方法参数上，当用于接口和方法需指定value, 格式key:  value (冒号后面有和空格)
 
      ``` java
+      @Headers({"clent: Easy-http"})
       @Post("/books")
       ApiResult<Void> addBook(@Body Book book,  @Headers Map<String, String> headers);
      ```
@@ -210,8 +215,16 @@ public class ResultInterceptor implements HttpInterceptor {
                                                     .withInterceptor(new TimeInterceptor())
                                                     .build(BookHttpService.class);
 ```
+7. 切换客户端
 
+   ```java
+    EasyHttp.builder()
+            .url("127.0.0.1:8888")
+            .client(ApacheHttpClient.getInstance())
+            .build(BookHttpService.class);
+   ```
 
+   
 
 #### 联系作者
 

@@ -2,6 +2,7 @@ package demo.main;
 
 
 import com.github.firelcw.EasyHttp;
+import com.github.firelcw.client.ApacheHttpClient;
 import com.github.firelcw.client.DefaultURLClient;
 import com.github.firelcw.interceptor.ErrorInterceptor;
 import com.github.firelcw.interceptor.TimeInterceptor;
@@ -28,7 +29,7 @@ public class BookServiceTest {
     public void init() {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
-                                    .client(DefaultURLClient.getInstance())
+                                    .client(ApacheHttpClient.getInstance())
                                     .withInterceptor(new TimeInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .build(BookHttpService.class);
