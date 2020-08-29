@@ -3,9 +3,11 @@ package com.github.firelcw.annotation;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.PARAMETER})
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Headers {
     String TYPE = "headers";
+    // 请求头
+    String[] value() default {};
 }

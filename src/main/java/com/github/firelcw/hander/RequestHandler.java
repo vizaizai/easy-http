@@ -10,6 +10,7 @@ import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 import com.github.firelcw.parser.ArgParser;
+import com.github.firelcw.parser.InterfaceParser;
 import com.github.firelcw.parser.MethodParser;
 import com.github.firelcw.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
@@ -29,6 +30,10 @@ public class RequestHandler {
      * 请求基本路径
      */
     private String url;
+    /**
+     * 接口解析器
+     */
+    private InterfaceParser interfaceParser;
     /**
      * 方法解析器
      */
@@ -67,23 +72,31 @@ public class RequestHandler {
     private void initRequest() {
         // 校验方法参数
         this.checkArgs();
+
         // 处理http://
         this.handleUrl();
         this.request = new HttpRequest();
+
         // 设置请求方式
         this.request.setMethod(methodParser.getHttpMethod());
+
         // 设置ContentType
         this.request.setContentType(methodParser.getContentType());
+
         // 处理请求路径
         this.handlePath();
+
+        // 处理请求headers
+        this.handleHeaders();
+
         // 参数解析列表不为空，则需要解析方法参数
         if (CollectionUtils.isNotEmpty(argParsers)) {
             // 处理请求query参数
             this.handleQuery();
+
             // 处理请求body参数
             this.handleBody();
-            // 处理请求headers
-            this.handleHeaders();
+
 
         }
     }
@@ -151,6 +164,16 @@ public class RequestHandler {
      * 处理headers
      */
     private void handleHeaders() {
+        // 添加接口级别的headers
+        this.request.addHeaders(this.interfaceParser.getHeaders());
+
+        // 添加方法级别的headers
+        this.request.addHeaders(this.methodParser.getHeaders());
+
+        if (CollectionUtils.isEmpty(argParsers)) {
+            return;
+        }
+        // 参数级别的headers
         for (ArgParser argParser : this.argParsers) {
             if (Headers.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
                 this.request.addHeaders(encoder.encodeMap(argParser.getSource()));
@@ -239,5 +262,13 @@ public class RequestHandler {
 
     public HttpRequestConfig getConfig() {
         return config;
+    }
+
+    public InterfaceParser getInterfaceParser() {
+        return interfaceParser;
+    }
+
+    public void setInterfaceParser(InterfaceParser interfaceParser) {
+        this.interfaceParser = interfaceParser;
     }
 }

@@ -12,6 +12,9 @@ public class TypeUtils {
             new String[] {"integer","short", "byte","long","char",
                     "float", "double","boolean","string", "void"};
 
+    private static final String CLASS_PREFIX = "java.lang.";
+    private static final int CLASS_PREFIX_INDEX = 9;
+
     private TypeUtils() {
     }
 
@@ -23,7 +26,9 @@ public class TypeUtils {
      */
     public static String getType(String typeName) {
         String typeLower = typeName.toLowerCase();
-        return Stream.of(SIMPLE_TYPES).filter(typeLower::contains).findFirst().orElse(null);
+        return Stream.of(SIMPLE_TYPES)
+                     .filter(typeLower::contains)
+                     .findFirst().orElse(null);
     }
     /**
      * 是否为简单参数
@@ -32,7 +37,12 @@ public class TypeUtils {
      */
     public static boolean isSimple(String typeName) {
         String typeLower = typeName.toLowerCase();
-        return Stream.of(SIMPLE_TYPES).anyMatch(typeLower::contains);
+        return Stream.of(SIMPLE_TYPES).anyMatch(e->{
+            if (typeLower.startsWith(CLASS_PREFIX)) {
+                return typeLower.substring(CLASS_PREFIX_INDEX).contains(e);
+            }
+            return e.equals(typeLower);
+        });
     }
 
     /**
