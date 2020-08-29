@@ -9,6 +9,7 @@ import com.github.firelcw.interceptor.HttpInterceptor;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.hander.RequestHandler;
 import com.github.firelcw.parser.ArgParser;
+import com.github.firelcw.parser.InterfaceParser;
 import com.github.firelcw.parser.MethodParser;
 
 import java.lang.reflect.InvocationHandler;
@@ -50,6 +51,7 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
         RequestHandler requestHandler = new RequestHandler();
         requestHandler.client(client, requestConfig);
 
+        requestHandler.setInterfaceParser(new InterfaceParser(this.targetClazz));
         requestHandler.setArgParsers(argParsers);
         requestHandler.setMethodParser(methodParser);
         requestHandler.setUrl(url);

@@ -44,10 +44,9 @@ public class HttpRequest {
 
     public void addHeaders(Map<String, String> headers) {
         if (this.headers == null) {
-            this.headers = headers;
-        }else {
-            this.headers.putAll(headers);
+            this.headers = new HashMap<>();
         }
+        this.headers.putAll(headers);
     }
 
     public void addQueryParam(String key, String value) {
@@ -59,10 +58,9 @@ public class HttpRequest {
 
     public void addQueryParams(Map<String, String> query) {
         if (this.params == null) {
-            this.params = query;
-        }else {
-            this.params.putAll(query);
+            this.params = new HashMap<>();
         }
+        this.params.putAll(query);
     }
 
     public Map<String, String> getHeaders() {

@@ -1,17 +1,21 @@
 package com.github.firelcw.util;
 
+import com.github.firelcw.annotation.Headers;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.annotation.Annotation;
 import java.net.URLEncoder;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author liaochongwei
@@ -52,6 +56,8 @@ public class Utils {
     public static final String PLACEHOLDER_PREFIX = "{";
     public static final String PLACEHOLDER_SUFFIX = "}";
 
+    public static final String COLON = ":";
+
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
@@ -80,7 +86,7 @@ public class Utils {
                 continue;
             }
             if (encode != null) {
-                urlEncode(value,encode);
+                value = urlEncode(value,encode);
             }
             sb.append("&").append(key).append("=").append(value);
         }
@@ -159,4 +165,36 @@ public class Utils {
         return buf.toString();
 
     }
+
+
+    /**
+     * 从@Headers获取请求头
+     * @param annotations
+     * @return  Map<String,String>
+     */
+    public static Map<String,String> getHeaders(Annotation[] annotations) {
+        if (annotations == null || annotations.length == 0) {
+            return null;
+        }
+        return Stream.of(annotations)
+                     .filter(e -> e instanceof Headers)
+                     .flatMap(e -> {
+                         String[] values = ((Headers) e).value();
+                         return Stream.of(values);
+                     })
+                     .map(Utils::genKeyValue)
+                     .collect(Collectors.toMap(e->e[0], e->e[1]));
+    }
+
+    private static String[] genKeyValue(String header) {
+        String[] split = header.split(COLON+" ");
+        if (split.length != 2 ) {
+            logger.error("Formatting error: {}", header);
+            throw new IllegalArgumentException("Formatting error");
+        }
+        split[0] = split[0].trim();
+        split[1] = split[1].trim();
+        return split;
+    }
+
 }

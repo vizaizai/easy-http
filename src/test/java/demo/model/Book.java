@@ -1,5 +1,7 @@
 package demo.model;
 
+import java.math.BigDecimal;
+
 /**
  * @author liaochongwei
  * @date 2020/8/3 10:28
@@ -8,11 +10,13 @@ public class Book {
 
     private String id;
 
+    private BigDecimal price;
+
     private String name;
 
     private String author;
 
-    private String des;
+    private String description;
 
     public String getId() {
         return id;
@@ -20,6 +24,14 @@ public class Book {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public String getName() {
@@ -38,11 +50,22 @@ public class Book {
         this.author = author;
     }
 
-    public String getDes() {
-        return des;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDes(String des) {
-        this.des = des;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id='" + id + '\'' +
+                ", price=" + price +
+                ", name='" + name + '\'' +
+                ", author='" + author + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

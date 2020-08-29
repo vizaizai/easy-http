@@ -1,16 +1,19 @@
 package com.github.firelcw.parser;
 
-import com.github.firelcw.annotation.Delete;
-import com.github.firelcw.annotation.Get;
-import com.github.firelcw.annotation.Post;
-import com.github.firelcw.annotation.Put;
+import com.github.firelcw.annotation.*;
 import com.github.firelcw.exception.EasyHttpException;
 import com.github.firelcw.model.HttpMethod;
+import com.github.firelcw.util.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 方法解析
@@ -38,6 +41,10 @@ public class MethodParser {
      * contentType
      */
     private String contentType;
+    /**
+     * 方法级别的headers
+     */
+    private Map<String,String> headers;
 
     public MethodParser() {
     }
@@ -51,37 +58,68 @@ public class MethodParser {
         this.parse();
     }
     private void parse() {
-        Annotation[] methodAnnotations = this.target.getAnnotations();
-        if (methodAnnotations.length != 1) {
-            throw new EasyHttpException("The number of annotations for a method can only be 1");
+        Annotation[] annotations = this.target.getAnnotations();
+
+        List<Annotation> methodAnnotations = this.selectMethodAnnotations(annotations);
+        // 一个请求只能指定一种请求方式
+        if (methodAnnotations.size() != 1) {
+            throw new EasyHttpException("A request can specify only one request method");
         }
-        Annotation methodAnnotation = methodAnnotations[0];
-        if (methodAnnotations[0] instanceof Get) {
+        Annotation methodAnnotation = methodAnnotations.get(0);
+        if (methodAnnotation instanceof Get) {
             this.path = ((Get) methodAnnotation).value();
             this.httpMethod = HttpMethod.GET;
 
-        }else if (methodAnnotations[0] instanceof Post) {
+        }else if (methodAnnotation instanceof Post) {
             Post post = ((Post) methodAnnotation);
             this.path = post.value();
             this.contentType = post.contentType();
             this.httpMethod = HttpMethod.POST;
 
-        }else if (methodAnnotations[0] instanceof Put) {
+        }else if (methodAnnotation instanceof Put) {
             Put put = ((Put) methodAnnotation);
             this.path = put.value();
             this.contentType = put.contentType();
             this.httpMethod = HttpMethod.PUT;
 
-        }else if (methodAnnotations[0] instanceof Delete) {
+        }else {
             path = ((Delete) methodAnnotation).value();
             this.httpMethod = HttpMethod.DELETE;
-
-        }else {
-            throw new EasyHttpException("incorrect type of annotation");
         }
-       // 计算路径变量
+        // 请求头注解
+        this.headers = Utils.getHeaders(annotations);
+        // 计算路径变量
         this.calVarCount(this.path);
 
+    }
+
+    /**
+     * 选择请求方式注解
+     * @param annotations
+     */
+    private List<Annotation> selectMethodAnnotations(Annotation[] annotations) {
+        if (annotations == null || annotations.length == 0) {
+            return Collections.emptyList();
+        }
+       return Stream.of(annotations)
+                    .filter(this::isHttpMethodAnnotation)
+                    .collect(Collectors.toList());
+    }
+
+    /**
+     * 判断是否为http请求方式注解
+     * @param annotation
+     * @return boolean
+     */
+    private boolean isHttpMethodAnnotation(Annotation annotation) {
+        String name = annotation.annotationType().getSimpleName();
+        HttpMethod[] values = HttpMethod.values();
+        for (HttpMethod value : values) {
+            if (value.name().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -136,5 +174,9 @@ public class MethodParser {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 }
