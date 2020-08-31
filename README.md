@@ -16,6 +16,8 @@
 
 ##### 2. 安装
 
+Java version: `8`
+
    ``` xml
    <dependency>
      <groupId>com.github.firelcw</groupId>
