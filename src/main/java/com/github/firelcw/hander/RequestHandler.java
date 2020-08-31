@@ -6,16 +6,20 @@ import com.github.firelcw.annotation.Query;
 import com.github.firelcw.annotation.Var;
 import com.github.firelcw.client.AbstractClient;
 import com.github.firelcw.codec.Encoder;
+import com.github.firelcw.interceptor.InterceptorOperations;
 import com.github.firelcw.model.HttpRequest;
 import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 import com.github.firelcw.parser.ArgParser;
 import com.github.firelcw.parser.InterfaceParser;
 import com.github.firelcw.parser.MethodParser;
+import com.github.firelcw.proxy.HttpInvocationHandler;
 import com.github.firelcw.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +29,7 @@ import java.util.Map;
  * @author liaochongwei
  * @date 2020/7/30 17:11
  */
-public class RequestHandler {
+public class RequestHandler implements Handler<HttpResponse>{
     /**
      * 请求基本路径
      */
@@ -46,11 +50,14 @@ public class RequestHandler {
      * 编码器
      */
     private Encoder encoder;
-
     /**
      * 请求参数
      */
     private HttpRequest request;
+    /**
+     * 拦截操作
+     */
+    private InterceptorOperations interceptorOps;
     /**
      * 请求配置
      */
@@ -59,11 +66,49 @@ public class RequestHandler {
      * 请求客户端
      */
     private AbstractClient client;
+
+
+    /**
+     * 创建RequestHandler
+     * @param invocation
+     * @return RequestHandler
+     */
+    public static RequestHandler create(HttpInvocationHandler<?> invocation) {
+        Method method = invocation.getMethod();
+        Object[] args = invocation.getArgs();
+        // 接口解析
+        InterfaceParser interfaceParser = new InterfaceParser(invocation.getTargetClazz());
+        // 方法解析
+        MethodParser methodParser = new MethodParser(method);
+        // 参数解析
+        List<ArgParser> argParsers = new ArrayList<>();
+        for (int i = 0; args!=null && i < args.length; i++) {
+            argParsers.add(new ArgParser(args[i],method, i));
+        }
+
+        RequestHandler handler = new RequestHandler();
+        handler.url = invocation.getUrl();
+        handler.encoder = invocation.getEncoder();
+        handler.client(invocation.getClient(),invocation.getRequestConfig());
+
+        handler.interfaceParser = interfaceParser;
+        handler.argParsers = argParsers;
+        handler.methodParser = methodParser;
+
+        // 拦截器
+        handler.interceptorOps = InterceptorOperations.create(invocation.getInterceptors());
+
+        // 初始化请求
+        handler.initRequest();
+
+        return handler;
+    }
+
     /**
      * 添加请求配置
      * @param config
      */
-    public void client(AbstractClient client, HttpRequestConfig config) {
+    private void client(AbstractClient client, HttpRequestConfig config) {
         this.config = config;
         this.client = client;
         client.setConfig(config);
@@ -75,6 +120,7 @@ public class RequestHandler {
 
         // 处理http://
         this.handleUrl();
+
         this.request = new HttpRequest();
 
         // 设置请求方式
@@ -97,18 +143,27 @@ public class RequestHandler {
             // 处理请求body参数
             this.handleBody();
 
-
         }
     }
 
-    public HttpResponse handle() {
-        if (this.request == null) {
-            this.initRequest();
-        }
+    @Override
+    public HttpResponse execute() {
+        // 执行过滤
+        this.doInterceptor();
         return client.request(this.request);
     }
 
-
+    /**
+     * 执行过滤器
+     */
+    private void doInterceptor() {
+        // 排除
+        interceptorOps.exclude(this.request.getUrl(), this.request.getMethod());
+        // 排序
+        interceptorOps.ordered();
+        // 执行前置过滤器
+        interceptorOps.doPreInterceptors(this.request, this.getConfig());
+    }
     /**
      * 处理path
      */
@@ -225,32 +280,15 @@ public class RequestHandler {
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public MethodParser getMethodParser() {
         return methodParser;
     }
-
-    public void setMethodParser(MethodParser methodParser) {
-        this.methodParser = methodParser;
-    }
-
     public List<ArgParser> getArgParsers() {
         return argParsers;
     }
 
-    public void setArgParsers(List<ArgParser> argParsers) {
-        this.argParsers = argParsers;
-    }
-
     public Encoder getEncoder() {
         return encoder;
-    }
-
-    public void setEncoder(Encoder encoder) {
-        this.encoder = encoder;
     }
 
     public HttpRequest getRequest() {
@@ -268,7 +306,11 @@ public class RequestHandler {
         return interfaceParser;
     }
 
-    public void setInterfaceParser(InterfaceParser interfaceParser) {
-        this.interfaceParser = interfaceParser;
+    public AbstractClient getClient() {
+        return client;
+    }
+
+    public InterceptorOperations getInterceptorOps() {
+        return interceptorOps;
     }
 }

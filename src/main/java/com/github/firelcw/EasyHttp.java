@@ -12,6 +12,7 @@ import com.github.firelcw.proxy.HttpInvocationHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * @author liaochongwei
@@ -31,6 +32,7 @@ public class EasyHttp {
         private Encoder encoder;
         private String url;
         private final List<HttpInterceptor> interceptors;
+        private Executor executor;
 
         public Builder() {
             this.client = ApacheHttpClient.getInstance();
@@ -65,7 +67,10 @@ public class EasyHttp {
             }
             return this;
         }
-
+        public Builder executor(Executor executor) {
+            this.executor = executor;
+            return this;
+        }
 
         public <T> T build(Class<T> clazz) {
             HttpInvocationHandler<T> invocationHandler = new HttpInvocationHandler<>(clazz);
@@ -75,6 +80,7 @@ public class EasyHttp {
             invocationHandler.encoder(encoder);
             invocationHandler.requestConfig(config);
             invocationHandler.interceptors(interceptors);
+            invocationHandler.executor(executor);
             return invocationHandler.getProxy();
         }
 
