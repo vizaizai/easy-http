@@ -5,6 +5,8 @@ import demo.model.ApiResult;
 import demo.model.Book;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 /**
  * @author liaochongwei
  * @date 2020/8/3 10:27
@@ -26,4 +28,7 @@ public interface BookHttpService {
 
     @Get("/books/search")
     ApiResult<List<Book>> searchBooks(@Query("keyword") String keyword);
+
+    @Get("/books")
+    CompletableFuture<ApiResult<List<Book>>> foo();
 }

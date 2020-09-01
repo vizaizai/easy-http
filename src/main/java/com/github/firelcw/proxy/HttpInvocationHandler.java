@@ -4,19 +4,19 @@ package com.github.firelcw.proxy;
 import com.github.firelcw.client.AbstractClient;
 import com.github.firelcw.codec.Decoder;
 import com.github.firelcw.codec.Encoder;
+import com.github.firelcw.hander.AsyncHttpHandler;
 import com.github.firelcw.hander.HttpHandler;
+import com.github.firelcw.hander.RequestHandler;
+import com.github.firelcw.hander.ResponseHandler;
 import com.github.firelcw.interceptor.HttpInterceptor;
 import com.github.firelcw.model.HttpRequestConfig;
-import com.github.firelcw.hander.RequestHandler;
-import com.github.firelcw.parser.ArgParser;
-import com.github.firelcw.parser.InterfaceParser;
-import com.github.firelcw.parser.MethodParser;
+import com.github.firelcw.util.TypeUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * @author liaochongwei
@@ -31,6 +31,9 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
     private Decoder decoder;
     private HttpRequestConfig requestConfig;
     private List<HttpInterceptor> interceptors;
+    private Method method;
+    private Object[] args;
+    private Executor executor;
 
     public HttpInvocationHandler(Class<T> targetClazz) {
         this.targetClazz = targetClazz;
@@ -42,26 +45,22 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
     }
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        this.method = method;
+        this.args = args;
+        // 构建请求处理
+        RequestHandler requestHandler = RequestHandler.create(this);
+        // 构建响应处理
+        ResponseHandler responseHandler = ResponseHandler.create(this, requestHandler);
 
-        MethodParser methodParser = new MethodParser(method);
-        List<ArgParser> argParsers = new ArrayList<>();
-        for (int i = 0; args!=null && i < args.length; i++) {
-            argParsers.add(new ArgParser(args[i],method, i));
+        // 异步返回
+        if (TypeUtils.isAsync(method.getGenericReturnType())) {
+            return AsyncHttpHandler.create(requestHandler, responseHandler)
+                                   .addExecutor(this.executor)
+                                   .execute();
         }
-        RequestHandler requestHandler = new RequestHandler();
-        requestHandler.client(client, requestConfig);
-
-        requestHandler.setInterfaceParser(new InterfaceParser(this.targetClazz));
-        requestHandler.setArgParsers(argParsers);
-        requestHandler.setMethodParser(methodParser);
-        requestHandler.setUrl(url);
-        requestHandler.setEncoder(encoder);
-
-        HttpHandler httpHandler = new HttpHandler();
-        httpHandler.setInterceptors(interceptors);
-
-        return httpHandler.handle(requestHandler,decoder, method.getGenericReturnType());
+        return HttpHandler.create(requestHandler,responseHandler).execute();
     }
+
     public HttpInvocationHandler<T> client(AbstractClient client) {
         this.client = client;
         return this;
@@ -86,5 +85,44 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
         this.interceptors = interceptors;
         return this;
     }
+    public HttpInvocationHandler<T> executor(Executor executor) {
+        this.executor = executor;
+        return this;
+    }
 
+    public Class<T> getTargetClazz() {
+        return targetClazz;
+    }
+
+    public AbstractClient getClient() {
+        return client;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public Encoder getEncoder() {
+        return encoder;
+    }
+
+    public Decoder getDecoder() {
+        return decoder;
+    }
+
+    public HttpRequestConfig getRequestConfig() {
+        return requestConfig;
+    }
+
+    public List<HttpInterceptor> getInterceptors() {
+        return interceptors;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public Object[] getArgs() {
+        return args;
+    }
 }

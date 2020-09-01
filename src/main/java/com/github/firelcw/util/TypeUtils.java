@@ -1,5 +1,10 @@
 package com.github.firelcw.util;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 /**
@@ -12,8 +17,11 @@ public class TypeUtils {
             new String[] {"integer","short", "byte","long","char",
                     "float", "double","boolean","string", "void"};
 
-    private static final String CLASS_PREFIX = "java.lang.";
+    private static final String CLASS_LANG_PREFIX = "java.lang.";
     private static final int CLASS_PREFIX_INDEX = 9;
+
+    private static final String ASYNC_CLASS_1 = "java.util.concurrent.CompletableFuture";
+    private static final String ASYNC_CLASS_2 = "java.util.concurrent.Future";
 
     private TypeUtils() {
     }
@@ -38,11 +46,37 @@ public class TypeUtils {
     public static boolean isSimple(String typeName) {
         String typeLower = typeName.toLowerCase();
         return Stream.of(SIMPLE_TYPES).anyMatch(e->{
-            if (typeLower.startsWith(CLASS_PREFIX)) {
+            if (typeLower.startsWith(CLASS_LANG_PREFIX)) {
                 return typeLower.substring(CLASS_PREFIX_INDEX).contains(e);
             }
             return e.equals(typeLower);
         });
+    }
+
+    /**
+     * 是否异步请求(要求返回值类型为 Future、CompletableFuture)
+     * @param returnType
+     * @return boolean
+     */
+    public static boolean isAsync(Type returnType) {
+        String name = returnType.getTypeName();
+        return name.startsWith(ASYNC_CLASS_1) || name.startsWith(ASYNC_CLASS_2);
+    }
+
+    /**
+     * 获取需要编码的返回值类型
+     * @param type
+     * @return
+     */
+    public static Type getDecodeType(Type type) {
+        if (!isAsync(type)) {
+            return type;
+        }
+        if (type instanceof  ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            return parameterizedType.getActualTypeArguments()[0];
+        }
+       return Object.class;
     }
 
     /**
