@@ -3,7 +3,6 @@ package demo.main;
 
 import com.github.firelcw.EasyHttp;
 import com.github.firelcw.client.ApacheHttpClient;
-import com.github.firelcw.client.DefaultURLClient;
 import com.github.firelcw.interceptor.ErrorInterceptor;
 import com.github.firelcw.interceptor.TimeInterceptor;
 import demo.model.ApiResult;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author liaochongwei
@@ -89,13 +87,18 @@ public class BookServiceTest {
 
 
     @Test
-    public void demo() throws ExecutionException, InterruptedException {
+    public void demo() {
 
         CompletableFuture<ApiResult<List<Book>>> foo = bookHttpService.foo();
         foo.thenRun(()->System.out.println("异步请求执行完毕"));
-        //System.out.println(foo.get().getData());
         System.out.println("异步");
         foo.join();
+    }
+
+    @Test
+    public void bar(){
+        String[] bar = bookHttpService.bar();
+        System.out.println(bar);
     }
 
     public static String uuid() {

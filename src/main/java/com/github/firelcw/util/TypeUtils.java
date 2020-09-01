@@ -2,9 +2,6 @@ package com.github.firelcw.util;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 /**
@@ -18,8 +15,8 @@ public class TypeUtils {
                     "float", "double","boolean","string", "void"};
 
     private static final String CLASS_LANG_PREFIX = "java.lang.";
+    private static final String SUFFIX = "[]";
     private static final int CLASS_PREFIX_INDEX = 9;
-
     private static final String ASYNC_CLASS_1 = "java.util.concurrent.CompletableFuture";
     private static final String ASYNC_CLASS_2 = "java.util.concurrent.Future";
 
@@ -46,6 +43,9 @@ public class TypeUtils {
     public static boolean isSimple(String typeName) {
         String typeLower = typeName.toLowerCase();
         return Stream.of(SIMPLE_TYPES).anyMatch(e->{
+            if (typeLower.endsWith(SUFFIX)) {
+                return false;
+            }
             if (typeLower.startsWith(CLASS_LANG_PREFIX)) {
                 return typeLower.substring(CLASS_PREFIX_INDEX).contains(e);
             }

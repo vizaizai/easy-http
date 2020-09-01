@@ -31,4 +31,7 @@ public interface BookHttpService {
 
     @Get("/books")
     CompletableFuture<ApiResult<List<Book>>> foo();
+
+    @Get("/books/bar")
+    String[] bar();
 }
