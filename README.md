@@ -9,20 +9,21 @@
    + 注解简单： 遵循大家的命名习惯，@Body、@Query、@Var等注解见名之意。
    + 无侵入： 接口不需要继承。
    + 多客户端实现: 底层支持多种客户端，默认已实现Java原生URL和HttpClient，也可以自己实现。
+   + 支持异步请求。
    + 支持自定义编解码：默认已经内置了JSON编解码(返回参数支持泛型)，如需支持xml，可自定义。
    + 支持自定义拦截器：请求前，和请求后的拦截。拦截器可满足大部分业务需求，如：计算请求耗时，动态添加公共请求头，返回错误统一处理等等。
    + 提供spring-boot版本，使用更简单。
-   + 未实现：规划实现异步请求、响应式模式、以及Java11的客户端。
+   + todo列表：响应式编程、以及Java11的客户端。
 
 ##### 2. 安装
 
-Java version: `8`
+Java版本: 最低 `8`
 
    ``` xml
    <dependency>
      <groupId>com.github.firelcw</groupId>
      <artifactId>easy-http</artifactId>
-     <version>1.6.0</version>
+     <version>2.0.1</version>
    </dependency>
    ```
 
@@ -217,7 +218,7 @@ public class ResultInterceptor implements HttpInterceptor {
                                                     .withInterceptor(new TimeInterceptor())
                                                     .build(BookHttpService.class);
 ```
-7. 切换客户端
+##### 7. 切换客户端
 
    ```java
     EasyHttp.builder()
@@ -225,8 +226,25 @@ public class ResultInterceptor implements HttpInterceptor {
             .client(ApacheHttpClient.getInstance())
             .build(BookHttpService.class);
    ```
+##### 8. 异步请求
 
-   
+将方法的返回参数设为`Future`或者`CompletableFuture` , 就可以轻松实现异步。
+
+```java
+// 接口方法
+@Get("/books")
+CompletableFuture<ApiResult<List<Book>>> foo();
+
+// 执行异步请求
+CompletableFuture<ApiResult<List<Book>>> foo = bookHttpService.foo();
+foo.thenAccept(e->System.out.println(e.getData()))
+   .thenRun(()->System.out.println("异步请求执行完毕"));
+System.out.println("异步");
+foo.join();
+```
+
+> 有关Java8`CompletableFuture`的更多操作，请前往 [Java8 CompletableFuture](https://blog.csdn.net/lcw158852/article/details/107981506)
+
 
 #### 联系作者
 

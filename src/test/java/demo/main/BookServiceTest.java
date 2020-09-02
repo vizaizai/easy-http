@@ -90,7 +90,8 @@ public class BookServiceTest {
     public void demo() {
 
         CompletableFuture<ApiResult<List<Book>>> foo = bookHttpService.foo();
-        foo.thenRun(()->System.out.println("异步请求执行完毕"));
+        foo.thenAccept(e->System.out.println(e.getData()))
+           .thenRun(()->System.out.println("异步请求执行完毕"));
         System.out.println("异步");
         foo.join();
     }
