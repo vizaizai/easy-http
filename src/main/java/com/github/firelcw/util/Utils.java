@@ -1,6 +1,7 @@
 package com.github.firelcw.util;
 
 import com.github.firelcw.annotation.Headers;
+import com.github.firelcw.model.ContentType;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,8 @@ import java.util.stream.Stream;
  * @date 2020/8/26 14:41
  */
 public class Utils {
+
+    public static final String CHARSET_S_F = "charset=";
 
     private Utils() {
     }
@@ -102,6 +105,31 @@ public class Utils {
         }
     }
 
+
+    public static Charset getCharset(String contentType) {
+        if (StringUtils.isBlank(contentType)) {
+            return UTF_8;
+        }
+        int index = contentType.indexOf(CHARSET_S_F);
+        if (index == -1) {
+            return UTF_8;
+        }
+        return Charset.forName(contentType.substring(index + CHARSET_S_F.length()));
+    }
+
+    /**
+     * 是否表单提交
+     * @param contentType
+     * @return boolean
+     */
+    public static boolean isForm(String contentType) {
+      if (StringUtils.isBlank(contentType) || contentType.length() < 33) {
+          return false;
+      }
+      return contentType.startsWith(ContentType.APPLICATION_FORM_URLENCODED_UTF8.substring(0, 33 - 1));
+    }
+
+
     public static void ensureClosed(Closeable closeable) {
         if (closeable != null) {
             try {
@@ -111,11 +139,15 @@ public class Utils {
         }
     }
 
-    public static String toString(InputStream inputStream) throws IOException {
+
+    public static String toString(InputStream inputStream, Charset charset) throws IOException {
         if (inputStream == null) {
             return null;
         }
-        Reader reader = new InputStreamReader(inputStream,UTF_8);
+        if (charset == null) {
+            charset = UTF_8;
+        }
+        Reader reader = new InputStreamReader(inputStream, charset);
         try {
             StringBuilder to = new StringBuilder();
             CharBuffer charBuf = CharBuffer.allocate(BUF_SIZE);
@@ -196,5 +228,4 @@ public class Utils {
         split[1] = split[1].trim();
         return split;
     }
-
 }

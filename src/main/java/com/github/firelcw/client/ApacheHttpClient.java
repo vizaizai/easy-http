@@ -2,7 +2,11 @@ package com.github.firelcw.client;
 
 
 import com.github.firelcw.exception.EasyHttpException;
-import com.github.firelcw.model.*;
+import com.github.firelcw.model.HttpMethod;
+import com.github.firelcw.model.HttpRequest;
+import com.github.firelcw.model.HttpRequestConfig;
+import com.github.firelcw.model.HttpResponse;
+import com.github.firelcw.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -116,7 +120,7 @@ public class ApacheHttpClient extends AbstractClient {
                 result.setMessage("the body is null");
                 return result;
             }
-            String ret = EntityUtils.toString(httpEntity);
+            String ret = EntityUtils.toString(httpEntity, Utils.UTF_8);
             result.setBody(ret);
             result.setStatusCode(response.getStatusLine().getStatusCode());
             result.setContentLength(response.getEntity().getContentLength());
@@ -163,7 +167,7 @@ public class ApacheHttpClient extends AbstractClient {
      * @return String
      */
     private static String convertUrl(String url,  List<BasicNameValuePair> queryParams, String contentType) {
-        if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
+        if (Utils.isForm(contentType)) {
             return url;
         }
         return convertUrl(url, queryParams);
@@ -176,7 +180,7 @@ public class ApacheHttpClient extends AbstractClient {
      * @return HttpEntity
      */
     private static HttpEntity genEntity(List<BasicNameValuePair> queryParams, String content,String contentType) {
-        if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
+        if (Utils.isForm(contentType)) {
            return new UrlEncodedFormEntity(queryParams, Consts.UTF_8);
         }
         if (content != null) {

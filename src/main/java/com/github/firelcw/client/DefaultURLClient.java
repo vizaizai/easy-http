@@ -1,13 +1,17 @@
 package com.github.firelcw.client;
 
 import com.github.firelcw.exception.EasyHttpException;
-import com.github.firelcw.model.*;
+import com.github.firelcw.model.HttpMethod;
+import com.github.firelcw.model.HttpRequest;
+import com.github.firelcw.model.HttpRequestConfig;
+import com.github.firelcw.model.HttpResponse;
 import com.github.firelcw.util.Utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import static com.github.firelcw.util.Utils.*;
@@ -54,6 +58,9 @@ public class DefaultURLClient extends AbstractClient{
 
             for (String field : param.getHeaders().keySet()) {
                 String values = param.getHeaders().get(field);
+                if (field.equals(CONTENT_TYPE)) {
+                    //values = values +
+                }
                 connection.addRequestProperty(field, values);
             }
 
@@ -86,18 +93,17 @@ public class DefaultURLClient extends AbstractClient{
         response.setStatusCode(status);
         response.setMessage(connection.getResponseMessage());
 
-        System.out.println(status);
         if (status < 0) {
             throw new IOException(format("Invalid status(%s) executing %s %s", status,
                     connection.getRequestMethod(), connection.getURL()));
         }
 
+        Charset charset = getCharset(connection.getHeaderField(CONTENT_TYPE));
         response.setContentLength(connection.getContentLength());
-
         if (status >= 400) {
-            response.setBody(Utils.toString(connection.getErrorStream()));
+            response.setBody(Utils.toString(connection.getErrorStream(), charset));
         } else {
-           response.setBody(Utils.toString(connection.getInputStream()));
+           response.setBody(Utils.toString(connection.getInputStream(), charset));
         }
 
         return response;
@@ -128,7 +134,7 @@ public class DefaultURLClient extends AbstractClient{
                 this.handleUrl(request.getQueryParams());
                 return;
             }
-            if (ContentType.APPLICATION_FORM_URLENCODED.equals(request.getContentType())) {
+            if (isForm(request.getContentType())) {
                 this.addBody(asUrlEncoded(request.getQueryParams()));
             }else {
                 this.addBody(request.getBody());
@@ -146,6 +152,9 @@ public class DefaultURLClient extends AbstractClient{
 
         private void handleUrl(Map<String,String> params) {
             String urlParams = asUrlEncoded(params, UTF_8.name());
+            if (urlParams == null) {
+                return;
+            }
             if (url.contains("?")) {
                 url = url + "&" + urlParams;
             }else {

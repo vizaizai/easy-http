@@ -11,5 +11,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Post {
     String value() default "";
-    String contentType() default ContentType.APPLICATION_JSON;
+    String contentType() default ContentType.APPLICATION_JSON_UTF8;
 }

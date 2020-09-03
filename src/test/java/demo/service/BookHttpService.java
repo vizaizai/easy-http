@@ -14,24 +14,27 @@ import java.util.concurrent.CompletableFuture;
 @Headers({"client: easy-http"})
 public interface BookHttpService {
 
-    @Post("/books")
+    @Post("/book")
     ApiResult<Void> addBook(@Body Book book);
 
-    @Delete("/books/{id}")
+    @Delete("/book/{id}")
     ApiResult<String> deleteBook(@Var("id") String id);
 
-    @Put("/books")
+    @Put("/book")
     ApiResult<Void> editBook(@Body Book book);
 
-    @Get("/books")
+    @Get("/book")
     ApiResult<List<Book>> listAllBooks();
 
-    @Get("/books/search")
+    @Get("/book/search")
     ApiResult<List<Book>> searchBooks(@Query("keyword") String keyword);
 
-    @Get("/books")
+    @Get("/book")
     CompletableFuture<ApiResult<List<Book>>> foo();
 
-    @Get("/books/bar")
+    @Get("/book/bar")
     String[] bar();
+
+    @Get
+    String baidu();
 }

@@ -3,6 +3,7 @@ package demo.main;
 
 import com.github.firelcw.EasyHttp;
 import com.github.firelcw.client.ApacheHttpClient;
+import com.github.firelcw.client.DefaultURLClient;
 import com.github.firelcw.interceptor.ErrorInterceptor;
 import com.github.firelcw.interceptor.TimeInterceptor;
 import demo.model.ApiResult;
@@ -11,6 +12,7 @@ import demo.service.BookHttpService;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.net.ssl.SSLContext;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +31,7 @@ public class BookServiceTest {
     public void init() {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
-                                    .client(ApacheHttpClient.getInstance())
+                                    .client(DefaultURLClient.getInstance())
                                     .withInterceptor(new TimeInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .build(BookHttpService.class);
@@ -40,9 +42,9 @@ public class BookServiceTest {
     public void addBook() {
         Book book = new Book();
         book.setId(uuid());
-        book.setPrice(BigDecimal.valueOf(19.40));
-        book.setName("零基础学Python（全彩版）1");
-        book.setAuthor("明日科技(Mingri Soft)1");
+        book.setPrice(BigDecimal.valueOf(17.40));
+        book.setName("零基础学Python（全彩版）2");
+        book.setAuthor("明日科技(Mingri Soft)2");
         book.setDescription("Python3全新升级！超20万读者认可的彩色书，从基本概念到完整项目开发，助您快速掌握Python编程。");
 
 
@@ -59,7 +61,7 @@ public class BookServiceTest {
     public void editBook() {
         Book book = new Book();
         book.setId("a443257960944e45aee4da013754bdf9");
-        book.setPrice(BigDecimal.valueOf(90.40));
+        book.setPrice(BigDecimal.valueOf(2.40));
         book.setName(" Java从入门到精通（第5版）");
         book.setAuthor("明日科技");
         book.setDescription("297个应用实例+37个典型应用+30小时教学视频+海量开发资源库，丛书累计销量200多万册,是Java入门的好图书");
@@ -72,7 +74,7 @@ public class BookServiceTest {
     @Test
     public void deleteBook() {
 
-        bookHttpService.deleteBook("ba81da8f6ec54c4a80dedaedc6400719");
+        bookHttpService.deleteBook("47df864121ac476093105e58b3ce2ec2");
         //System.out.println(bookRet.getData());
     }
 
@@ -100,6 +102,19 @@ public class BookServiceTest {
     public void bar(){
         String[] bar = bookHttpService.bar();
         System.out.println(bar);
+    }
+
+    @Test
+    public void baidu(){
+        bookHttpService = EasyHttp.builder()
+                                    .url("https://www.baidu.com/")
+                                    .client(DefaultURLClient.getInstance())
+                                    .withInterceptor(new TimeInterceptor())
+                                    .withInterceptor(new ErrorInterceptor())
+                                    .build(BookHttpService.class);
+        String s =  bookHttpService.baidu();
+        System.out.println(s);
+
     }
 
     public static String uuid() {
