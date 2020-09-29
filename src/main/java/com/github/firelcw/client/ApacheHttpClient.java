@@ -1,6 +1,7 @@
 package com.github.firelcw.client;
 
 
+import com.github.firelcw.apache.HttpDeleteWithBody;
 import com.github.firelcw.exception.EasyHttpException;
 import com.github.firelcw.model.HttpMethod;
 import com.github.firelcw.model.HttpRequest;
@@ -100,7 +101,8 @@ public class ApacheHttpClient extends AbstractClient {
                 request = httpPut;
                 break;
             case DELETE:
-                HttpDelete httpDelete = new HttpDelete(convertUrl(url,queryParams));
+                HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(convertUrl(url,queryParams,param.getContentType()));
+                httpDelete.setEntity(genEntity(queryParams,content,param.getContentType()));
                 httpDelete.setConfig(config);
                 request = httpDelete;
                 break;

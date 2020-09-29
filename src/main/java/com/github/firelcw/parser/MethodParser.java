@@ -83,7 +83,9 @@ public class MethodParser {
             this.httpMethod = HttpMethod.PUT;
 
         }else {
-            path = ((Delete) methodAnnotation).value();
+            Delete delete = ((Delete) methodAnnotation);
+            this.path = ((Delete) methodAnnotation).value();
+            this.contentType = delete.contentType();
             this.httpMethod = HttpMethod.DELETE;
         }
         // 请求头注解

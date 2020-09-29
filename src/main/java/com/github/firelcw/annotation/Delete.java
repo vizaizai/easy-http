@@ -1,6 +1,8 @@
 package com.github.firelcw.annotation;
 
 
+import com.github.firelcw.model.ContentType;
+
 import java.lang.annotation.*;
 
 @Target({ElementType.METHOD})
@@ -8,4 +10,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Delete {
     String value() default "";
+    String contentType() default ContentType.APPLICATION_JSON_UTF8;
 }

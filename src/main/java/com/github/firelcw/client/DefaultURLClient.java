@@ -126,8 +126,7 @@ public class DefaultURLClient extends AbstractClient{
 
         public void init(HttpRequest request) {
             url = request.getUrl();
-            if (HttpMethod.GET.equals(request.getMethod()) ||
-                    HttpMethod.DELETE.equals(request.getMethod()) ) {
+            if (HttpMethod.GET.equals(request.getMethod())) {
                 this.handleUrl(request.getQueryParams());
                 return;
             }
