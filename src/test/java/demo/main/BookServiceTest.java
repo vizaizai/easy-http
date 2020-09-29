@@ -12,7 +12,6 @@ import demo.service.BookHttpService;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.net.ssl.SSLContext;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +30,7 @@ public class BookServiceTest {
     public void init() {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
-                                    .client(DefaultURLClient.getInstance())
+                                    .client(ApacheHttpClient.getInstance())
                                     .withInterceptor(new TimeInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .build(BookHttpService.class);
@@ -74,8 +73,9 @@ public class BookServiceTest {
     @Test
     public void deleteBook() {
 
-        bookHttpService.deleteBook("47df864121ac476093105e58b3ce2ec2");
-        //System.out.println(bookRet.getData());
+        //bookHttpService.deleteBook("47df864121ac476093105e58b3ce2ec2");
+        ApiResult<String> apiResult = bookHttpService.deleteBookByBody("47df864121ac476093105e58b3ce2ec2");
+        System.out.println(apiResult.getData());
     }
 
     @Test

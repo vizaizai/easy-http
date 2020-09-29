@@ -58,9 +58,6 @@ public class DefaultURLClient extends AbstractClient{
 
             for (String field : param.getHeaders().keySet()) {
                 String values = param.getHeaders().get(field);
-                if (field.equals(CONTENT_TYPE)) {
-                    //values = values +
-                }
                 connection.addRequestProperty(field, values);
             }
 
@@ -129,8 +126,7 @@ public class DefaultURLClient extends AbstractClient{
 
         public void init(HttpRequest request) {
             url = request.getUrl();
-            if (HttpMethod.GET.equals(request.getMethod()) ||
-                    HttpMethod.DELETE.equals(request.getMethod()) ) {
+            if (HttpMethod.GET.equals(request.getMethod())) {
                 this.handleUrl(request.getQueryParams());
                 return;
             }
