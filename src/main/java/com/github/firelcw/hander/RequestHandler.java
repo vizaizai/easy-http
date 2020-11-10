@@ -239,8 +239,8 @@ public class RequestHandler implements Handler<HttpResponse>{
 
     private void checkArgs() {
 
-        if (this.url == null) {
-            throw new IllegalArgumentException("The url is null");
+        if ("".equals(this.url)) {
+            throw new IllegalArgumentException("The url is \"\"");
         }
         if (this.methodParser == null) {
             throw new IllegalArgumentException("The method is null");
@@ -270,9 +270,15 @@ public class RequestHandler implements Handler<HttpResponse>{
 
     }
     private void handleUrl() {
-        if (!url.startsWith( "http://") && !url.startsWith("https://")) {
+        if (this.url == null) {
+            this.url = "";
+        }
+        if (StringUtils.isNotBlank(url) &&
+                !url.startsWith( "http://") && !url.startsWith("https://")) {
             url = "http://" + url;
         }
+
+
     }
 
 

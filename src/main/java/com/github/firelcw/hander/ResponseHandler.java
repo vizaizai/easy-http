@@ -28,6 +28,7 @@ public class ResponseHandler implements Handler<Object>{
 
     public ResponseHandler response(HttpResponse response) {
         this.response = response;
+        this.response.setReturnType(this.returnType);
         return this;
     }
 
@@ -53,12 +54,18 @@ public class ResponseHandler implements Handler<Object>{
         }
         // 执行详情拦截
         interceptorOps.doPostInterceptors(this.request, this.response);
-
+        // 如果已经序列化,则直接返回
+        if (this.response.isDeserialize()) {
+            return this.response.getReturnObject();
+        }
         // 响应解码
         if (TypeUtils.isSimple(this.returnType.getTypeName())) {
             this.decoder = new SimpleDecoder();
         }
-        return this.decoder.decode(this.response, this.returnType);
+        Object returnObject = this.decoder.decode(this.response, this.returnType);
+        this.response.setReturnObject(returnObject);
+        this.response.setDeserialize(true);
+        return returnObject;
     }
 
     public Type getReturnType() {

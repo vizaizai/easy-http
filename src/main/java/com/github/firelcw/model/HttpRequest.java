@@ -34,6 +34,10 @@ public class HttpRequest {
      * 请求体文本内容
      */
     private String body;
+    /**
+     * 扩展参数
+     */
+    private Map<String, Object> extendParams;
 
     public void addHeader(String name, String value) {
         if (this.headers == null) {
@@ -101,5 +105,13 @@ public class HttpRequest {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public Map<String, Object> getExtendParams() {
+        return extendParams;
+    }
+
+    public void setExtendParams(Map<String, Object> extendParams) {
+        this.extendParams = extendParams;
     }
 }

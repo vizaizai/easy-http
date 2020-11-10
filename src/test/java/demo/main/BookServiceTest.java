@@ -6,6 +6,7 @@ import com.github.firelcw.client.ApacheHttpClient;
 import com.github.firelcw.client.DefaultURLClient;
 import com.github.firelcw.interceptor.ErrorInterceptor;
 import com.github.firelcw.interceptor.TimeInterceptor;
+import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
 import demo.service.BookHttpService;
@@ -107,12 +108,13 @@ public class BookServiceTest {
     @Test
     public void baidu(){
         bookHttpService = EasyHttp.builder()
-                                    .url("https://www.baidu.com/")
+                                    .url("http://10.10.11.107:25068/inner")
                                     .client(DefaultURLClient.getInstance())
                                     .withInterceptor(new TimeInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
+                                    .withInterceptor(new ResultInterceptor())
                                     .build(BookHttpService.class);
-        String s =  bookHttpService.baidu();
+        String s =  bookHttpService.baidu("dsy_Wlep4Af6LPQf","1290478984305881090");
         System.out.println(s);
 
     }

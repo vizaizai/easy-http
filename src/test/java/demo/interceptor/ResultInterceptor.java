@@ -27,12 +27,17 @@ public class ResultInterceptor implements HttpInterceptor {
         if (StringUtils.isBlank(response.getBody())) {
            return;
         }
-        JSONObject retJson = JSON.parseObject(response.getBody());
+        JSONObject ret = JSON.parseObject(response.getBody());
         // 假设业务code：200 为操作成功
-        if (retJson.getInteger("code") == 200) {
+        if (ret.getInteger("code") == 200) {
             // 覆盖包含公共信息的json
-            response.setBody(retJson.getString("data"));
+            JSONObject data = ret.getJSONObject("data");
+            if (data != null) {
+                response.setReturnObject(data.toJavaObject(response.getReturnType()));
+                return;
+            }
         }
+        response.setReturnObject(null);
     }
 
     @Override
