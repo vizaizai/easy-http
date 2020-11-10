@@ -23,7 +23,7 @@ Java版本: 最低 `8`
    <dependency>
      <groupId>com.github.firelcw</groupId>
      <artifactId>easy-http</artifactId>
-     <version>2.1.0</version>
+     <version>2.1.1</version>
    </dependency>
    ```
 
@@ -44,8 +44,8 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/firelcw/eas
 
    ``` java
    BookHttpService bookHttpService = EasyHttp.builder()
-       								.url("127.0.0.1:8888")
-       								.build(BookHttpService.class);
+                      .url("127.0.0.1:8888")
+                      .build(BookHttpService.class);
    ApiResult<Book> bookRet = bookHttpService.getBookById("166895");
    System.out.println(bookRet.getData().getName());
    ```
@@ -114,7 +114,7 @@ public class CustomEncoder implements Encoder {
     public Map<String, String> encodeMap(Object object) {
         return null;
     }
-	 /**
+   /**
      * 将对象转化成string，用于编码 @Body注解的对象（默认是解析成json字符串）
      * @param object
      * @return string
@@ -169,7 +169,7 @@ BookHttpService bookHttpService = EasyHttp.builder()
 
    > 在请求发出前和请求响应后进行拦截
 
-编写自定义编码器类`ResultInterceptor`实现`HttpInterceptor`接口
+编写自定义编码器类`ResultInterceptor`实现`HttpInterceptor`接口，抽离data部分返回
 
 ``` java
 public class ResultInterceptor implements HttpInterceptor {
@@ -186,12 +186,17 @@ public class ResultInterceptor implements HttpInterceptor {
         if (StringUtils.isBlank(response.getBody())) {
            return;
         }
-        JSONObject retJson = JSON.parseObject(response.getBody());
+        JSONObject ret = JSON.parseObject(response.getBody());
         // 假设业务code：200 为操作成功
-        if (retJson.getInteger("code") == 200) {
+        if (ret.getInteger("code") == 200) {
             // 覆盖包含公共信息的json
-            response.setBody(retJson.getString("data"));
+            JSONObject data = ret.getJSONObject("data");
+            if (data != null) {
+                response.setReturnObject(data.toJavaObject(response.getReturnType()));
+                return;
+            }
         }
+        response.setReturnObject(null);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.github.firelcw.model;
 
+import java.lang.reflect.Type;
+
 /**
  * 响应
  * @author liaochongwei
@@ -8,9 +10,21 @@ package com.github.firelcw.model;
 public class HttpResponse {
 
     /**
-     * 返回体
+     * 响应体
      */
     private String body;
+    /**
+     * 返回类型
+     */
+    private Type returnType;
+    /**
+     * 返回是否已经序列化
+     */
+    private boolean deserialize = false;
+    /**
+     * 序列化后的响应体
+     */
+    private Object returnObject;
     /**
      * 响应码
      */
@@ -58,5 +72,30 @@ public class HttpResponse {
 
     public void setContentLength(long contentLength) {
         this.contentLength = contentLength;
+    }
+
+    public Type getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+
+    public boolean isDeserialize() {
+        return deserialize;
+    }
+
+    public void setDeserialize(boolean deserialize) {
+        this.deserialize = deserialize;
+    }
+
+    public Object getReturnObject() {
+        return returnObject;
+    }
+
+    public void setReturnObject(Object returnObject) {
+        this.setDeserialize(true);
+        this.returnObject = returnObject;
     }
 }

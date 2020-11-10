@@ -66,7 +66,13 @@ public class MethodParser {
             throw new EasyHttpException("A request can specify only one request method");
         }
         Annotation methodAnnotation = methodAnnotations.get(0);
-        if (methodAnnotation instanceof Get) {
+        if (methodAnnotation instanceof  Mapping) {
+            Mapping mapping = ((Mapping) methodAnnotation);
+            this.path = mapping.value();
+            this.contentType = mapping.contentType();
+            this.httpMethod = mapping.httpMethod();
+
+        }else if (methodAnnotation instanceof Get) {
             this.path = ((Get) methodAnnotation).value();
             this.httpMethod = HttpMethod.GET;
 
@@ -115,6 +121,10 @@ public class MethodParser {
      */
     private boolean isHttpMethodAnnotation(Annotation annotation) {
         String name = annotation.annotationType().getSimpleName();
+        if (annotation instanceof  Mapping) {
+            Mapping mapping = (Mapping) annotation;
+            name = mapping.httpMethod().name();
+        }
         HttpMethod[] values = HttpMethod.values();
         for (HttpMethod value : values) {
             if (value.name().equalsIgnoreCase(name)) {
