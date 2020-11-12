@@ -39,7 +39,7 @@ public class HttpResponse {
     private String message;
 
 
-    public boolean isOk() {
+    public boolean  isOk() {
         return statusCode >= 200 && statusCode <= 300 ;
     }
     public String getBody() {

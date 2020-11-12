@@ -123,6 +123,9 @@ public class RequestHandler implements Handler<HttpResponse>{
 
         this.request = new HttpRequest();
 
+        // 是否异步
+        this.request.setAsync(this.getMethodParser().isAsync());
+
         // 设置请求方式
         this.request.setMethod(methodParser.getHttpMethod());
 

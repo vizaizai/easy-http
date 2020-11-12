@@ -27,7 +27,7 @@ public class ErrorInterceptor implements HttpInterceptor{
             return;
         }
         if (log.isErrorEnabled()) {
-            log.error("请求错误 => {}, 状态码:{}, 原因:{}",request.getUrl(),response.getStatusCode(),response.getMessage());
+            log.error("请求错误=>{}, [{}]:{}",request.getUrl(),response.getStatusCode(),response.getMessage());
         }
         throw new CodeStatusException(response.getStatusCode(), response.getMessage());
     }

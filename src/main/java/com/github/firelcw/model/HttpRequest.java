@@ -10,6 +10,7 @@ import java.util.Map;
  * @date 2020/7/30 17:37
  */
 public class HttpRequest {
+
     /**
      * 请求类型
      */
@@ -38,6 +39,14 @@ public class HttpRequest {
      * 扩展参数
      */
     private Map<String, Object> extendParams;
+    /**
+     * 是否异步
+     */
+    private boolean async;
+    /**
+     * 请求开始时间戳
+     */
+    private long startTime;
 
     public void addHeader(String name, String value) {
         if (this.headers == null) {
@@ -113,5 +122,21 @@ public class HttpRequest {
 
     public void setExtendParams(Map<String, Object> extendParams) {
         this.extendParams = extendParams;
+    }
+
+    public boolean isAsync() {
+        return async;
+    }
+
+    public void setAsync(boolean async) {
+        this.async = async;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 }

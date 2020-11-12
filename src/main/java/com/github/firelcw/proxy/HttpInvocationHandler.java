@@ -10,7 +10,6 @@ import com.github.firelcw.hander.RequestHandler;
 import com.github.firelcw.hander.ResponseHandler;
 import com.github.firelcw.interceptor.HttpInterceptor;
 import com.github.firelcw.model.HttpRequestConfig;
-import com.github.firelcw.util.TypeUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -53,11 +52,12 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
         ResponseHandler responseHandler = ResponseHandler.create(this, requestHandler);
 
         // 异步返回
-        if (TypeUtils.isAsync(method.getGenericReturnType())) {
+        if (requestHandler.getRequest().isAsync()) {
             return AsyncHttpHandler.create(requestHandler, responseHandler)
-                                   .addExecutor(this.executor)
-                                   .execute();
+                    .addExecutor(this.executor)
+                    .execute();
         }
+
         return HttpHandler.create(requestHandler,responseHandler).execute();
     }
 

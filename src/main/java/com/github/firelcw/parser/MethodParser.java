@@ -3,6 +3,7 @@ package com.github.firelcw.parser;
 import com.github.firelcw.annotation.*;
 import com.github.firelcw.exception.EasyHttpException;
 import com.github.firelcw.model.HttpMethod;
+import com.github.firelcw.util.TypeUtils;
 import com.github.firelcw.util.Utils;
 
 import java.lang.annotation.Annotation;
@@ -45,6 +46,10 @@ public class MethodParser {
      * 方法级别的headers
      */
     private Map<String,String> headers;
+    /**
+     * 是否异步
+     */
+    private boolean async;
 
     public MethodParser() {
     }
@@ -98,7 +103,8 @@ public class MethodParser {
         this.headers = Utils.getHeaders(annotations);
         // 计算路径变量
         this.calVarCount(this.path);
-
+        // 是否异步请求
+        this.async = TypeUtils.isAsync(this.target.getGenericReturnType());
     }
 
     /**
@@ -190,5 +196,9 @@ public class MethodParser {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public boolean isAsync() {
+        return async;
     }
 }

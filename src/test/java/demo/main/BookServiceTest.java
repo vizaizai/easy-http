@@ -5,7 +5,7 @@ import com.github.firelcw.EasyHttp;
 import com.github.firelcw.client.ApacheHttpClient;
 import com.github.firelcw.client.DefaultURLClient;
 import com.github.firelcw.interceptor.ErrorInterceptor;
-import com.github.firelcw.interceptor.TimeInterceptor;
+import com.github.firelcw.interceptor.LogInterceptor;
 import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
@@ -32,7 +32,7 @@ public class BookServiceTest {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
                                     .client(ApacheHttpClient.getInstance())
-                                    .withInterceptor(new TimeInterceptor())
+                                    .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .build(BookHttpService.class);
     }
@@ -110,11 +110,16 @@ public class BookServiceTest {
         bookHttpService = EasyHttp.builder()
                                     .url("http://10.10.11.107:25068/inner")
                                     .client(DefaultURLClient.getInstance())
-                                    .withInterceptor(new TimeInterceptor())
+                                    .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .withInterceptor(new ResultInterceptor())
                                     .build(BookHttpService.class);
-        String s =  bookHttpService.baidu("dsy_Wlep4Af6LPQf","1290478984305881090");
+        CompletableFuture<String> s =  bookHttpService.baidu("dsy_Wlep4Af6LPQf","1290478984305881090");
+
+        s.thenAccept(e->System.out.println(e))
+                .thenRun(()->System.out.println("异步请求执行完毕"));
+        System.out.println("异步");
+        s.join();
         System.out.println(s);
 
     }

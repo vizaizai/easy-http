@@ -22,14 +22,17 @@ public interface HttpInterceptor {
      * @param request 后置拦截
      * @return boolean
      */
-    boolean preHandle(HttpRequest request, HttpRequestConfig config);
+    default boolean preHandle(HttpRequest request, HttpRequestConfig config){
+        return true;
+    }
 
     /**
      * 后置拦截
      * @param request
      * @param response
      */
-    void postHandle(HttpRequest request, HttpResponse response);
+    default void postHandle(HttpRequest request, HttpResponse response){
+    }
 
     /**
      * 执行顺序(值越小越先执行)

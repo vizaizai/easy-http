@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
  * @author liaochongwei
  * @date 2020/8/3 10:27
  */
-@Headers({"client: easy-http"})
+@Headers({"client: easy-http","sign: 56c41d9e1142784770d2c8cd1049c9e3"})
 public interface BookHttpService {
 
     @Post("/books")
@@ -40,5 +40,5 @@ public interface BookHttpService {
     String[] bar();
 
     @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId", httpMethod = HttpMethod.GET)
-    String baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
+    CompletableFuture<String> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
 }
