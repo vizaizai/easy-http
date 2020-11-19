@@ -56,11 +56,10 @@ public class InterceptorOperations {
     /**
      * 执行前置拦截
      * @param request
-     * @param config
      */
-    public void doPreInterceptors(HttpRequest request, HttpRequestConfig config) {
+    public void doPreInterceptors(HttpRequest request) {
         interceptors.forEach(e-> {
-            if (!e.preHandle(request, config)) {
+            if (!e.preHandle(request)) {
                 throw new HttpInterceptorException( "The '" + e.getClass().getSimpleName() +"' failed");
             }
         });

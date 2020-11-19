@@ -2,7 +2,6 @@ package com.github.firelcw.interceptor;
 
 
 import com.github.firelcw.model.HttpRequest;
-import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 import com.github.firelcw.util.Utils;
 import org.apache.commons.collections.MapUtils;
@@ -19,7 +18,7 @@ public class LogInterceptor implements HttpInterceptor{
     private static final Logger log = LoggerFactory.getLogger(LogInterceptor.class);
 
     @Override
-    public boolean preHandle(HttpRequest request, HttpRequestConfig config) {
+    public boolean preHandle(HttpRequest request) {
         request.setStartTime(System.currentTimeMillis());
         if (!log.isDebugEnabled()) {
            return true;

@@ -3,7 +3,6 @@ package com.github.firelcw.interceptor;
 
 import com.github.firelcw.model.ExcludePath;
 import com.github.firelcw.model.HttpRequest;
-import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 
 import java.util.Collections;
@@ -18,11 +17,10 @@ public interface HttpInterceptor {
 
     /**
      * 前置拦截
-     * @param config 请求配置
      * @param request 后置拦截
      * @return boolean
      */
-    default boolean preHandle(HttpRequest request, HttpRequestConfig config){
+    default boolean preHandle(HttpRequest request){
         return true;
     }
 

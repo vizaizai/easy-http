@@ -47,6 +47,10 @@ public class HttpRequest {
      * 请求开始时间戳
      */
     private long startTime;
+    /**
+     * 请求配置
+     */
+    private HttpRequestConfig config;
 
     public void addHeader(String name, String value) {
         if (this.headers == null) {
@@ -138,5 +142,13 @@ public class HttpRequest {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public HttpRequestConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig(HttpRequestConfig config) {
+        this.config = config;
     }
 }

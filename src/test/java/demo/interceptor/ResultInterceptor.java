@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.firelcw.exception.EasyHttpException;
 import com.github.firelcw.interceptor.HttpInterceptor;
 import com.github.firelcw.model.HttpRequest;
-import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ResultInterceptor implements HttpInterceptor {
     @Override
-    public boolean preHandle(HttpRequest request, HttpRequestConfig config) {
+    public boolean preHandle(HttpRequest request) {
         return true;
     }
 

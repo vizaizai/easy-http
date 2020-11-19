@@ -111,7 +111,6 @@ public class RequestHandler implements Handler<HttpResponse>{
     private void client(AbstractClient client, HttpRequestConfig config) {
         this.config = config;
         this.client = client;
-        client.setConfig(config);
     }
 
     private void initRequest() {
@@ -122,6 +121,9 @@ public class RequestHandler implements Handler<HttpResponse>{
         this.handleUrl();
 
         this.request = new HttpRequest();
+
+        // 设置配置
+        this.request.setConfig(this.config);
 
         // 是否异步
         this.request.setAsync(this.getMethodParser().isAsync());
@@ -142,7 +144,6 @@ public class RequestHandler implements Handler<HttpResponse>{
         if (CollectionUtils.isNotEmpty(argParsers)) {
             // 处理请求query参数
             this.handleQuery();
-
             // 处理请求body参数
             this.handleBody();
 
@@ -153,6 +154,7 @@ public class RequestHandler implements Handler<HttpResponse>{
     public HttpResponse execute() {
         // 执行过滤
         this.doInterceptor();
+        client.setConfig(this.request.getConfig());
         return client.request(this.request);
     }
 
@@ -165,7 +167,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 排序
         interceptorOps.ordered();
         // 执行前置过滤器
-        interceptorOps.doPreInterceptors(this.request, this.getConfig());
+        interceptorOps.doPreInterceptors(this.request);
     }
     /**
      * 处理path

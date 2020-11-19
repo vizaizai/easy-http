@@ -3,7 +3,6 @@ package demo.interceptor;
 
 import com.github.firelcw.interceptor.HttpInterceptor;
 import com.github.firelcw.model.HttpRequest;
-import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 
 /**
@@ -14,7 +13,7 @@ import com.github.firelcw.model.HttpResponse;
 public class RequestHeadersInterceptor implements HttpInterceptor {
 
     @Override
-    public boolean preHandle(HttpRequest request, HttpRequestConfig config) {
+    public boolean preHandle(HttpRequest request) {
         //request.addHeader("Client-X","api");
         // request.addHeader("platform","wx-mp");
         return true;
