@@ -98,4 +98,12 @@ public class HttpResponse {
         this.setDeserialize(true);
         this.returnObject = returnObject;
     }
+
+    public static HttpResponse ok(String body) {
+        HttpResponse response = new HttpResponse();
+        response.setMessage("ok");
+        response.setStatusCode(200);
+        response.setBody(body);
+        return response;
+    }
 }

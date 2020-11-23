@@ -74,13 +74,13 @@ public class EasyHttp {
 
         public <T> T build(Class<T> clazz) {
             HttpInvocationHandler<T> invocationHandler = new HttpInvocationHandler<>(clazz);
-            invocationHandler.client(client);
-            invocationHandler.url(url);
-            invocationHandler.decoder(decoder);
-            invocationHandler.encoder(encoder);
-            invocationHandler.requestConfig(config);
-            invocationHandler.interceptors(interceptors);
-            invocationHandler.executor(executor);
+            invocationHandler.client(client)
+                             .url(url)
+                             .decoder(decoder)
+                             .encoder(encoder)
+                             .requestConfig(config)
+                             .interceptors(interceptors)
+                             .executor(executor);
             return invocationHandler.getProxy();
         }
 

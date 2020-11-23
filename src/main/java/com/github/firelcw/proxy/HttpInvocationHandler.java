@@ -31,7 +31,8 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
     private HttpRequestConfig requestConfig;
     private List<HttpInterceptor> interceptors;
     private Method method;
-    private Object[] args;
+    private Object[] args
+            ;
     private Executor executor;
 
     public HttpInvocationHandler(Class<T> targetClazz) {
