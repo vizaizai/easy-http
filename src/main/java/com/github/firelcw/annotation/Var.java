@@ -8,5 +8,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Var {
     String TYPE = "var";
-    String value();
+    String value() default "";
 }
