@@ -7,9 +7,11 @@ import com.github.firelcw.annotation.Query;
 import com.github.firelcw.annotation.Var;
 import com.github.firelcw.exception.EasyHttpException;
 import com.github.firelcw.util.TypeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 /**
  * 参数解析
@@ -46,6 +48,10 @@ public class ArgParser {
      * 变量名
      */
     private String varName;
+    /**
+     * 参数名称
+     */
+    private String argName;
 
     public ArgParser(Object source, Method method, int index) {
         this.source = source;
@@ -58,10 +64,15 @@ public class ArgParser {
 
         // 判断参数时简单参数还是对象参数
         Class<?> argClazz = source.getClass();
+
         this.argClass =  argClazz;
         // 是否为简单参数
         this.isSimple = TypeUtils.isSimple(argClazz.getTypeName());
         Annotation[] annotations = this.getParameterAnnotation();
+
+        // 获取参数名称
+        Parameter[] parameters = this.method.getParameters();
+        this.argName = parameters.length > this.index ? parameters[this.index].getName() : "arg" + this.index;
 
         // 一个参数最多一个注解
         if (annotations.length > 1) {
@@ -69,13 +80,14 @@ public class ArgParser {
         }
         if (annotations.length == 0) {
             this.type = Query.TYPE;
+            this.varName = this.varNameFor(null);
         }else {
             Annotation annotation = annotations[0];
+            this.varName = this.varNameFor(annotation);
+
             if (annotation instanceof Var) {
-                this.varName = ((Var) annotation).value();
                 this.type = Var.TYPE;
             }else if (annotation instanceof Query) {
-                this.varName = ((Query) annotation).value();
                 this.type = Query.TYPE;
             }else if (annotation instanceof Body) {
                 this.type = Body.TYPE;
@@ -108,6 +120,27 @@ public class ArgParser {
         }
         return parameterAnnotations[index];
     }
+
+    /**
+     * 获取变量名称(优先取注解上的名称)
+     * @param annotation 注解
+     * @return varName
+     */
+    private String varNameFor(Annotation annotation) {
+        String name;
+        if (annotation == null) {
+            return this.argName;
+        }
+        if (annotation instanceof Var) {
+            name= ((Var) annotation).value();
+        }else if (annotation instanceof Query) {
+            name = ((Query) annotation).value();
+        }else {
+            name = "";
+        }
+        return StringUtils.isNotBlank(name) ? name : this.argName;
+    }
+
     public Object getSource() {
         return source;
     }
@@ -162,6 +195,10 @@ public class ArgParser {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public String getArgName() {
+        return argName;
     }
 }
 
