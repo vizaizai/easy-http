@@ -112,7 +112,6 @@ public class BookServiceTest {
                                     .client(DefaultURLClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
-                                    .withInterceptor(new ResultInterceptor())
                                     .build(BookHttpService.class);
         CompletableFuture<String> s =  bookHttpService.baidu("dsy_Wlep4Af6LPQf","1290478984305881090");
 

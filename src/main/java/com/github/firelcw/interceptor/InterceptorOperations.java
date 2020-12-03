@@ -3,13 +3,10 @@ package com.github.firelcw.interceptor;
 import com.github.firelcw.exception.HttpInterceptorException;
 import com.github.firelcw.model.HttpMethod;
 import com.github.firelcw.model.HttpRequest;
-import com.github.firelcw.model.HttpRequestConfig;
 import com.github.firelcw.model.HttpResponse;
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +28,25 @@ public class InterceptorOperations {
         return operation;
     }
 
+    public void addInterceptors(HttpInterceptor ...interceptors) {
+        if (interceptors == null) {
+            return;
+        }
+        if (this.interceptors.isEmpty()) {
+            this.interceptors = new ArrayList<>();
+        }
+        this.interceptors.addAll(Arrays.asList(interceptors));
+    }
+
+    public void addInterceptors(List<HttpInterceptor> interceptors) {
+        if (CollectionUtils.isEmpty(interceptors)) {
+            return;
+        }
+        if (this.interceptors.isEmpty()) {
+            this.interceptors = new ArrayList<>();
+        }
+        this.interceptors.addAll(interceptors);
+    }
     /**
      * 拦截器排除
      */

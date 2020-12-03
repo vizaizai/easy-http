@@ -8,4 +8,7 @@ public class EasyHttpException extends RuntimeException{
     public EasyHttpException(String message) {
         super(message);
     }
+    public EasyHttpException(String message,Throwable cause) {
+        super(message, cause);
+    }
 }

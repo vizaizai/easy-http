@@ -2,12 +2,16 @@ package com.github.firelcw.parser;
 
 import com.github.firelcw.annotation.*;
 import com.github.firelcw.exception.EasyHttpException;
+import com.github.firelcw.interceptor.HttpInterceptor;
 import com.github.firelcw.model.HttpMethod;
 import com.github.firelcw.util.TypeUtils;
 import com.github.firelcw.util.Utils;
+import org.apache.commons.collections.CollectionUtils;
+import sun.dc.pr.PRError;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +54,10 @@ public class MethodParser {
      * 是否异步
      */
     private boolean async;
+    /**
+     * 方法上的拦截器
+     */
+    private List<HttpInterceptor> interceptors;
 
     public MethodParser() {
     }
@@ -71,34 +79,43 @@ public class MethodParser {
             throw new EasyHttpException("A request can specify only one request method");
         }
         Annotation methodAnnotation = methodAnnotations.get(0);
+        Class<? extends HttpInterceptor>[] interceptorClasses;
         if (methodAnnotation instanceof  Mapping) {
             Mapping mapping = ((Mapping) methodAnnotation);
             this.path = mapping.value();
             this.contentType = mapping.contentType();
             this.httpMethod = mapping.httpMethod();
+            interceptorClasses = mapping.interceptors();
 
         }else if (methodAnnotation instanceof Get) {
-            this.path = ((Get) methodAnnotation).value();
+            Get get = (Get) methodAnnotation;
+            this.path = get.value();
             this.httpMethod = HttpMethod.GET;
+            interceptorClasses = get.interceptors();
 
         }else if (methodAnnotation instanceof Post) {
             Post post = ((Post) methodAnnotation);
             this.path = post.value();
             this.contentType = post.contentType();
             this.httpMethod = HttpMethod.POST;
+            interceptorClasses = post.interceptors();
 
         }else if (methodAnnotation instanceof Put) {
             Put put = ((Put) methodAnnotation);
             this.path = put.value();
             this.contentType = put.contentType();
             this.httpMethod = HttpMethod.PUT;
+            interceptorClasses = put.interceptors();
 
         }else {
             Delete delete = ((Delete) methodAnnotation);
-            this.path = ((Delete) methodAnnotation).value();
+            this.path = delete.value();
             this.contentType = delete.contentType();
             this.httpMethod = HttpMethod.DELETE;
+            interceptorClasses = delete.interceptors();
         }
+        // 添加拦截器
+        this.addInterceptorsOnPath(interceptorClasses);
         // 请求头注解
         this.headers = Utils.getHeaders(annotations);
         // 计算路径变量
@@ -107,6 +124,28 @@ public class MethodParser {
         this.async = TypeUtils.isAsync(this.target.getGenericReturnType());
     }
 
+    /**
+     * 添加路径上的拦截器
+     * @param classes classes
+     */
+    private void addInterceptorsOnPath(Class<? extends HttpInterceptor>[] classes){
+        if (classes == null || classes.length == 0) {
+            return;
+        }
+        try {
+            for (Class<? extends HttpInterceptor> clazz : classes) {
+                if (this.interceptors == null) {
+                    this.interceptors = new ArrayList<>();
+                }
+                this.interceptors.add(clazz.newInstance());
+
+            }
+        }catch (Exception ex) {
+            throw new EasyHttpException("Instance 'interceptor' creation error", ex);
+        }
+
+
+    }
     /**
      * 选择请求方式注解
      * @param annotations
@@ -200,5 +239,9 @@ public class MethodParser {
 
     public boolean isAsync() {
         return async;
+    }
+
+    public List<HttpInterceptor> getInterceptors() {
+        return interceptors;
     }
 }

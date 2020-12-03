@@ -30,9 +30,6 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
     private Decoder decoder;
     private HttpRequestConfig requestConfig;
     private List<HttpInterceptor> interceptors;
-    private Method method;
-    private Object[] args
-            ;
     private Executor executor;
 
     public HttpInvocationHandler(Class<T> targetClazz) {
@@ -45,10 +42,8 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
     }
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        this.method = method;
-        this.args = args;
         // 构建请求处理
-        RequestHandler requestHandler = RequestHandler.create(this);
+        RequestHandler requestHandler = RequestHandler.create(this, method, args);
         // 构建响应处理
         ResponseHandler responseHandler = ResponseHandler.create(this, requestHandler);
 
@@ -117,13 +112,5 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
 
     public List<HttpInterceptor> getInterceptors() {
         return interceptors;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public Object[] getArgs() {
-        return args;
     }
 }
