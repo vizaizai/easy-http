@@ -23,7 +23,7 @@ Java版本: 最低 `8`
    <dependency>
      <groupId>com.github.firelcw</groupId>
      <artifactId>easy-http</artifactId>
-     <version>2.1.5</version>
+     <version>2.2.0</version>
    </dependency>
    ```
 

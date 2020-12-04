@@ -1,6 +1,7 @@
 package com.github.firelcw.annotation;
 
 
+import com.github.firelcw.interceptor.HttpInterceptor;
 import com.github.firelcw.model.ContentType;
 
 import java.lang.annotation.*;
@@ -11,4 +12,8 @@ import java.lang.annotation.*;
 public @interface Delete {
     String value() default "";
     String contentType() default ContentType.APPLICATION_JSON_UTF8;
+    /**
+     * @return 拦截器
+     */
+    Class<? extends HttpInterceptor>[] interceptors() default {};
 }

@@ -73,9 +73,7 @@ public class RequestHandler implements Handler<HttpResponse>{
      * @param invocation
      * @return RequestHandler
      */
-    public static RequestHandler create(HttpInvocationHandler<?> invocation) {
-        Method method = invocation.getMethod();
-        Object[] args = invocation.getArgs();
+    public static RequestHandler create(HttpInvocationHandler<?> invocation, Method method, Object[] args) {
         // 接口解析
         InterfaceParser interfaceParser = new InterfaceParser(invocation.getTargetClazz());
         // 方法解析
@@ -97,6 +95,9 @@ public class RequestHandler implements Handler<HttpResponse>{
 
         // 拦截器
         handler.interceptorOps = InterceptorOperations.create(invocation.getInterceptors());
+
+        // 添加路径级别的拦截器
+        handler.interceptorOps.addInterceptors(methodParser.getInterceptors());
 
         // 初始化请求
         handler.initRequest();

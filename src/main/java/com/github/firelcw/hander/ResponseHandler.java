@@ -38,7 +38,7 @@ public class ResponseHandler implements Handler<Object>{
      * @return ResponseHandler
      */
     public static ResponseHandler create(HttpInvocationHandler<?> invocation, RequestHandler requestHandler) {
-        Type returnType = invocation.getMethod().getGenericReturnType();
+        Type returnType = requestHandler.getMethodParser().getTarget().getGenericReturnType();
         ResponseHandler handler = new ResponseHandler();
         handler.request = requestHandler.getRequest();
         handler.returnType = TypeUtils.getDecodeType(returnType);

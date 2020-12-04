@@ -2,6 +2,7 @@ package demo.service;
 
 import com.github.firelcw.annotation.*;
 import com.github.firelcw.model.HttpMethod;
+import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
 
@@ -39,6 +40,8 @@ public interface BookHttpService {
     @Get("/books/bar")
     String[] bar();
 
-    @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId", httpMethod = HttpMethod.GET)
+    @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId",
+            httpMethod = HttpMethod.GET,
+            interceptors = ResultInterceptor.class)
     CompletableFuture<String> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
 }
