@@ -1,7 +1,7 @@
 package demo.service;
 
-import com.github.firelcw.annotation.*;
-import com.github.firelcw.model.HttpMethod;
+import com.github.vizaizai.annotation.*;
+import com.github.vizaizai.model.HttpMethod;
 import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;

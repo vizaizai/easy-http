@@ -1,6 +1,6 @@
 package demo.codec;
 
-import com.github.firelcw.codec.Encoder;
+import com.github.vizaizai.codec.Encoder;
 
 import java.util.Map;
 

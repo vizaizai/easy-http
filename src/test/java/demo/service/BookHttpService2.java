@@ -1,8 +1,8 @@
 package demo.service;
 
 
-import com.github.firelcw.annotation.Get;
-import com.github.firelcw.annotation.Var;
+import com.github.vizaizai.annotation.Get;
+import com.github.vizaizai.annotation.Var;
 import demo.model.Book;
 
 import java.util.List;
