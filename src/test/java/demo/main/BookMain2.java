@@ -1,7 +1,7 @@
 package demo.main;
 
 
-import com.github.firelcw.util.TypeUtils;
+import com.github.vizaizai.util.TypeUtils;
 
 import java.util.Collections;
 

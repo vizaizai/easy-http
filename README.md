@@ -21,13 +21,13 @@ Java版本: 最低 `8`
 
    ``` xml
    <dependency>
-     <groupId>com.github.firelcw</groupId>
+     <groupId>com.github.vizaizai</groupId>
      <artifactId>easy-http</artifactId>
      <version>2.2.0</version>
    </dependency>
    ```
 
-spring-boot版本移步: [easy-http-boot-starter](https://github.com/firelcw/easy-http-spring)
+spring-boot版本移步: [easy-http-boot-starter](https://github.com/vizaizai/easy-http-spring)
 
 ##### 3. 使用
 

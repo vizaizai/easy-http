@@ -1,12 +1,11 @@
 package demo.main;
 
 
-import com.github.firelcw.EasyHttp;
-import com.github.firelcw.client.ApacheHttpClient;
-import com.github.firelcw.client.DefaultURLClient;
-import com.github.firelcw.interceptor.ErrorInterceptor;
-import com.github.firelcw.interceptor.LogInterceptor;
-import demo.interceptor.ResultInterceptor;
+import com.github.vizaizai.EasyHttp;
+import com.github.vizaizai.client.ApacheHttpClient;
+import com.github.vizaizai.client.DefaultURLClient;
+import com.github.vizaizai.interceptor.ErrorInterceptor;
+import com.github.vizaizai.interceptor.LogInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
 import demo.service.BookHttpService;

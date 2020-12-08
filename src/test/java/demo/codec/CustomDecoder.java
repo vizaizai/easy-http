@@ -1,7 +1,7 @@
 package demo.codec;
 
-import com.github.firelcw.codec.Decoder;
-import com.github.firelcw.model.HttpResponse;
+import com.github.vizaizai.codec.Decoder;
+import com.github.vizaizai.model.HttpResponse;
 
 import java.lang.reflect.Type;
 
