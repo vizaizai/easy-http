@@ -1,9 +1,12 @@
 package com.github.vizaizai.parser;
 
-import com.github.vizaizai.annotation.*;
+import com.github.vizaizai.annotation.Mapping;
 import com.github.vizaizai.exception.EasyHttpException;
+import com.github.vizaizai.hander.mapping.Mappings;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpMethod;
+import com.github.vizaizai.model.MappingInfo;
+import com.github.vizaizai.model.RetryProperties;
 import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
 
@@ -56,6 +59,10 @@ public class MethodParser {
      * 方法上的拦截器
      */
     private List<HttpInterceptor> interceptors;
+    /**
+     * 重试属性
+     */
+    private RetryProperties retryProperties;
 
     public MethodParser() {
     }
@@ -77,41 +84,17 @@ public class MethodParser {
             throw new EasyHttpException("A request can specify only one request method");
         }
         Annotation methodAnnotation = methodAnnotations.get(0);
+
         Class<? extends HttpInterceptor>[] interceptorClasses;
-        if (methodAnnotation instanceof  Mapping) {
-            Mapping mapping = ((Mapping) methodAnnotation);
-            this.path = mapping.value();
-            this.contentType = mapping.contentType();
-            this.httpMethod = mapping.httpMethod();
-            interceptorClasses = mapping.interceptors();
 
-        }else if (methodAnnotation instanceof Get) {
-            Get get = (Get) methodAnnotation;
-            this.path = get.value();
-            this.httpMethod = HttpMethod.GET;
-            interceptorClasses = get.interceptors();
+        // 解析映射注解上的参数
+        MappingInfo mappingInfo = Mappings.getMappingInfo(methodAnnotation);
+        this.path = mappingInfo.getPath();
+        this.contentType = mappingInfo.getContentType();
+        this.httpMethod = mappingInfo.getHttpMethod();
+        this.retryProperties = mappingInfo.getRetryProperties();
+        interceptorClasses = mappingInfo.getInterceptors();
 
-        }else if (methodAnnotation instanceof Post) {
-            Post post = ((Post) methodAnnotation);
-            this.path = post.value();
-            this.contentType = post.contentType();
-            this.httpMethod = HttpMethod.POST;
-            interceptorClasses = post.interceptors();
-
-        }else if (methodAnnotation instanceof Put) {
-            Put put = ((Put) methodAnnotation);
-            this.path = put.value();
-            this.contentType = put.contentType();
-            this.httpMethod = HttpMethod.PUT;
-            interceptorClasses = put.interceptors();
-
-        }else {
-            Delete delete = ((Delete) methodAnnotation);
-            this.path = delete.value();
-            this.contentType = delete.contentType();
-            this.httpMethod = HttpMethod.DELETE;
-            interceptorClasses = delete.interceptors();
-        }
         // 添加拦截器
         this.addInterceptorsOnPath(interceptorClasses);
         // 请求头注解

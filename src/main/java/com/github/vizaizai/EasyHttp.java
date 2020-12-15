@@ -8,6 +8,7 @@ import com.github.vizaizai.codec.DefaultEncoder;
 import com.github.vizaizai.codec.Encoder;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpRequestConfig;
+import com.github.vizaizai.model.RetryProperties;
 import com.github.vizaizai.proxy.HttpInvocationHandler;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class EasyHttp {
         private String url;
         private final List<HttpInterceptor> interceptors;
         private Executor executor;
+        private RetryProperties retryProperties;
 
         public Builder() {
             this.client = ApacheHttpClient.getInstance();
@@ -72,6 +74,20 @@ public class EasyHttp {
             return this;
         }
 
+        /**
+         * 开始重试
+         * @param maxAttempts 最大重试次数
+         * @param intervalTime 间隔时间(ms)
+         * @return Builder
+         */
+        public Builder enableRetry(Integer maxAttempts, Integer intervalTime) {
+            this.retryProperties = new RetryProperties();
+            this.retryProperties.setEnable(true);
+            this.retryProperties.setMaxAttempts(maxAttempts);
+            this.retryProperties.setIntervalTime(intervalTime);
+            return this;
+        }
+
         public <T> T build(Class<T> clazz) {
             HttpInvocationHandler<T> invocationHandler = new HttpInvocationHandler<>(clazz);
             invocationHandler.client(client)
@@ -80,6 +96,7 @@ public class EasyHttp {
                              .encoder(encoder)
                              .requestConfig(config)
                              .interceptors(interceptors)
+                             .enableRetry(retryProperties)
                              .executor(executor);
             return invocationHandler.getProxy();
         }

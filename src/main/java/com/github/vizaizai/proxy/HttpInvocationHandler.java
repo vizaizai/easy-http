@@ -10,6 +10,7 @@ import com.github.vizaizai.hander.RequestHandler;
 import com.github.vizaizai.hander.ResponseHandler;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpRequestConfig;
+import com.github.vizaizai.model.RetryProperties;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -31,6 +32,7 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
     private HttpRequestConfig requestConfig;
     private List<HttpInterceptor> interceptors;
     private Executor executor;
+    private RetryProperties retryProperties;
 
     public HttpInvocationHandler(Class<T> targetClazz) {
         this.targetClazz = targetClazz;
@@ -85,6 +87,10 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
         this.executor = executor;
         return this;
     }
+    public HttpInvocationHandler<T> enableRetry(RetryProperties retryProperties) {
+        this.retryProperties = retryProperties;
+        return this;
+    }
 
     public Class<T> getTargetClazz() {
         return targetClazz;
@@ -112,5 +118,9 @@ public class HttpInvocationHandler<T> implements InvocationHandler {
 
     public List<HttpInterceptor> getInterceptors() {
         return interceptors;
+    }
+
+    public RetryProperties getRetryProperties() {
+        return retryProperties;
     }
 }

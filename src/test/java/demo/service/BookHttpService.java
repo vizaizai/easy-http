@@ -37,11 +37,12 @@ public interface BookHttpService {
     @Get("/books")
     CompletableFuture<ApiResult<List<Book>>> foo();
 
-    @Get("/books/bar")
+    @Get("/book/bar")
     String[] bar();
 
     @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId",
             httpMethod = HttpMethod.GET,
-            interceptors = ResultInterceptor.class)
+            interceptors = ResultInterceptor.class,
+            retries = 3)
     CompletableFuture<String> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
 }

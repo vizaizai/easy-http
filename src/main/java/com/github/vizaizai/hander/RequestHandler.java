@@ -6,19 +6,24 @@ import com.github.vizaizai.annotation.Query;
 import com.github.vizaizai.annotation.Var;
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.codec.Encoder;
+import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.interceptor.InterceptorOperations;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.model.RetryProperties;
 import com.github.vizaizai.parser.ArgParser;
 import com.github.vizaizai.parser.InterfaceParser;
 import com.github.vizaizai.parser.MethodParser;
 import com.github.vizaizai.proxy.HttpInvocationHandler;
+import com.github.vizaizai.retry.attempt.Modes;
+import com.github.vizaizai.retry.core.Retry;
 import com.github.vizaizai.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +71,10 @@ public class RequestHandler implements Handler<HttpResponse>{
      * 请求客户端
      */
     private AbstractClient client;
-
+    /**
+     * 重试属性
+     */
+    private RetryProperties retryProperties;
 
     /**
      * 创建RequestHandler
@@ -92,6 +100,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         handler.interfaceParser = interfaceParser;
         handler.argParsers = argParsers;
         handler.methodParser = methodParser;
+        handler.retryProperties = invocation.getRetryProperties();
 
         // 拦截器
         handler.interceptorOps = InterceptorOperations.create(invocation.getInterceptors());
@@ -156,6 +165,24 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 执行过滤
         this.doInterceptor();
         client.setConfig(this.request.getConfig());
+        // 开启重试，注入重试任务
+        if (this.retryProperties != null && this.retryProperties.isEnable()) {
+            // 最大重试次数
+            int max = this.retryProperties.getMaxAttempts() == null ? 3 : this.retryProperties.getMaxAttempts();
+            // 间隔时间（ms）
+            int intervalTime = this.retryProperties.getIntervalTime() == null ? 10 : this.retryProperties.getIntervalTime();
+            Retry<HttpResponse> retry = Retry.inject(() -> {
+                HttpResponse response = client.request(this.request);
+                // http状态码不对触发重试
+                if (!response.isOk()) {
+                    throw new EasyHttpException(response.getMessage());
+                }
+                return response;
+            });
+            return retry.max(max)
+                        .mode(Modes.arithmetic(intervalTime, 0, ChronoUnit.MILLIS))
+                        .execute();
+        }
         return client.request(this.request);
     }
 

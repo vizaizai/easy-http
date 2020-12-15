@@ -33,6 +33,7 @@ public class BookServiceTest {
                                     .client(ApacheHttpClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
+                                    .enableRetry(3,1000)
                                     .build(BookHttpService.class);
     }
 

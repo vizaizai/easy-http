@@ -14,4 +14,12 @@ public @interface Get {
      * @return 拦截器
      */
     Class<? extends HttpInterceptor>[] interceptors() default {};
+    /**
+     * @return 重试次数，-1=禁用重试
+     */
+    int retries() default 0;
+    /**
+     * @return 重试间隔时间（ms）
+     */
+    int interval() default 0;
 }
