@@ -1,17 +1,18 @@
 package com.github.vizaizai.client;
 
-import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.model.HttpMethod;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
 import com.github.vizaizai.util.Utils;
+import org.apache.commons.collections.MapUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.vizaizai.util.Utils.*;
@@ -35,45 +36,42 @@ public class DefaultURLClient extends AbstractClient{
 
 
     @Override
-    public HttpResponse request(HttpRequest param) {
+    public HttpResponse request(HttpRequest param) throws IOException{
         HttpRequestConfig config = super.getConfig();
 
         Entity entity = new Entity();
         entity.init(param);
 
-        this.addDefaultHeaders(param);
+        Map<String,String> headers = new HashMap<>();
+        this.addHeaders(param, headers);
+
 
         final URL url;
         final HttpURLConnection connection;
-        try {
-            url = new URL(entity.url);
-            connection = (HttpURLConnection) url.openConnection();
+        url = new URL(entity.url);
+        connection = (HttpURLConnection) url.openConnection();
 
-            connection.setConnectTimeout(config.getConnectTimeout());
-            connection.setReadTimeout(config.getRequestTimeout());
-            connection.setAllowUserInteraction(false);
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod(param.getMethod().name());
+        connection.setConnectTimeout(config.getConnectTimeout());
+        connection.setReadTimeout(config.getRequestTimeout());
+        connection.setAllowUserInteraction(false);
+        connection.setInstanceFollowRedirects(false);
+        connection.setRequestMethod(param.getMethod().name());
 
 
-            for (String field : param.getHeaders().keySet()) {
-                String values = param.getHeaders().get(field);
-                connection.addRequestProperty(field, values);
-            }
-
-            if (entity.body != null) {
-                connection.setChunkedStreamingMode(8196);
-                connection.setDoOutput(true);
-                try (OutputStream out = connection.getOutputStream()) {
-                    out.write(entity.body);
-                }
-            }
-            connection.connect();
-            return this.convertResponse(connection);
-
-        } catch (Exception e) {
-            throw new EasyHttpException("URL request error: " + e.getMessage());
+        for (String field : headers.keySet()) {
+            String values = headers.get(field);
+            connection.addRequestProperty(field, values);
         }
+
+        if (entity.body != null) {
+            connection.setChunkedStreamingMode(8196);
+            connection.setDoOutput(true);
+            try (OutputStream out = connection.getOutputStream()) {
+                out.write(entity.body);
+            }
+        }
+        connection.connect();
+        return this.convertResponse(connection);
 
     }
 
@@ -110,13 +108,16 @@ public class DefaultURLClient extends AbstractClient{
      * 添加默认
      * @param request
      */
-    private void addDefaultHeaders(HttpRequest request) {
+    private void addHeaders(HttpRequest request, Map<String, String> headers) {
 
+        if (MapUtils.isNotEmpty(request.getHeaders())) {
+            headers.putAll(request.getHeaders());
+        }
         if (request.getContentType() != null) {
-            request.addHeader(CONTENT_TYPE, request.getContentType());
+            headers.put(CONTENT_TYPE, request.getContentType());
         }
         if (request.getHeaders().get(ACCEPT) == null) {
-            request.addHeader(ACCEPT,"*/*");
+            headers.put(ACCEPT,"*/*");
         }
     }
 

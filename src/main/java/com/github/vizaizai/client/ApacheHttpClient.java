@@ -60,7 +60,7 @@ public class ApacheHttpClient extends AbstractClient {
        }
     }
 
-    public HttpResponse request(HttpRequest param) {
+    public HttpResponse request(HttpRequest param) throws IOException{
         HttpMethod method = param.getMethod();
         String url = param.getUrl();
         Map<String,String> headers = param.getHeaders();
@@ -127,11 +127,7 @@ public class ApacheHttpClient extends AbstractClient {
             result.setStatusCode(response.getStatusLine().getStatusCode());
             result.setContentLength(response.getEntity().getContentLength());
             result.setMessage(response.getStatusLine().getReasonPhrase());
-        } catch (IOException e) {
-            result.setMessage("request error:"+e.getMessage());
-            return result;
         }
-
         return result;
 
     }

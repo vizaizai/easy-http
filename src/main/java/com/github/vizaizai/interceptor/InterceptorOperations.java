@@ -90,4 +90,7 @@ public class InterceptorOperations {
         interceptors.forEach(e->e.postHandle(request, response));
     }
 
+    public List<HttpInterceptor> getInterceptors() {
+        return interceptors;
+    }
 }

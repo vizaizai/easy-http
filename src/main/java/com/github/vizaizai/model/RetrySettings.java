@@ -1,11 +1,13 @@
 package com.github.vizaizai.model;
 
+import com.github.vizaizai.retry.RetryTrigger;
+
 /**
- * 重试属性
+ * 重试设置
  * @author liaochongwei
  * @date 2020/12/15 15:40
  */
-public class RetryProperties {
+public class RetrySettings {
     /**
      * 是否开启
      */
@@ -18,6 +20,10 @@ public class RetryProperties {
      * 间隔时间(ms)
      */
     private Integer intervalTime;
+    /**
+     * 触发的重试条件
+     */
+    private RetryTrigger retryTrigger;
 
     public Boolean getEnable() {
         return enable;
@@ -41,5 +47,13 @@ public class RetryProperties {
 
     public void setIntervalTime(Integer intervalTime) {
         this.intervalTime = intervalTime;
+    }
+
+    public RetryTrigger getRetryTrigger() {
+        return retryTrigger;
+    }
+
+    public void setRetryTrigger(RetryTrigger retryTrigger) {
+        this.retryTrigger = retryTrigger;
     }
 }

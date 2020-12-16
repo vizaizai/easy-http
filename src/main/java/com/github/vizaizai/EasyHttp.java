@@ -8,8 +8,9 @@ import com.github.vizaizai.codec.DefaultEncoder;
 import com.github.vizaizai.codec.Encoder;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.RetryProperties;
+import com.github.vizaizai.model.RetrySettings;
 import com.github.vizaizai.proxy.HttpInvocationHandler;
+import com.github.vizaizai.retry.RetryTrigger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class EasyHttp {
         private String url;
         private final List<HttpInterceptor> interceptors;
         private Executor executor;
-        private RetryProperties retryProperties;
+        private RetrySettings retrySettings;
 
         public Builder() {
             this.client = ApacheHttpClient.getInstance();
@@ -73,20 +74,26 @@ public class EasyHttp {
             this.executor = executor;
             return this;
         }
-
         /**
-         * 开始重试
-         * @param maxAttempts 最大重试次数
-         * @param intervalTime 间隔时间(ms)
-         * @return Builder
+         * 可重试
+         * @param retries 最大重试次数
+         * @param interval 间隔时间(ms)
+         * @param retryTrigger 重试规则
+         * @return
          */
-        public Builder enableRetry(Integer maxAttempts, Integer intervalTime) {
-            this.retryProperties = new RetryProperties();
-            this.retryProperties.setEnable(true);
-            this.retryProperties.setMaxAttempts(maxAttempts);
-            this.retryProperties.setIntervalTime(intervalTime);
+        public Builder retryable(Integer retries, Integer interval, RetryTrigger retryTrigger) {
+            this.retrySettings = new RetrySettings();
+            this.retrySettings.setEnable(true);
+            this.retrySettings.setMaxAttempts(retries);
+            this.retrySettings.setIntervalTime(interval);
+            this.retrySettings.setRetryTrigger(retryTrigger);
             return this;
         }
+
+        public Builder retryable(Integer retries, Integer interval) {
+            return this.retryable(retries,interval, null);
+        }
+
 
         public <T> T build(Class<T> clazz) {
             HttpInvocationHandler<T> invocationHandler = new HttpInvocationHandler<>(clazz);
@@ -96,7 +103,7 @@ public class EasyHttp {
                              .encoder(encoder)
                              .requestConfig(config)
                              .interceptors(interceptors)
-                             .enableRetry(retryProperties)
+                             .enableRetry(retrySettings)
                              .executor(executor);
             return invocationHandler.getProxy();
         }

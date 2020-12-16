@@ -1,5 +1,7 @@
 package com.github.vizaizai.hander;
 
+import java.io.IOException;
+
 /**
  * 处理器
  * @author liaochongwei
@@ -7,5 +9,5 @@ package com.github.vizaizai.hander;
  */
 public interface Handler<T> {
 
-    T execute();
+    T execute() throws IOException;
 }

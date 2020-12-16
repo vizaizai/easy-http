@@ -25,7 +25,7 @@ public class ArgParser {
      */
     private Object source;
     /**
-     * 参数类型
+     * 参数clazz
      */
     private Class<?> argClass;
     /**

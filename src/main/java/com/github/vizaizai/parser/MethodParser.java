@@ -6,7 +6,7 @@ import com.github.vizaizai.hander.mapping.Mappings;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpMethod;
 import com.github.vizaizai.model.MappingInfo;
-import com.github.vizaizai.model.RetryProperties;
+import com.github.vizaizai.model.RetrySettings;
 import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
 
@@ -60,9 +60,9 @@ public class MethodParser {
      */
     private List<HttpInterceptor> interceptors;
     /**
-     * 重试属性
+     * 重试设置
      */
-    private RetryProperties retryProperties;
+    private RetrySettings retrySettings;
 
     public MethodParser() {
     }
@@ -92,7 +92,7 @@ public class MethodParser {
         this.path = mappingInfo.getPath();
         this.contentType = mappingInfo.getContentType();
         this.httpMethod = mappingInfo.getHttpMethod();
-        this.retryProperties = mappingInfo.getRetryProperties();
+        this.retrySettings = mappingInfo.getRetrySettings();
         interceptorClasses = mappingInfo.getInterceptors();
 
         // 添加拦截器
@@ -224,5 +224,9 @@ public class MethodParser {
 
     public List<HttpInterceptor> getInterceptors() {
         return interceptors;
+    }
+
+    public RetrySettings getRetrySettings() {
+        return retrySettings;
     }
 }

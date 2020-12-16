@@ -52,7 +52,7 @@ public class ResponseHandler implements Handler<Object>{
         if (response == null) {
             throw new EasyHttpException("Response is null");
         }
-        // 执行详情拦截
+        // 执行后置拦截
         interceptorOps.doPostInterceptors(this.request, this.response);
         // 如果已经序列化,则直接返回
         if (this.response.isDeserialize()) {
@@ -66,6 +66,10 @@ public class ResponseHandler implements Handler<Object>{
         this.response.setReturnObject(returnObject);
         this.response.setDeserialize(true);
         return returnObject;
+    }
+
+    public void setResponse(HttpResponse response) {
+        this.response = response;
     }
 
     public Type getReturnType() {

@@ -1,6 +1,7 @@
 package demo.main;
 
 
+import com.alibaba.fastjson.JSON;
 import com.github.vizaizai.EasyHttp;
 import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
@@ -33,7 +34,7 @@ public class BookServiceTest {
                                     .client(ApacheHttpClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
-                                    .enableRetry(3,1000)
+                                    .retryable(3,1000)
                                     .build(BookHttpService.class);
     }
 
@@ -102,7 +103,7 @@ public class BookServiceTest {
     @Test
     public void bar(){
         String[] bar = bookHttpService.bar();
-        System.out.println(bar);
+        System.out.println(JSON.toJSONString(bar));
     }
 
     @Test

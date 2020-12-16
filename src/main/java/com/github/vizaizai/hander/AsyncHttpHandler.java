@@ -29,16 +29,9 @@ public class AsyncHttpHandler extends HttpHandler {
     @Override
     public Object execute() {
         if (executor == null) {
-            return CompletableFuture.supplyAsync(this::run);
+            return CompletableFuture.supplyAsync(super::execute);
         }
-        return CompletableFuture.supplyAsync(this::run, executor);
-    }
-    /**
-     * 异步执行方法
-     * @return Object
-     */
-    private Object run() {
-       return responseHandler.response(requestHandler.execute()).execute();
+        return CompletableFuture.supplyAsync(super::execute, executor);
     }
     public Executor getExecutor() {
         return executor;

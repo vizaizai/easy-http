@@ -37,7 +37,10 @@ public class HttpResponse {
      * 消息
      */
     private String message;
-
+    /**
+     * 发生的异常信息
+     */
+    private Throwable cause;
 
     public boolean  isOk() {
         return statusCode >= 200 && statusCode <= 300 ;
@@ -94,6 +97,14 @@ public class HttpResponse {
         return returnObject;
     }
 
+    public Throwable getCause() {
+        return cause;
+    }
+
+    public void setCause(Throwable cause) {
+        this.cause = cause;
+    }
+
     public void setReturnObject(Object returnObject) {
         this.setDeserialize(true);
         this.returnObject = returnObject;
@@ -104,6 +115,13 @@ public class HttpResponse {
         response.setMessage("ok");
         response.setStatusCode(200);
         response.setBody(body);
+        return response;
+    }
+
+    public static HttpResponse exception(Throwable cause) {
+        HttpResponse response = new HttpResponse();
+        response.setMessage(cause.getMessage());
+        response.cause = cause;
         return response;
     }
 }

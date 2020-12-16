@@ -25,9 +25,9 @@ public class MappingInfo {
      */
     private Class<? extends HttpInterceptor>[] interceptors;
     /**
-     * 重试属性
+     * 重试设置
      */
-    private RetryProperties retryProperties;
+    private RetrySettings retrySettings;
 
     public String getPath() {
         return path;
@@ -61,11 +61,11 @@ public class MappingInfo {
         this.interceptors = interceptors;
     }
 
-    public RetryProperties getRetryProperties() {
-        return retryProperties;
+    public RetrySettings getRetrySettings() {
+        return retrySettings;
     }
 
-    public void setRetryProperties(RetryProperties retryProperties) {
-        this.retryProperties = retryProperties;
+    public void setRetrySettings(RetrySettings retrySettings) {
+        this.retrySettings = retrySettings;
     }
 }

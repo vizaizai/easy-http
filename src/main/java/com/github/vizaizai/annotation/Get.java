@@ -15,11 +15,11 @@ public @interface Get {
      */
     Class<? extends HttpInterceptor>[] interceptors() default {};
     /**
-     * @return 重试次数，-1=禁用重试
+     * @return 重试 (-1:禁用重试 0:默认 >0: 选用+重试次数)
      */
     int retries() default 0;
     /**
      * @return 重试间隔时间（ms）
      */
-    int interval() default 0;
+    int interval() default -1;
 }

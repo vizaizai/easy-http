@@ -66,7 +66,7 @@ public class TypeUtils {
     /**
      * 获取需要编码的返回值类型
      * @param type
-     * @return
+     * @return Type
      */
     public static Type getDecodeType(Type type) {
         if (!isAsync(type)) {

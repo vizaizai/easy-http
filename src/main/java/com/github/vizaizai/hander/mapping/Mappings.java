@@ -3,7 +3,7 @@ package com.github.vizaizai.hander.mapping;
 import com.github.vizaizai.annotation.*;
 import com.github.vizaizai.model.HttpMethod;
 import com.github.vizaizai.model.MappingInfo;
-import com.github.vizaizai.model.RetryProperties;
+import com.github.vizaizai.model.RetrySettings;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -47,18 +47,11 @@ public class Mappings {
      * @param interval interval（ms）
      */
     private static void addRetryProps(MappingInfo mappingInfo, Integer retries, Integer interval) {
-        RetryProperties retryProperties = new RetryProperties();
-        // 关闭重试
-        if (retries <= -1) {
-            retryProperties.setEnable(false);
-        }else if (retries == 0){ // 使用全局设置
-            retryProperties.setEnable(null);
-        }else {
-            retryProperties.setEnable(true);
-            retryProperties.setMaxAttempts(retries);
-            retryProperties.setIntervalTime(interval);
-        }
-        mappingInfo.setRetryProperties(retryProperties);
+        RetrySettings retrySettings = new RetrySettings();
+        retrySettings.setMaxAttempts(retries);
+        retrySettings.setIntervalTime(interval);
+        retrySettings.setEnable(retries == 0 ? null : retries > 0);
+        mappingInfo.setRetrySettings(retrySettings);
 
     }
 

@@ -6,24 +6,21 @@ import com.github.vizaizai.annotation.Query;
 import com.github.vizaizai.annotation.Var;
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.codec.Encoder;
-import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.interceptor.InterceptorOperations;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
-import com.github.vizaizai.model.RetryProperties;
+import com.github.vizaizai.model.RetrySettings;
 import com.github.vizaizai.parser.ArgParser;
 import com.github.vizaizai.parser.InterfaceParser;
 import com.github.vizaizai.parser.MethodParser;
 import com.github.vizaizai.proxy.HttpInvocationHandler;
-import com.github.vizaizai.retry.attempt.Modes;
-import com.github.vizaizai.retry.core.Retry;
 import com.github.vizaizai.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,9 +69,9 @@ public class RequestHandler implements Handler<HttpResponse>{
      */
     private AbstractClient client;
     /**
-     * 重试属性
+     * 重试设置
      */
-    private RetryProperties retryProperties;
+    private RetrySettings retrySettings;
 
     /**
      * 创建RequestHandler
@@ -100,7 +97,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         handler.interfaceParser = interfaceParser;
         handler.argParsers = argParsers;
         handler.methodParser = methodParser;
-        handler.retryProperties = invocation.getRetryProperties();
+        handler.retrySettings = invocation.getRetrySettings();
 
         // 拦截器
         handler.interceptorOps = InterceptorOperations.create(invocation.getInterceptors());
@@ -150,6 +147,9 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 处理请求headers
         this.handleHeaders();
 
+        // 处理重试设置
+        this.handleRetry();
+
         // 参数解析列表不为空，则需要解析方法参数
         if (CollectionUtils.isNotEmpty(argParsers)) {
             // 处理请求query参数
@@ -161,31 +161,12 @@ public class RequestHandler implements Handler<HttpResponse>{
     }
 
     @Override
-    public HttpResponse execute() {
+    public HttpResponse execute() throws IOException {
         // 执行过滤
         this.doInterceptor();
         client.setConfig(this.request.getConfig());
-        // 开启重试，注入重试任务
-        if (this.retryProperties != null && this.retryProperties.isEnable()) {
-            // 最大重试次数
-            int max = this.retryProperties.getMaxAttempts() == null ? 3 : this.retryProperties.getMaxAttempts();
-            // 间隔时间（ms）
-            int intervalTime = this.retryProperties.getIntervalTime() == null ? 10 : this.retryProperties.getIntervalTime();
-            Retry<HttpResponse> retry = Retry.inject(() -> {
-                HttpResponse response = client.request(this.request);
-                // http状态码不对触发重试
-                if (!response.isOk()) {
-                    throw new EasyHttpException(response.getMessage());
-                }
-                return response;
-            });
-            return retry.max(max)
-                        .mode(Modes.arithmetic(intervalTime, 0, ChronoUnit.MILLIS))
-                        .execute();
-        }
         return client.request(this.request);
     }
-
     /**
      * 执行过滤器
      */
@@ -270,6 +251,33 @@ public class RequestHandler implements Handler<HttpResponse>{
         }
     }
 
+    /**
+     * 处理重试设置
+     */
+    private void handleRetry() {
+        // 方法上的设置
+        RetrySettings methodSettings = this.methodParser.getRetrySettings();
+        if (methodSettings == null) {
+            return;
+        }
+        // 全局默认设置
+        if (this.retrySettings == null) {
+            this.retrySettings = new RetrySettings();
+        }
+        // 方法上的重试设置优先级更高
+        if (methodSettings.getEnable() != null) {
+            this.retrySettings.setEnable(methodSettings.getEnable());
+        }
+
+        if (methodSettings.getMaxAttempts() != null && methodSettings.getMaxAttempts() > 0) {
+            this.retrySettings.setMaxAttempts(methodSettings.getMaxAttempts());
+        }
+
+        if (methodSettings.getIntervalTime() != null && methodSettings.getIntervalTime() > -1) {
+            this.retrySettings.setIntervalTime(methodSettings.getIntervalTime());
+        }
+
+    }
     private void checkArgs() {
 
         if ("".equals(this.url)) {
@@ -351,5 +359,9 @@ public class RequestHandler implements Handler<HttpResponse>{
 
     public InterceptorOperations getInterceptorOps() {
         return interceptorOps;
+    }
+
+    public RetrySettings getRetrySettings() {
+        return retrySettings;
     }
 }

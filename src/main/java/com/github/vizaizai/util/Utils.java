@@ -168,7 +168,7 @@ public class Utils {
      * /books?name={name}&author={author}
      * @param source
      * @param params
-     * @return
+     * @return path
      */
     public static String formatPlaceholder(String source, Map<String,String> params) {
         if (MapUtils.isEmpty(params)) {

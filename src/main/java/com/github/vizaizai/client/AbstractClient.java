@@ -4,6 +4,8 @@ import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
 
+import java.io.IOException;
+
 /**
  * @author liaochongwei
  * @date 2020/8/20 10:09
@@ -15,7 +17,7 @@ public abstract class AbstractClient {
      * @param param HttpRequest
      * @return HttpResponse
      */
-    public abstract HttpResponse request(HttpRequest param);
+    public abstract HttpResponse request(HttpRequest param) throws IOException;
 
     public HttpRequestConfig getConfig() {
         return config;
