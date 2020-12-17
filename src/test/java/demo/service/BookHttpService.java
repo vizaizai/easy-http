@@ -37,7 +37,7 @@ public interface BookHttpService {
     @Get("/books")
     CompletableFuture<ApiResult<List<Book>>> foo();
 
-    @Get(value = "/book/bar", retries = 4, interval = 10)
+    @Get(value = "/book/bar", retries = 1, interval = 10)
     String[] bar();
 
     @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId",

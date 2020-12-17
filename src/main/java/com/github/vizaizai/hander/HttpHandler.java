@@ -10,6 +10,7 @@ import com.github.vizaizai.model.RetrySettings;
 import com.github.vizaizai.parser.ArgParser;
 import com.github.vizaizai.parser.InterfaceParser;
 import com.github.vizaizai.parser.MethodParser;
+import com.github.vizaizai.retry.RetryLimiter;
 
 import java.util.List;
 
@@ -41,8 +42,16 @@ public class HttpHandler implements Handler<Object>, Context{
     @Override
     public Object execute() {
         Object result;
-        if (RetryHandler.enableRetry(this.requestHandler.getRetrySettings())) {
-            result = new RetryHandler(this).execute();
+        String url = this.requestHandler.getRequest().getUrl();
+        if (RetryHandler.enableRetry(this.requestHandler.getRetrySettings()) && !RetryLimiter.limit(url)) {
+            try {
+                result = new RetryHandler(this).execute();
+                RetryLimiter.delete(url);
+            }catch (Exception e) {
+                // 重试全部失败，记录失败时间
+                RetryLimiter.add(url);
+                throw e;
+            }
         }else {
             result = this.doHttp();
         }
