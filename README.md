@@ -23,7 +23,7 @@ Java版本: 最低 `8`
    <dependency>
      <groupId>com.github.vizaizai</groupId>
      <artifactId>easy-http</artifactId>
-     <version>3.1.0</version>
+     <version>3.1.1</version>
    </dependency>
    ```
 
