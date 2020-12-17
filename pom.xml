@@ -6,7 +6,7 @@
 
     <groupId>com.github.vizaizai</groupId>
     <artifactId>easy-http</artifactId>
-    <version>3.1.0</version>
+    <version>3.1.1</version>
     <packaging>jar</packaging>
     <name>easy-http</name>
     <url>https://github.com/vizaizai/easy-http</url>
@@ -51,7 +51,7 @@
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <slf4j.version>1.7.30</slf4j.version>
         <logback.version>1.2.3</logback.version>
-        <retry.version>1.0.0</retry.version>
+        <retry.version>1.0.1</retry.version>
 
         <gpg.passphrase>easyhttp123</gpg.passphrase>
         <!-- gpg.exe的绝对路径，在gpg安装目录下的bin目录中 -->
