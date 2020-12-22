@@ -18,6 +18,7 @@ import com.github.vizaizai.proxy.HttpInvocationHandler;
 import com.github.vizaizai.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.TypeUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -200,16 +201,25 @@ public class RequestHandler implements Handler<HttpResponse>{
      */
     private void handleQuery() {
         for (ArgParser argParser : this.argParsers) {
-            if(Query.TYPE.equals(argParser.getType())) {
-                if (argParser.isSimple() && StringUtils.isBlank(argParser.getVarName())) {
-                   throw new IllegalArgumentException("The value of @Query is empty");
-                }
-                if (argParser.isSimple()) {
-                    this.request.addQueryParam(argParser.getVarName(), argParser.getSource().toString());
-                }else {
-                    this.request.addQueryParams(encoder.encodeMap(argParser.getSource()));
-                }
+            if (argParser.isSimple() && StringUtils.isBlank(argParser.getVarName())) {
+                throw new IllegalArgumentException("The value of @Query is empty");
             }
+            if(!Query.TYPE.equals(argParser.getType())) {
+                break;
+            }
+            if (argParser.isSimple()) {
+                // 为简单参数
+                this.request.addQueryParam(argParser.getVarName(), argParser.getSource().toString());
+            }else if (TypeUtils.isArrayType(argParser.getArgClass())) {
+                // 数组
+                this.request.addQueryParams(Utils.getNameValuesFromArray(argParser.getArgName(), argParser.getSource()));
+            }else if (argParser.getSource() instanceof Iterable) {
+                this.request.addQueryParams(Utils.getNameValuesFromList(argParser.getArgName(), (Iterable<?>) argParser.getSource()));
+            } else {
+                // JavaBean或者map
+                this.request.addQueryParams(encoder.encodeNameValue(argParser.getSource()));
+            }
+
         }
     }
 
@@ -245,7 +255,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 参数级别的headers
         for (ArgParser argParser : this.argParsers) {
             if (Headers.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
-                this.request.addHeaders(encoder.encodeMap(argParser.getSource()));
+                this.request.addHeaders(encoder.encodeNameValue(argParser.getSource()));
                 return;
             }
         }

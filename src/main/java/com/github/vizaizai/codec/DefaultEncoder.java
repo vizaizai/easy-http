@@ -1,9 +1,12 @@
 package com.github.vizaizai.codec;
 
 import com.alibaba.fastjson.JSON;
+import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.beanutils.BeanMap;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,25 +18,20 @@ public class DefaultEncoder implements Encoder {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, String> encodeMap(Object object) {
+    public StringNameValues encodeNameValue(Object object) {
         if (object == null) {
             return null;
         }
         Map<Object,Object> map;
-        Map<String,String> result = new HashMap<>();
-
         if (object instanceof  Map) {
             map = (Map<Object, Object>)object;
-        }else {
-            map = new BeanMap(object);
-        }
-        map.forEach((k, v)-> {
-            String key = k.toString();
-            if (v != null && !key.equals("class")) {
-                result.put(key, v.toString());
+        } else {
+            map = new HashMap<>(new BeanMap(object));
+            if (map.get("class") != null) {
+                map.remove("class");
             }
-        });
-        return result;
+        }
+        return Utils.toNameValues(map);
     }
 
     @Override

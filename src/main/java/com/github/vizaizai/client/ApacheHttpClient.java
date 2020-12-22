@@ -8,6 +8,8 @@ import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
 import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.util.value.HeadersNameValues;
+import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -63,8 +65,8 @@ public class ApacheHttpClient extends AbstractClient {
     public HttpResponse request(HttpRequest param) throws IOException{
         HttpMethod method = param.getMethod();
         String url = param.getUrl();
-        Map<String,String> headers = param.getHeaders();
-        Map<String,String> params = param.getQueryParams();
+        HeadersNameValues headers = param.getHeaders();
+        StringNameValues params = param.getQueryParams();
         String content = param.getBody();
 
         if (config == null) {
@@ -76,8 +78,8 @@ public class ApacheHttpClient extends AbstractClient {
 
         List<BasicNameValuePair> queryParams = new ArrayList<>();
         HttpResponse result = new HttpResponse();
-        if (params != null && params.size() > 0) {
-            params.forEach((k,v)-> queryParams.add(new BasicNameValuePair(k, v)));
+        if (params != null && !params.isEmpty()) {
+            params.forEach(e-> queryParams.add(new BasicNameValuePair(e.getName(), e.getValue())));
         }
         HttpUriRequest request;
         switch (method) {
@@ -113,7 +115,7 @@ public class ApacheHttpClient extends AbstractClient {
 
         //添加请求头
         if (headers != null) {
-            headers.forEach(request::addHeader);
+            headers.forEach(e-> request.addHeader(e.getName(), e.getValue()));
         }
 
         try (CloseableHttpResponse response = httpClient.execute(request)){

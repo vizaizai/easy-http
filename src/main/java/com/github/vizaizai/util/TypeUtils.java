@@ -1,5 +1,6 @@
 package com.github.vizaizai.util;
 
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.stream.Stream;
@@ -53,6 +54,14 @@ public class TypeUtils {
         });
     }
 
+    /**
+     * 获取数组元素类型
+     * @param clazz
+     * @return Class
+     */
+    public static Class<?> getArrayComponentClass(Class<?> clazz) {
+        return clazz.isArray() ? clazz.getComponentType() : null;
+    }
     /**
      * 是否异步请求(要求返回值类型为 Future、CompletableFuture)
      * @param returnType

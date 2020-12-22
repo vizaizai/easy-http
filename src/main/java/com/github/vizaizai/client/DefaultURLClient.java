@@ -5,15 +5,16 @@ import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
 import com.github.vizaizai.util.Utils;
-import org.apache.commons.collections.MapUtils;
+import com.github.vizaizai.util.value.HeadersNameValues;
+import com.github.vizaizai.util.value.StringNameValue;
+import com.github.vizaizai.util.value.StringNameValues;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.github.vizaizai.util.Utils.*;
 import static java.lang.String.format;
@@ -42,7 +43,7 @@ public class DefaultURLClient extends AbstractClient{
         Entity entity = new Entity();
         entity.init(param);
 
-        Map<String,String> headers = new HashMap<>();
+        HeadersNameValues headers = new HeadersNameValues();
         this.addHeaders(param, headers);
 
 
@@ -58,9 +59,8 @@ public class DefaultURLClient extends AbstractClient{
         connection.setRequestMethod(param.getMethod().name());
 
 
-        for (String field : headers.keySet()) {
-            String values = headers.get(field);
-            connection.addRequestProperty(field, values);
+        for (StringNameValue nameValue : headers) {
+            connection.addRequestProperty(nameValue.getName(), nameValue.getValue());
         }
 
         if (entity.body != null) {
@@ -108,16 +108,16 @@ public class DefaultURLClient extends AbstractClient{
      * 添加默认
      * @param request
      */
-    private void addHeaders(HttpRequest request, Map<String, String> headers) {
+    private void addHeaders(HttpRequest request, HeadersNameValues headers) {
 
-        if (MapUtils.isNotEmpty(request.getHeaders())) {
-            headers.putAll(request.getHeaders());
+        if (CollectionUtils.isNotEmpty(request.getHeaders())) {
+            headers.addAll(request.getHeaders());
         }
         if (request.getContentType() != null) {
-            headers.put(CONTENT_TYPE, request.getContentType());
+            headers.add(CONTENT_TYPE, request.getContentType());
         }
-        if (request.getHeaders().get(ACCEPT) == null) {
-            headers.put(ACCEPT,"*/*");
+        if (request.getHeaders().getHeaders(ACCEPT).isEmpty()) {
+            headers.add(ACCEPT,"*/*");
         }
     }
 
@@ -147,7 +147,7 @@ public class DefaultURLClient extends AbstractClient{
             }
         }
 
-        private void handleUrl(Map<String,String> params) {
+        private void handleUrl(StringNameValues params) {
             String urlParams = asUrlEncoded(params, UTF_8.name());
             if (urlParams == null) {
                 return;

@@ -4,9 +4,15 @@ package com.github.vizaizai.interceptor;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpResponse;
 import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.util.value.HeadersNameValues;
+import com.github.vizaizai.util.value.StringNameValue;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * http日志拦截器
@@ -25,15 +31,21 @@ public class LogInterceptor implements HttpInterceptor{
         }
         String method = request.getMethod() == null ? "" : request.getMethod().name();
         log.debug("请求行: {} {}",method, request.getUrl());
-        if (MapUtils.isNotEmpty(request.getHeaders())) {
+        if (CollectionUtils.isNotEmpty(request.getHeaders())) {
             StringBuilder sb = new StringBuilder();
-            request.getHeaders().forEach((k,v)-> {
-                sb.append(k).append(":").append(v).append(", ");
-            });
-            sb.deleteCharAt(sb.length() - 2);
+            HeadersNameValues headers = request.getHeaders();
+            Set<String> names = headers.names();
+            for (String name : names) {
+                sb.append(name).append(":");
+                for (String value : headers.getHeaders(name)) {
+                    sb.append(value).append(",");
+                }
+                sb.deleteCharAt(sb.length() - 1);
+                sb.append(" ");
+            }
             log.debug("请求头: {}", sb);
         }
-        if (MapUtils.isNotEmpty(request.getQueryParams())) {
+        if (CollectionUtils.isNotEmpty(request.getQueryParams())) {
             log.debug("请求参数: {}", Utils.asUrlEncoded(request.getQueryParams()));
         }
         if (request.getBody() != null) {

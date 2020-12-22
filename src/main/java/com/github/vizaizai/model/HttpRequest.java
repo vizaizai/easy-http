@@ -1,7 +1,8 @@
 package com.github.vizaizai.model;
 
-import java.util.Collections;
-import java.util.HashMap;
+import com.github.vizaizai.util.value.HeadersNameValues;
+import com.github.vizaizai.util.value.StringNameValues;
+
 import java.util.Map;
 
 /**
@@ -26,11 +27,11 @@ public class HttpRequest {
     /**
      * 请求头
      */
-    private Map<String, String> headers;
+    private HeadersNameValues headers;
     /**
      * 请求参数 ?param1=1
      */
-    private Map<String, String> params;
+    private StringNameValues params;
     /**
      * 请求体文本内容
      */
@@ -54,37 +55,37 @@ public class HttpRequest {
 
     public void addHeader(String name, String value) {
         if (this.headers == null) {
-            this.headers = new HashMap<>();
+            this.headers = new HeadersNameValues();
         }
-        this.headers.put(name, value);
+        this.headers.add(name, value);
     }
 
-    public void addHeaders(Map<String, String> headers) {
+    public void addHeaders(StringNameValues headers) {
         if (this.headers == null) {
-            this.headers = new HashMap<>();
+            this.headers = new HeadersNameValues();
         }
-        this.headers.putAll(headers);
+        this.headers.addAll(headers);
     }
 
     public void addQueryParam(String key, String value) {
         if (this.params == null) {
-            this.params = new HashMap<>();
+            this.params = new StringNameValues();
         }
-        this.params.put(key, value);
+        this.params.add(key, value);
     }
 
-    public void addQueryParams(Map<String, String> query) {
+    public void addQueryParams(StringNameValues nameValues) {
         if (this.params == null) {
-            this.params = new HashMap<>();
+            this.params = new StringNameValues();
         }
-        this.params.putAll(query);
+        this.params.addAll(nameValues);
     }
 
-    public Map<String, String> getHeaders() {
-        return headers == null ? Collections.emptyMap() : headers;
+    public HeadersNameValues getHeaders() {
+        return headers == null ? new HeadersNameValues() : headers;
     }
 
-    public Map<String, String> getQueryParams() {
+    public StringNameValues getQueryParams() {
         return params;
     }
 

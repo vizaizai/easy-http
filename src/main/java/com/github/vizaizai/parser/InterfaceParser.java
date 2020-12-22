@@ -1,6 +1,7 @@
 package com.github.vizaizai.parser;
 
 import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.util.value.HeadersNameValues;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class InterfaceParser {
     /**
      * 接口级别的headers
      */
-    private Map<String,String> headers;
+    private HeadersNameValues headers;
 
     public InterfaceParser() {
     }
@@ -41,7 +42,7 @@ public class InterfaceParser {
         return target;
     }
 
-    public Map<String, String> getHeaders() {
+    public HeadersNameValues getHeaders() {
         return headers;
     }
 }

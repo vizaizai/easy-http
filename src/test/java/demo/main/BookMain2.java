@@ -1,9 +1,7 @@
 package demo.main;
 
 
-import com.github.vizaizai.util.TypeUtils;
-
-import java.util.Collections;
+import com.github.vizaizai.util.value.StringNameValues;
 
 /**
  * @author liaochongwei
@@ -11,12 +9,12 @@ import java.util.Collections;
  */
 public class BookMain2 {
     public static void main(String[] args) {
+        StringNameValues nameValues = new StringNameValues();
 
-        System.out.println(TypeUtils.isSimple(String[].class.getTypeName()));
-        System.out.println(TypeUtils.isSimple(char.class.getTypeName()));
-        System.out.println(TypeUtils.isSimple(Character.class.getTypeName()));
+        nameValues.add("13123","1233213");
+        nameValues.add("13123","1233213");
 
-        Collections.emptyList().add("1");
+        System.out.println(nameValues.getNameValues().size());
     }
 
 }
