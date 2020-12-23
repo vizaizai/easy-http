@@ -9,6 +9,7 @@ import com.github.vizaizai.model.MappingInfo;
 import com.github.vizaizai.model.RetrySettings;
 import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.util.value.HeadersNameValues;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -50,7 +51,7 @@ public class MethodParser {
     /**
      * 方法级别的headers
      */
-    private Map<String,String> headers;
+    private HeadersNameValues headers;
     /**
      * 是否异步
      */
@@ -214,7 +215,7 @@ public class MethodParser {
         this.contentType = contentType;
     }
 
-    public Map<String, String> getHeaders() {
+    public HeadersNameValues getHeaders() {
         return headers;
     }
 

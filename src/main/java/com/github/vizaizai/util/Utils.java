@@ -2,19 +2,24 @@ package com.github.vizaizai.util;
 
 import com.github.vizaizai.annotation.Headers;
 import com.github.vizaizai.model.ContentType;
+import com.github.vizaizai.util.value.HeadersNameValues;
+import com.github.vizaizai.util.value.StringNameValue;
+import com.github.vizaizai.util.value.StringNameValues;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,12 +66,14 @@ public class Utils {
 
     public static final String COLON = ":";
 
+    public static final String COMMA = ",";
+
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
 
 
-    public static String asUrlEncoded(Map<String, String> source) {
+    public static String asUrlEncoded(StringNameValues source) {
         return asUrlEncoded(source,null);
     }
     /**
@@ -76,15 +83,16 @@ public class Utils {
      * @param encode
      * @return String
      */
-    public static String asUrlEncoded(Map<String, String> source, String encode) {
-        if (MapUtils.isEmpty(source)) {
+    public static String asUrlEncoded(StringNameValues source, String encode) {
+        if (CollectionUtils.isEmpty(source)) {
             return null;
         }
-        Iterator<String> it = source.keySet().iterator();
+        Iterator<StringNameValue> iterator = source.iterator();
         StringBuilder sb = new StringBuilder();
-        while (it.hasNext()){
-            String key = it.next();
-            String value = source.get(key);
+        while (iterator.hasNext()){
+            StringNameValue nameValue = iterator.next();
+            String key = nameValue.getName();
+            String value = nameValue.getValue();
             if (StringUtils.isBlank(value)){
                 continue;
             }
@@ -204,28 +212,108 @@ public class Utils {
      * @param annotations
      * @return  Map<String,String>
      */
-    public static Map<String,String> getHeaders(Annotation[] annotations) {
+    public static HeadersNameValues getHeaders(Annotation[] annotations) {
         if (annotations == null || annotations.length == 0) {
             return null;
         }
-        return Stream.of(annotations)
-                     .filter(e -> e instanceof Headers)
-                     .flatMap(e -> {
-                         String[] values = ((Headers) e).value();
-                         return Stream.of(values);
-                     })
-                     .map(Utils::genKeyValue)
-                     .collect(Collectors.toMap(e->e[0], e->e[1]));
+        List<StringNameValue> nameValues = Stream.of(annotations)
+                                                .filter(e -> e instanceof Headers)
+                                                .flatMap(e -> {
+                                                    String[] values = ((Headers) e).value();
+                                                    return Stream.of(values);
+                                                })
+                                                .map(Utils::genKeyValue)
+                                                .flatMap(Collection::stream)
+                                                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(nameValues)) {
+            return null;
+        }
+        HeadersNameValues headersNameValues = new HeadersNameValues();
+        headersNameValues.addAll(nameValues);
+
+        return headersNameValues;
     }
 
-    private static String[] genKeyValue(String header) {
+
+    /**
+     * 转化为NameMap
+     * @param queryObj
+     * @return StringNameValues
+     */
+    public static StringNameValues toNameValues(Map<?,?> queryObj) {
+        StringNameValues nameValues = new StringNameValues();
+        for (Map.Entry<?, ?> entry : queryObj.entrySet()) {
+            Object key = entry.getKey();
+            Object value = queryObj.get(entry.getKey());
+            if (value == null) {
+                continue;
+            }
+            String strKey = String.valueOf(key);
+            if (TypeUtils.isArrayType(value.getClass())) { // 值为数组
+                nameValues.addAll(getNameValuesFromArray(strKey, value));
+            } else if (value instanceof Iterable) { // 值为集合
+                nameValues.addAll(getNameValuesFromList(strKey, (Iterable<?>) value));
+            } else {
+                nameValues.add(strKey, String.valueOf(value));
+            }
+
+        }
+        return nameValues;
+    }
+
+    /**
+     * 从数组中获取NameValues
+     * @param key keu
+     * @param value array
+     * @return StringNameValues
+     */
+    public static StringNameValues getNameValuesFromArray(String key, Object value) {
+        StringNameValues nameValues = new StringNameValues();
+        if (!TypeUtils.isArrayType(value.getClass())) {
+           return null;
+        }
+        int length = Array.getLength(value);
+        if (length == 0) {
+            return null;
+        }
+        for (int i = 0; i < length; i++) {
+            nameValues.add(key, String.valueOf(Array.get(value, i)));
+        }
+        return nameValues;
+    }
+
+    /**
+     * 从集合中获取NameValues
+     * @param key
+     * @param iterable
+     * @return StringNameValues
+     */
+    public static StringNameValues getNameValuesFromList(String key, Iterable<?> iterable) {
+        StringNameValues nameValues = new StringNameValues();
+        for (Object item : iterable) {
+            nameValues.add(key, String.valueOf(item));
+        }
+        return nameValues;
+    }
+
+    private static List<StringNameValue> genKeyValue(String header) {
         String[] split = header.split(COLON+" ");
         if (split.length != 2 ) {
             logger.error("Formatting error: {}", header);
             throw new IllegalArgumentException("Formatting error");
         }
-        split[0] = split[0].trim();
-        split[1] = split[1].trim();
-        return split;
+        String name =  split[0].trim();
+        String value = split[1].trim();
+        List<StringNameValue> nameValues = new LinkedList<>();
+        String[] values = value.split(COMMA);
+
+        for (String v : values) {
+            nameValues.add(new StringNameValue(name,v));
+        }
+        return nameValues;
     }
+
+
+
+
 }

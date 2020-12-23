@@ -2,22 +2,20 @@ package demo.main;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.vizaizai.EasyHttp;
-import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
+import demo.model.QueryForm;
 import demo.service.BookHttpService;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -31,7 +29,7 @@ public class BookServiceTest {
     public void init() {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
-                                    .client(ApacheHttpClient.getInstance())
+                                    .client(DefaultURLClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .retryable(3,1000)
@@ -102,7 +100,21 @@ public class BookServiceTest {
 
     @Test
     public void bar(){
-        String[] bar = bookHttpService.bar();
+        String[] bar = bookHttpService.bar(new String[]{"1","2"});
+        System.out.println(JSON.toJSONString(bar));
+    }
+
+    @Test
+    public void bar1(){
+        String[] bar = bookHttpService.bar1(Arrays.asList("123","111"));
+        System.out.println(JSON.toJSONString(bar));
+    }
+
+    @Test
+    public void foo() {
+        QueryForm form = new QueryForm();
+        form.setIds(Arrays.asList("123","555","lololo"));
+        String[] bar = bookHttpService.foo(form, new JSONObject().fluentPut("HeaderName","121111"));
         System.out.println(JSON.toJSONString(bar));
     }
 

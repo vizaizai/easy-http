@@ -1,19 +1,22 @@
 package demo.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.vizaizai.annotation.*;
 import com.github.vizaizai.model.HttpMethod;
 import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
+import demo.model.QueryForm;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * @author liaochongwei
  * @date 2020/8/3 10:27
  */
-@Headers({"client: easy-http","sign: 56c41d9e1142784770d2c8cd1049c9e3"})
+@Headers({"client: easy-http,okHttp","sign: 56c41d9e1142784770d2c8cd1049c9e3"})
 public interface BookHttpService {
 
     @Post("/books")
@@ -38,7 +41,14 @@ public interface BookHttpService {
     CompletableFuture<ApiResult<List<Book>>> foo();
 
     @Get(value = "/book/bar", retries = 1, interval = 10)
-    String[] bar();
+    String[] bar(String[] ids);
+
+    @Get(value = "/book/bar", retries = 1, interval = 10)
+    String[] bar1(List<String> ids);
+
+    @Headers({"client: easy-http1,okHttp","sign: 56c41d9e1142784770d2sc8cd1049c9e3"})
+    @Get(value = "/book/bar")
+    String[] foo(QueryForm form, @Headers JSONObject headers);
 
     @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId",
             httpMethod = HttpMethod.GET,
