@@ -4,7 +4,6 @@ package demo.main;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.vizaizai.EasyHttp;
-import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
@@ -30,7 +29,7 @@ public class BookServiceTest {
     public void init() {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
-                                    .client(ApacheHttpClient.getInstance())
+                                    .client(DefaultURLClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .retryable(3,1000)
@@ -114,8 +113,8 @@ public class BookServiceTest {
     @Test
     public void foo() {
         QueryForm form = new QueryForm();
-        form.setIds(new String[]{"1","2"});
-        String[] bar = bookHttpService.foo(form, new JSONObject().fluentPut("12323","121111"));
+        form.setIds(Arrays.asList("123","555","lololo"));
+        String[] bar = bookHttpService.foo(form, new JSONObject().fluentPut("HeaderName","121111"));
         System.out.println(JSON.toJSONString(bar));
     }
 

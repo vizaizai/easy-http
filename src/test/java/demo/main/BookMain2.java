@@ -1,6 +1,7 @@
 package demo.main;
 
 
+import com.github.vizaizai.util.value.StringNameValue;
 import com.github.vizaizai.util.value.StringNameValues;
 
 /**
@@ -14,7 +15,7 @@ public class BookMain2 {
         nameValues.add("13123","1233213");
         nameValues.add("13123","1233213");
 
-        System.out.println(nameValues.getNameValues().size());
+        System.out.println(String.valueOf(new StringNameValue("123123","fdd")));
     }
 
 }

@@ -1,5 +1,7 @@
 package demo.model;
 
+import java.util.List;
+
 /**
  * @author liaochongwei
  * @date 2020/12/22 10:07
@@ -7,14 +9,13 @@ package demo.model;
 
 public class QueryForm {
 
-    private String[] ids;
+    private List<String> ids;
 
-
-    public String[] getIds() {
+    public List<String> getIds() {
         return ids;
     }
 
-    public void setIds(String[] ids) {
+    public void setIds(List<String> ids) {
         this.ids = ids;
     }
 }

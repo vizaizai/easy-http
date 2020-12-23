@@ -5,13 +5,10 @@ import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpResponse;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
-import com.github.vizaizai.util.value.StringNameValue;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -60,8 +57,12 @@ public class LogInterceptor implements HttpInterceptor{
         if (!log.isDebugEnabled()) {
             return;
         }
-        log.debug("请求响应: {} [{}]:{} ",request.getUrl(), response.getStatusCode(), response.getMessage());
-        log.debug("响应体: {}", response.getBody());
+        log.debug("请求响应: {} [{}]:{} ",request.getUrl(), response.getStatusCode(), text(response.getMessage()));
+        log.debug("响应体: {}", text(response.getBody()));
         log.debug("耗时: {}毫秒",endTime - request.getStartTime());
+    }
+
+    private static String text(Object o) {
+        return o == null ? "" : o.toString();
     }
 }

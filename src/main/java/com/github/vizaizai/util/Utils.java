@@ -238,10 +238,11 @@ public class Utils {
     /**
      * 转化为NameMap
      * @param queryObj
+     * @return StringNameValues
      */
-    public static StringNameValues toNameValues(Map<Object,Object> queryObj) {
+    public static StringNameValues toNameValues(Map<?,?> queryObj) {
         StringNameValues nameValues = new StringNameValues();
-        for (Map.Entry<Object, Object> entry : queryObj.entrySet()) {
+        for (Map.Entry<?, ?> entry : queryObj.entrySet()) {
             Object key = entry.getKey();
             Object value = queryObj.get(entry.getKey());
             if (value == null) {
@@ -253,9 +254,8 @@ public class Utils {
             } else if (value instanceof Iterable) { // 值为集合
                 nameValues.addAll(getNameValuesFromList(strKey, (Iterable<?>) value));
             } else {
-                nameValues.add(strKey, value.toString());
+                nameValues.add(strKey, String.valueOf(value));
             }
-
 
         }
         return nameValues;
@@ -291,7 +291,7 @@ public class Utils {
     public static StringNameValues getNameValuesFromList(String key, Iterable<?> iterable) {
         StringNameValues nameValues = new StringNameValues();
         for (Object item : iterable) {
-            nameValues.add(key, item.toString());
+            nameValues.add(key, String.valueOf(item));
         }
         return nameValues;
     }

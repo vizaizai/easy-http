@@ -6,7 +6,6 @@ import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.beanutils.BeanMap;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,14 +16,13 @@ import java.util.Map;
 public class DefaultEncoder implements Encoder {
 
     @Override
-    @SuppressWarnings("unchecked")
     public StringNameValues encodeNameValue(Object object) {
         if (object == null) {
             return null;
         }
-        Map<Object,Object> map;
+        Map<?,?> map;
         if (object instanceof  Map) {
-            map = (Map<Object, Object>)object;
+            map = (Map<?, ?>) object;
         } else {
             map = new HashMap<>(new BeanMap(object));
             if (map.get("class") != null) {

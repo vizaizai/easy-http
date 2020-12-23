@@ -208,12 +208,13 @@ public class RequestHandler implements Handler<HttpResponse>{
                 break;
             }
             if (argParser.isSimple()) {
-                // 为简单参数
+                // 基本数据类型
                 this.request.addQueryParam(argParser.getVarName(), argParser.getSource().toString());
             }else if (TypeUtils.isArrayType(argParser.getArgClass())) {
                 // 数组
                 this.request.addQueryParams(Utils.getNameValuesFromArray(argParser.getArgName(), argParser.getSource()));
             }else if (argParser.getSource() instanceof Iterable) {
+                // 集合
                 this.request.addQueryParams(Utils.getNameValuesFromList(argParser.getArgName(), (Iterable<?>) argParser.getSource()));
             } else {
                 // JavaBean或者map
