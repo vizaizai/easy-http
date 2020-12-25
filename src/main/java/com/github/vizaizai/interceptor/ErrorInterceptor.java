@@ -5,7 +5,7 @@ import com.github.vizaizai.exception.CodeStatusException;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpResponse;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.vizaizai.logging.LoggerFactory;
 
 /**
  * 错误拦截器

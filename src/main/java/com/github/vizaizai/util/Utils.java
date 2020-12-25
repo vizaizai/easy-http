@@ -10,7 +10,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.vizaizai.logging.LoggerFactory;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
