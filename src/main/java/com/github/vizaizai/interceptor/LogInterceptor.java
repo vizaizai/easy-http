@@ -1,13 +1,13 @@
 package com.github.vizaizai.interceptor;
 
 
+import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpResponse;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -59,7 +59,7 @@ public class LogInterceptor implements HttpInterceptor{
         }
         log.debug("请求响应: {} [{}]:{} ",request.getUrl(), response.getStatusCode(), text(response.getMessage()));
         log.debug("响应体: {}", text(response.getBody()));
-        log.debug("耗时: {}毫秒",endTime - request.getStartTime());
+        log.debug("耗时: {}ms",endTime - request.getStartTime());
     }
 
     private static String text(Object o) {

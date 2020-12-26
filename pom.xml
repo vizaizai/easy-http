@@ -6,7 +6,7 @@
 
     <groupId>com.github.vizaizai</groupId>
     <artifactId>easy-http</artifactId>
-    <version>3.1.2</version>
+    <version>3.2.0</version>
     <packaging>jar</packaging>
     <name>easy-http</name>
     <url>https://github.com/vizaizai/easy-http</url>
@@ -49,6 +49,8 @@
         <httpclient.version>4.5.12</httpclient.version>
         <commons.lang3.version>3.11</commons.lang3.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
+        <slf4j-jul.version>1.0.1</slf4j-jul.version>
+        <retry.version>1.0.3</retry.version>
         <slf4j.version>1.7.30</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <retry.version>1.0.1</retry.version>
@@ -97,17 +99,10 @@
             <version>${commons.beanutils.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
+            <groupId>com.github.vizaizai</groupId>
+            <artifactId>slf4j-jul</artifactId>
+            <version>${slf4j-jul.version}</version>
         </dependency>
 
         <dependency>
