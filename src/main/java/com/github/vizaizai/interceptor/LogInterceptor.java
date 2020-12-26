@@ -59,7 +59,7 @@ public class LogInterceptor implements HttpInterceptor{
         }
         log.debug("请求响应: {} [{}]:{} ",request.getUrl(), response.getStatusCode(), text(response.getMessage()));
         log.debug("响应体: {}", text(response.getBody()));
-        log.debug("耗时: {}毫秒",endTime - request.getStartTime());
+        log.debug("耗时: {}ms",endTime - request.getStartTime());
     }
 
     private static String text(Object o) {
