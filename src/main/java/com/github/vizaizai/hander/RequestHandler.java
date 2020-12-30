@@ -14,7 +14,7 @@ import com.github.vizaizai.model.RetrySettings;
 import com.github.vizaizai.parser.ArgParser;
 import com.github.vizaizai.parser.InterfaceParser;
 import com.github.vizaizai.parser.MethodParser;
-import com.github.vizaizai.proxy.HttpInvocationHandler;
+import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -76,12 +76,12 @@ public class RequestHandler implements Handler<HttpResponse>{
 
     /**
      * 创建RequestHandler
-     * @param invocation
+     * @param proxyContext
      * @return RequestHandler
      */
-    public static RequestHandler create(HttpInvocationHandler<?> invocation, Method method, Object[] args) {
+    public static RequestHandler create(ProxyContext<?> proxyContext, Method method, Object[] args) {
         // 接口解析
-        InterfaceParser interfaceParser = new InterfaceParser(invocation.getTargetClazz());
+        InterfaceParser interfaceParser = new InterfaceParser(proxyContext.getTargetClazz());
         // 方法解析
         MethodParser methodParser = new MethodParser(method);
         // 参数解析
@@ -91,17 +91,17 @@ public class RequestHandler implements Handler<HttpResponse>{
         }
 
         RequestHandler handler = new RequestHandler();
-        handler.url = invocation.getUrl();
-        handler.encoder = invocation.getEncoder();
-        handler.client(invocation.getClient(),invocation.getRequestConfig());
+        handler.url = proxyContext.getUrl();
+        handler.encoder = proxyContext.getEncoder();
+        handler.client(proxyContext.getClient(),proxyContext.getRequestConfig());
 
         handler.interfaceParser = interfaceParser;
         handler.argParsers = argParsers;
         handler.methodParser = methodParser;
-        handler.retrySettings = invocation.getRetrySettings();
+        handler.retrySettings = proxyContext.getRetrySettings();
 
         // 拦截器
-        handler.interceptorOps = InterceptorOperations.create(invocation.getInterceptors());
+        handler.interceptorOps = InterceptorOperations.create(proxyContext.getInterceptors());
 
         // 添加路径级别的拦截器
         handler.interceptorOps.addInterceptors(methodParser.getInterceptors());

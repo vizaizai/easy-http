@@ -315,5 +315,21 @@ public class Utils {
 
 
 
-
+    public static void outputClazz(byte[] bytes) {
+        FileOutputStream out = null;
+        try {
+            String pathName = Utils.class.getResource("/").getPath() + "AutoByte.class";
+            out = new FileOutputStream(new File(pathName));
+            System.out.println("类输出路径：" + pathName);
+            out.write(bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null != out) try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

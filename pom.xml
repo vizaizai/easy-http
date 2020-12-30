@@ -6,7 +6,7 @@
 
     <groupId>com.github.vizaizai</groupId>
     <artifactId>easy-http</artifactId>
-    <version>3.2.0</version>
+    <version>3.3.0</version>
     <packaging>jar</packaging>
     <name>easy-http</name>
     <url>https://github.com/vizaizai/easy-http</url>
@@ -51,6 +51,7 @@
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <slf4j-jul.version>1.0.1</slf4j-jul.version>
         <retry.version>1.0.3</retry.version>
+        <bytebuddy.version>1.10.19</bytebuddy.version>
     </properties>
 
     <dependencies>
@@ -88,6 +89,13 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>${commons.beanutils.version}</version>
+        </dependency>
+
+        <!-- 字节码工具 -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${bytebuddy.version}</version>
         </dependency>
 
         <dependency>
