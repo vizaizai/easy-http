@@ -1,6 +1,7 @@
 package com.github.vizaizai.util;
 
 import com.github.vizaizai.annotation.Headers;
+import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.model.ContentType;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValue;
@@ -10,7 +11,6 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.slf4j.Logger;
-import com.github.vizaizai.logging.LoggerFactory;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
@@ -311,25 +311,5 @@ public class Utils {
             nameValues.add(new StringNameValue(name,v));
         }
         return nameValues;
-    }
-
-
-
-    public static void outputClazz(byte[] bytes) {
-        FileOutputStream out = null;
-        try {
-            String pathName = Utils.class.getResource("/").getPath() + "AutoByte.class";
-            out = new FileOutputStream(new File(pathName));
-            System.out.println("类输出路径：" + pathName);
-            out.write(bytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (null != out) try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

@@ -22,12 +22,11 @@ public class ProxyHandler<T>{
     }
 
     public T getProxy() {
-//        T proxy = new ByteBuddyProxy<>(this.proxyContext).getProxy();
-//        if (proxy == null) {
-//            proxy = new JDKProxy<>(this.proxyContext).getProxy();
-//        }
-//        return proxy;
-        return new JDKProxy<>(this.proxyContext).getProxy();
+        T proxy = new ByteBuddyProxy<>(this.proxyContext).getProxy();
+        if (proxy == null) {
+            proxy = new JDKProxy<>(this.proxyContext).getProxy();
+        }
+        return proxy;
     }
 
     public ProxyHandler<T> client(AbstractClient client) {

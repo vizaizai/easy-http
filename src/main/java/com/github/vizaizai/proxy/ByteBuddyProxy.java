@@ -32,7 +32,6 @@ public class ByteBuddyProxy<T> {
                     .method(ElementMatchers.isAbstract()) // 只匹配抽象方法
                     .intercept(MethodDelegation.to(new ByteBuddyProxyTarget(this.proxyContext)))// 委托拦截实现
                     .make(); //构建类
-            Utils.outputClazz(dynamicType.getBytes());
             return (T)dynamicType.load(ByteBuddyProxy.class.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER) // 加载类
                                  .getLoaded()
                                  .newInstance(); // 创建实例

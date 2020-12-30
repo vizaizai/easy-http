@@ -119,6 +119,22 @@ public class BookServiceTest {
     }
 
     @Test
+    public void man() {
+        bookHttpService = EasyHttp.builder()
+                .url("http://10.10.11.107:25068/inner")
+                .client(DefaultURLClient.getInstance())
+                .withInterceptor(new LogInterceptor())
+                .withInterceptor(new ErrorInterceptor())
+                .build(BookHttpService.class);
+
+        long time1= System.currentTimeMillis();
+        for (int i = 0; i < 100; i++) {
+            bookHttpService.man("dsy_Wlep4Af6LPQf","1290478984305881090");
+        }
+        System.out.println("time:" + (System.currentTimeMillis() - time1) + "ms");
+    }
+
+    @Test
     public void baidu(){
         bookHttpService = EasyHttp.builder()
                                     .url("http://10.10.11.107:25068/inner")

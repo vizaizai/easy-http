@@ -41,10 +41,10 @@ public interface BookHttpService {
     CompletableFuture<ApiResult<List<Book>>> foo();
 
     @Get(value = "/book/bar", retries = 1, interval = 10)
-    String[] bar(String[] ids);
+    String[] bar(@Query("ids") String[] ids);
 
     @Get(value = "/book/bar", retries = 1, interval = 10)
-    String[] bar1(List<String> ids);
+    String[] bar1(@Query("ids") List<String> ids);
 
     @Headers({"client: easy-http1,okHttp","sign: 56c41d9e1142784770d2sc8cd1049c9e3"})
     @Get(value = "/book/bar")
@@ -55,4 +55,7 @@ public interface BookHttpService {
             interceptors = ResultInterceptor.class,
             retries = 5)
     CompletableFuture<String> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
+
+    @Get(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId")
+    void man(@Query("platformId") String platformId, @Query("storeId") String storeId);
 }

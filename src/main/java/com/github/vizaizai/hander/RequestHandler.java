@@ -212,10 +212,10 @@ public class RequestHandler implements Handler<HttpResponse>{
                 this.request.addQueryParam(argParser.getVarName(), argParser.getSource().toString());
             }else if (TypeUtils.isArrayType(argParser.getArgClass())) {
                 // 数组
-                this.request.addQueryParams(Utils.getNameValuesFromArray(argParser.getArgName(), argParser.getSource()));
+                this.request.addQueryParams(Utils.getNameValuesFromArray(argParser.getVarName(), argParser.getSource()));
             }else if (argParser.getSource() instanceof Iterable) {
                 // 集合
-                this.request.addQueryParams(Utils.getNameValuesFromList(argParser.getArgName(), (Iterable<?>) argParser.getSource()));
+                this.request.addQueryParams(Utils.getNameValuesFromList(argParser.getVarName(), (Iterable<?>) argParser.getSource()));
             } else {
                 // JavaBean或者map
                 this.request.addQueryParams(encoder.encodeNameValue(argParser.getSource()));
