@@ -35,6 +35,5 @@ public class ProxyInvokes {
                     .execute();
         }
         return HttpHandler.create(requestHandler,responseHandler).execute();
-
     }
 }

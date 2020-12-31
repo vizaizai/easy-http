@@ -4,8 +4,10 @@ package com.github.vizaizai.proxy;
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.Encoder;
+import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpRequestConfig;
+import com.github.vizaizai.model.ProxyMode;
 import com.github.vizaizai.model.RetrySettings;
 
 import java.util.List;
@@ -21,10 +23,14 @@ public class ProxyHandler<T>{
         proxyContext = new ProxyContext<>(targetClazz);
     }
 
-    public T getProxy() {
-        T proxy = new ByteBuddyProxy<>(this.proxyContext).getProxy();
-        if (proxy == null) {
+    public T getProxyImpl() {
+        T proxy;
+        if (ProxyMode.JDK.equals(this.proxyContext.getProxyMode())) {
             proxy = new JDKProxy<>(this.proxyContext).getProxy();
+        }else if (ProxyMode.BYTE_BUDDY.equals(this.proxyContext.getProxyMode())) {
+            proxy = new ByteBuddyProxy<>(this.proxyContext).getProxy();
+        }else {
+            throw new EasyHttpException("No proxy implementation");
         }
         return proxy;
     }
@@ -59,6 +65,10 @@ public class ProxyHandler<T>{
     }
     public ProxyHandler<T> enableRetry(RetrySettings retrySettings) {
         this.proxyContext.setRetrySettings(retrySettings);
+        return this;
+    }
+    public ProxyHandler<T> proxy(ProxyMode proxyMode) {
+        this.proxyContext.setProxyMode(proxyMode);
         return this;
     }
 }

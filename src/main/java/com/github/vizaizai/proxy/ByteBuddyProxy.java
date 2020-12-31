@@ -1,7 +1,6 @@
 package com.github.vizaizai.proxy;
 
 
-import com.github.vizaizai.util.Utils;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.ClassFileVersion;
 import net.bytebuddy.dynamic.DynamicType;
@@ -32,6 +31,7 @@ public class ByteBuddyProxy<T> {
                     .method(ElementMatchers.isAbstract()) // 只匹配抽象方法
                     .intercept(MethodDelegation.to(new ByteBuddyProxyTarget(this.proxyContext)))// 委托拦截实现
                     .make(); //构建类
+            // dynamicType.saveIn(new File("./target/test-classes/"));
             return (T)dynamicType.load(ByteBuddyProxy.class.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER) // 加载类
                                  .getLoaded()
                                  .newInstance(); // 创建实例

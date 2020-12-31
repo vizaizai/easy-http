@@ -80,6 +80,7 @@ public class RequestHandler implements Handler<HttpResponse>{
      * @return RequestHandler
      */
     public static RequestHandler create(ProxyContext<?> proxyContext, Method method, Object[] args) {
+        long time = System.currentTimeMillis();
         // 接口解析
         InterfaceParser interfaceParser = new InterfaceParser(proxyContext.getTargetClazz());
         // 方法解析
@@ -108,7 +109,7 @@ public class RequestHandler implements Handler<HttpResponse>{
 
         // 初始化请求
         handler.initRequest();
-
+        System.out.println("创建请求处理耗时:" + (System.currentTimeMillis() - time));
         return handler;
     }
 

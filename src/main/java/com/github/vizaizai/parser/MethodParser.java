@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -80,9 +79,12 @@ public class MethodParser {
         Annotation[] annotations = this.target.getAnnotations();
 
         List<Annotation> methodAnnotations = this.selectMethodAnnotations(annotations);
+        if (methodAnnotations.isEmpty()) {
+            throw new EasyHttpException("Request method must be not null");
+        }
         // 一个请求只能指定一种请求方式
-        if (methodAnnotations.size() != 1) {
-            throw new EasyHttpException("A request can specify only one request method");
+        if (methodAnnotations.size() > 1) {
+            throw new EasyHttpException("Request method must be unique");
         }
         Annotation methodAnnotation = methodAnnotations.get(0);
 

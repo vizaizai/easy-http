@@ -64,7 +64,6 @@ public class ArgParser {
 
         // 判断参数时简单参数还是对象参数
         Class<?> argClazz = source.getClass();
-
         this.argClass =  argClazz;
         // 是否为简单参数
         this.isSimple = TypeUtils.isSimple(argClazz.getTypeName());

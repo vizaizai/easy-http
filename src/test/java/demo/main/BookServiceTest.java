@@ -4,9 +4,11 @@ package demo.main;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.vizaizai.EasyHttp;
+import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
+import com.github.vizaizai.model.ProxyMode;
 import demo.model.ApiResult;
 import demo.model.Book;
 import demo.model.QueryForm;
@@ -122,16 +124,27 @@ public class BookServiceTest {
     public void man() {
         bookHttpService = EasyHttp.builder()
                 .url("http://10.10.11.107:25068/inner")
-                .client(DefaultURLClient.getInstance())
+                .client(ApacheHttpClient.getInstance())
                 .withInterceptor(new LogInterceptor())
                 .withInterceptor(new ErrorInterceptor())
+                .proxy(ProxyMode.BYTE_BUDDY)
                 .build(BookHttpService.class);
 
-        long time1= System.currentTimeMillis();
-        for (int i = 0; i < 100; i++) {
+
+        long total = 0;
+        int n = 100;
+        for (int i = 0; i < n; i++) {
+            long time1= System.currentTimeMillis();
             bookHttpService.man("dsy_Wlep4Af6LPQf","1290478984305881090");
+            long time = System.currentTimeMillis() - time1;
+            System.out.println("执行时间:" + time);
+            total = total + time;
         }
-        System.out.println("time:" + (System.currentTimeMillis() - time1) + "ms");
+
+        System.out.println("平均执行时间:" + total*1.0 / n);
+
+
+
     }
 
     @Test
