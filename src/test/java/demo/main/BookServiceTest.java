@@ -8,7 +8,6 @@ import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
-import com.github.vizaizai.model.ProxyMode;
 import demo.model.ApiResult;
 import demo.model.Book;
 import demo.model.QueryForm;
@@ -122,17 +121,17 @@ public class BookServiceTest {
 
     @Test
     public void man() {
+        TimeConsuming.mark("jdk-create");
         bookHttpService = EasyHttp.builder()
                 .url("http://10.10.11.107:25068/inner")
                 .client(ApacheHttpClient.getInstance())
                 .withInterceptor(new LogInterceptor())
                 .withInterceptor(new ErrorInterceptor())
-                .proxy(ProxyMode.BYTE_BUDDY)
                 .build(BookHttpService.class);
-
+        TimeConsuming.printMS("jdk-create");
 
         long total = 0;
-        int n = 100;
+        int n = 1;
         for (int i = 0; i < n; i++) {
             long time1= System.currentTimeMillis();
             bookHttpService.man("dsy_Wlep4Af6LPQf","1290478984305881090");

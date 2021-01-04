@@ -5,7 +5,6 @@ import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.Encoder;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.ProxyMode;
 import com.github.vizaizai.model.RetrySettings;
 
 import java.util.List;
@@ -26,7 +25,6 @@ public class ProxyContext<T> {
     private List<HttpInterceptor> interceptors;
     private Executor executor;
     private RetrySettings retrySettings;
-    private ProxyMode proxyMode;
 
     public ProxyContext(Class<T> targetClazz) {
         this.targetClazz = targetClazz;
@@ -98,13 +96,5 @@ public class ProxyContext<T> {
 
     public void setRetrySettings(RetrySettings retrySettings) {
         this.retrySettings = retrySettings;
-    }
-
-    public ProxyMode getProxyMode() {
-        return proxyMode;
-    }
-
-    public void setProxyMode(ProxyMode proxyMode) {
-        this.proxyMode = proxyMode;
     }
 }

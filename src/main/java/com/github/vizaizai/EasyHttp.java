@@ -8,7 +8,6 @@ import com.github.vizaizai.codec.DefaultEncoder;
 import com.github.vizaizai.codec.Encoder;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.ProxyMode;
 import com.github.vizaizai.model.RetrySettings;
 import com.github.vizaizai.proxy.ProxyHandler;
 import com.github.vizaizai.retry.RetryTrigger;
@@ -37,15 +36,12 @@ public class EasyHttp {
         private final List<HttpInterceptor> interceptors;
         private Executor executor;
         private RetrySettings retrySettings;
-        private ProxyMode proxyMode;
         public Builder() {
             this.client = ApacheHttpClient.getInstance();
             this.encoder = new DefaultEncoder();
             this.decoder = new DefaultDecoder();
             this.config =  HttpRequestConfig.defaultConfig();
             this.interceptors = new ArrayList<>();
-            this.proxyMode = ProxyMode.JDK;
-
         }
         public Builder client(AbstractClient client) {
             this.client = client;
@@ -75,10 +71,6 @@ public class EasyHttp {
         }
         public Builder executor(Executor executor) {
             this.executor = executor;
-            return this;
-        }
-        public Builder proxy(ProxyMode proxyMode) {
-            this.proxyMode = proxyMode;
             return this;
         }
         /**
@@ -111,8 +103,7 @@ public class EasyHttp {
                              .requestConfig(config)
                              .interceptors(interceptors)
                              .enableRetry(retrySettings)
-                             .executor(executor)
-                             .proxy(proxyMode);
+                             .executor(executor);
             return proxyHandler.getProxyImpl();
         }
 
