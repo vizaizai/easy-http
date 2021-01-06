@@ -64,15 +64,11 @@ public class MethodParser {
      */
     private RetrySettings retrySettings;
 
-    public MethodParser() {
+    public static MethodParser doParse(Method target) {
+        return new MethodParser(target);
     }
-
-    public MethodParser(Method target) {
+    private MethodParser(Method target) {
         this.target = target;
-        this.parse();
-    }
-    public void parse(Method method) {
-        this.target = method;
         this.parse();
     }
     private void parse() {

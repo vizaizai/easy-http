@@ -8,6 +8,7 @@ import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
+import com.github.vizaizai.retry.loop.TimeLooper;
 import demo.model.ApiResult;
 import demo.model.Book;
 import demo.model.QueryForm;
@@ -26,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class BookServiceTest {
     BookHttpService bookHttpService;
-    @Before
+    //@Before
     public void init() {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
@@ -131,8 +132,9 @@ public class BookServiceTest {
         TimeConsuming.printMS("jdk-create");
 
         long total = 0;
-        int n = 1;
+        int n = 1000000;
         for (int i = 0; i < n; i++) {
+            TimeLooper.sleep(3000);
             long time1= System.currentTimeMillis();
             bookHttpService.man("dsy_Wlep4Af6LPQf","1290478984305881090");
             long time = System.currentTimeMillis() - time1;

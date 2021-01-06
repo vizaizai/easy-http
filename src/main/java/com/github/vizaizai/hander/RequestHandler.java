@@ -22,10 +22,7 @@ import org.apache.commons.lang3.reflect.TypeUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 请求处理器
@@ -81,15 +78,14 @@ public class RequestHandler implements Handler<HttpResponse>{
      */
     public static RequestHandler create(ProxyContext<?> proxyContext, Method method, Object[] args) {
         // 接口解析
-        InterfaceParser interfaceParser = new InterfaceParser(proxyContext.getTargetClazz());
+        InterfaceParser interfaceParser = InterfaceParser.doParse(proxyContext.getTargetClazz());
         // 方法解析
-        MethodParser methodParser = new MethodParser(method);
+        MethodParser methodParser = MethodParser.doParse(method);
         // 参数解析
-        List<ArgParser> argParsers = new ArrayList<>();
-        for (int i = 0; args!=null && i < args.length; i++) {
-            argParsers.add(new ArgParser(args[i],method, i));
+        List<ArgParser> argParsers = new LinkedList<>();
+        for (int i = 0; args != null && i < args.length; i++) {
+            argParsers.add(ArgParser.doParse(args[i],method, i));
         }
-
         RequestHandler handler = new RequestHandler();
         handler.url = proxyContext.getUrl();
         handler.encoder = proxyContext.getEncoder();
@@ -103,7 +99,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 拦截器
         handler.interceptorOps = InterceptorOperations.create(proxyContext.getInterceptors());
 
-        // 添加路径级别的拦截器
+        // 添加方法级别的拦截器
         handler.interceptorOps.addInterceptors(methodParser.getInterceptors());
 
         // 初始化请求
