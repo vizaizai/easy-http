@@ -8,6 +8,7 @@ import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
+import com.github.vizaizai.retry.DefaultRule;
 import com.github.vizaizai.retry.loop.TimeLooper;
 import demo.model.ApiResult;
 import demo.model.Book;
@@ -34,7 +35,7 @@ public class BookServiceTest {
                                     .client(DefaultURLClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
-                                    .retryable(3,1000)
+                                    .retryable(3,1000, new DefaultRule())
                                     .build(BookHttpService.class);
     }
 
