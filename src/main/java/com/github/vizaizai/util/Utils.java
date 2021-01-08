@@ -1,6 +1,7 @@
 package com.github.vizaizai.util;
 
 import com.github.vizaizai.annotation.Headers;
+import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.model.ContentType;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValue;
@@ -10,7 +11,6 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.slf4j.Logger;
-import com.github.vizaizai.logging.LoggerFactory;
 
 import java.io.*;
 import java.lang.annotation.Annotation;
@@ -312,8 +312,4 @@ public class Utils {
         }
         return nameValues;
     }
-
-
-
-
 }

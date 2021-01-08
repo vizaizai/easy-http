@@ -4,7 +4,6 @@ import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
 
 /**
  * 接口解析
@@ -15,20 +14,18 @@ public class InterfaceParser {
     /**
      * 目标接口
      */
-    private Class<?> target;
+    private final Class<?> target;
     /**
      * 接口级别的headers
      */
     private HeadersNameValues headers;
 
-    public InterfaceParser() {
+
+    public static InterfaceParser doParse(Class<?> target) {
+        return new InterfaceParser(target);
     }
 
-    public InterfaceParser(Class<?> target) {
-        this.target = target;
-        this.parse();
-    }
-    public void parse(Class<?> target) {
+    private InterfaceParser(Class<?> target) {
         this.target = target;
         this.parse();
     }

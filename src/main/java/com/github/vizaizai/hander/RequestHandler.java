@@ -14,7 +14,7 @@ import com.github.vizaizai.model.RetrySettings;
 import com.github.vizaizai.parser.ArgParser;
 import com.github.vizaizai.parser.InterfaceParser;
 import com.github.vizaizai.parser.MethodParser;
-import com.github.vizaizai.proxy.HttpInvocationHandler;
+import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,10 +22,7 @@ import org.apache.commons.lang3.reflect.TypeUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 请求处理器
@@ -76,39 +73,37 @@ public class RequestHandler implements Handler<HttpResponse>{
 
     /**
      * 创建RequestHandler
-     * @param invocation
+     * @param proxyContext
      * @return RequestHandler
      */
-    public static RequestHandler create(HttpInvocationHandler<?> invocation, Method method, Object[] args) {
+    public static RequestHandler create(ProxyContext<?> proxyContext, Method method, Object[] args) {
         // 接口解析
-        InterfaceParser interfaceParser = new InterfaceParser(invocation.getTargetClazz());
+        InterfaceParser interfaceParser = InterfaceParser.doParse(proxyContext.getTargetClazz());
         // 方法解析
-        MethodParser methodParser = new MethodParser(method);
+        MethodParser methodParser = MethodParser.doParse(method);
         // 参数解析
-        List<ArgParser> argParsers = new ArrayList<>();
-        for (int i = 0; args!=null && i < args.length; i++) {
-            argParsers.add(new ArgParser(args[i],method, i));
+        List<ArgParser> argParsers = new LinkedList<>();
+        for (int i = 0; args != null && i < args.length; i++) {
+            argParsers.add(ArgParser.doParse(args[i],method, i));
         }
-
         RequestHandler handler = new RequestHandler();
-        handler.url = invocation.getUrl();
-        handler.encoder = invocation.getEncoder();
-        handler.client(invocation.getClient(),invocation.getRequestConfig());
+        handler.url = proxyContext.getUrl();
+        handler.encoder = proxyContext.getEncoder();
+        handler.client(proxyContext.getClient(),proxyContext.getRequestConfig());
 
         handler.interfaceParser = interfaceParser;
         handler.argParsers = argParsers;
         handler.methodParser = methodParser;
-        handler.retrySettings = invocation.getRetrySettings();
+        handler.retrySettings = proxyContext.getRetrySettings();
 
         // 拦截器
-        handler.interceptorOps = InterceptorOperations.create(invocation.getInterceptors());
+        handler.interceptorOps = InterceptorOperations.create(proxyContext.getInterceptors());
 
-        // 添加路径级别的拦截器
+        // 添加方法级别的拦截器
         handler.interceptorOps.addInterceptors(methodParser.getInterceptors());
 
         // 初始化请求
         handler.initRequest();
-
         return handler;
     }
 
@@ -212,10 +207,10 @@ public class RequestHandler implements Handler<HttpResponse>{
                 this.request.addQueryParam(argParser.getVarName(), argParser.getSource().toString());
             }else if (TypeUtils.isArrayType(argParser.getArgClass())) {
                 // 数组
-                this.request.addQueryParams(Utils.getNameValuesFromArray(argParser.getArgName(), argParser.getSource()));
+                this.request.addQueryParams(Utils.getNameValuesFromArray(argParser.getVarName(), argParser.getSource()));
             }else if (argParser.getSource() instanceof Iterable) {
                 // 集合
-                this.request.addQueryParams(Utils.getNameValuesFromList(argParser.getArgName(), (Iterable<?>) argParser.getSource()));
+                this.request.addQueryParams(Utils.getNameValuesFromList(argParser.getVarName(), (Iterable<?>) argParser.getSource()));
             } else {
                 // JavaBean或者map
                 this.request.addQueryParams(encoder.encodeNameValue(argParser.getSource()));

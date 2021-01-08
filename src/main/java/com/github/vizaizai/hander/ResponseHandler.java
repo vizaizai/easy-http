@@ -6,7 +6,7 @@ import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.interceptor.InterceptorOperations;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpResponse;
-import com.github.vizaizai.proxy.HttpInvocationHandler;
+import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.TypeUtils;
 
 import java.lang.reflect.Type;
@@ -34,15 +34,15 @@ public class ResponseHandler implements Handler<Object>{
 
     /**
      * 创建ResponseHandler
-     * @param invocation
+     * @param proxyContext
      * @return ResponseHandler
      */
-    public static ResponseHandler create(HttpInvocationHandler<?> invocation, RequestHandler requestHandler) {
+    public static ResponseHandler create(ProxyContext<?> proxyContext, RequestHandler requestHandler) {
         Type returnType = requestHandler.getMethodParser().getTarget().getGenericReturnType();
         ResponseHandler handler = new ResponseHandler();
         handler.request = requestHandler.getRequest();
         handler.returnType = TypeUtils.getDecodeType(returnType);
-        handler.decoder = invocation.getDecoder();
+        handler.decoder = proxyContext.getDecoder();
         handler.interceptorOps = requestHandler.getInterceptorOps();
         return handler;
     }

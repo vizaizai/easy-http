@@ -53,7 +53,10 @@ public class ArgParser {
      */
     private String argName;
 
-    public ArgParser(Object source, Method method, int index) {
+    public static ArgParser doParse(Object source, Method method, int index) {
+        return new ArgParser(source, method, index);
+    }
+    private ArgParser(Object source, Method method, int index) {
         this.source = source;
         this.method = method;
         this.index = index;
@@ -61,10 +64,8 @@ public class ArgParser {
     }
 
     private void parse() {
-
         // 判断参数时简单参数还是对象参数
         Class<?> argClazz = source.getClass();
-
         this.argClass =  argClazz;
         // 是否为简单参数
         this.isSimple = TypeUtils.isSimple(argClazz.getTypeName());
@@ -76,7 +77,7 @@ public class ArgParser {
 
         // 一个参数最多一个注解
         if (annotations.length > 1) {
-            throw new EasyHttpException("The number of annotations for a arg  is at most 1");
+            throw new EasyHttpException("At most one annotation on a parameter");
         }
         if (annotations.length == 0) {
             this.type = Query.TYPE;
@@ -100,11 +101,11 @@ public class ArgParser {
 
         // 规则校验1: @Var只能注解在简单类型上
         if (Var.TYPE.equals(this.type) && !this.isSimple) {
-            throw new EasyHttpException("@var only can annotate on a simple argument");
+            throw new EasyHttpException("@var only can annotate on a simple parameter");
         }
         // 规则校验2: @Headers只能注解在复杂类型上
         if (Headers.TYPE.equals(this.type) && this.isSimple) {
-            throw new EasyHttpException("@Headers only can annotate on a complex argument");
+            throw new EasyHttpException("@Headers only can annotate on a complex parameter");
         }
 
     }
