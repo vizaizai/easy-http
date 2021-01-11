@@ -133,13 +133,14 @@ public class BookServiceTest {
         TimeConsuming.printMS("jdk-create");
 
         long total = 0;
-        int n = 1000000;
+        int n = 3;
         for (int i = 0; i < n; i++) {
-            TimeLooper.sleep(3000);
+            //TimeLooper.sleep(3000);
             long time1= System.currentTimeMillis();
-            bookHttpService.man("dsy_Wlep4Af6LPQf","1290478984305881090");
+            String r = bookHttpService.man("dsy_Wlep4Af6LPQf","1290478984305881090");
             long time = System.currentTimeMillis() - time1;
             System.out.println("执行时间:" + time);
+            System.out.println(r);
             total = total + time;
         }
 

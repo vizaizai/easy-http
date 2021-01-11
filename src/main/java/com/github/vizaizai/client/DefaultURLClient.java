@@ -4,7 +4,7 @@ import com.github.vizaizai.model.HttpMethod;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
-import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.model.body.InputStreamBody;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValue;
 import com.github.vizaizai.util.value.StringNameValues;
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
 
 import static com.github.vizaizai.util.Utils.*;
 import static java.lang.String.format;
@@ -92,13 +91,12 @@ public class DefaultURLClient extends AbstractClient{
             throw new IOException(format("Invalid status(%s) executing %s %s", status,
                     connection.getRequestMethod(), connection.getURL()));
         }
-
-        Charset charset = getCharset(connection.getHeaderField(CONTENT_TYPE));
-        response.setContentLength(connection.getContentLength());
+        // Charset charset = getCharset(connection.getHeaderField(CONTENT_TYPE));
         if (status >= 400) {
-            response.setBody(Utils.toString(connection.getErrorStream(), charset));
+            response.setBody(InputStreamBody.ofNullable(connection.getErrorStream(), connection.getContentLength()));
+            //response.setBody(Utils.toString(connection.getErrorStream(), charset));
         } else {
-           response.setBody(Utils.toString(connection.getInputStream(), charset));
+            response.setBody(InputStreamBody.ofNullable(connection.getInputStream(), connection.getContentLength()));
         }
 
         return response;

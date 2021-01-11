@@ -1,5 +1,7 @@
 package com.github.vizaizai.model;
 
+import com.github.vizaizai.model.body.Body;
+
 import java.lang.reflect.Type;
 
 /**
@@ -12,7 +14,7 @@ public class HttpResponse {
     /**
      * 响应体
      */
-    private String body;
+    private Body body;
     /**
      * 返回类型
      */
@@ -30,10 +32,6 @@ public class HttpResponse {
      */
     private int statusCode = -1;
     /**
-     * 响应大小
-     */
-    private long contentLength;
-    /**
      * 消息
      */
     private String message;
@@ -45,11 +43,11 @@ public class HttpResponse {
     public boolean  isOk() {
         return statusCode >= 200 && statusCode <= 300 ;
     }
-    public String getBody() {
+    public Body getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(Body body) {
         this.body = body;
     }
 
@@ -67,14 +65,6 @@ public class HttpResponse {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public long getContentLength() {
-        return contentLength;
-    }
-
-    public void setContentLength(long contentLength) {
-        this.contentLength = contentLength;
     }
 
     public Type getReturnType() {
@@ -110,7 +100,7 @@ public class HttpResponse {
         this.returnObject = returnObject;
     }
 
-    public static HttpResponse ok(String body) {
+    public static HttpResponse ok(Body body) {
         HttpResponse response = new HttpResponse();
         response.setMessage("ok");
         response.setStatusCode(200);

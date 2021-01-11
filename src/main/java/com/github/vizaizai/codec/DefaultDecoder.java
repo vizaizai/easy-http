@@ -14,9 +14,10 @@ import java.lang.reflect.Type;
 public class DefaultDecoder implements Decoder {
     @Override
     public Object decode(HttpResponse response, Type type){
-        if (StringUtils.isBlank(response.getBody())) {
-            return null;
-        }
-        return JSON.parseObject(response.getBody(), type);
+//        if (StringUtils.isBlank(response.getBody())) {
+//            return null;
+//        }
+//        return JSON.parseObject(response.getBody(), type);
+        return null;
     }
 }

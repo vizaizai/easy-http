@@ -57,5 +57,5 @@ public interface BookHttpService {
     CompletableFuture<String> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
 
     @Get(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId")
-    void man(@Query("platformId") String platformId, @Query("storeId") String storeId);
+    String man(@Query("platformId") String platformId, @Query("storeId") String storeId);
 }

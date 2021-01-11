@@ -2,10 +2,7 @@ package com.github.vizaizai;
 
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.client.ApacheHttpClient;
-import com.github.vizaizai.codec.Decoder;
-import com.github.vizaizai.codec.DefaultDecoder;
-import com.github.vizaizai.codec.DefaultEncoder;
-import com.github.vizaizai.codec.Encoder;
+import com.github.vizaizai.codec.*;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.RetrySettings;
@@ -39,7 +36,7 @@ public class EasyHttp {
         public Builder() {
             this.client = ApacheHttpClient.getInstance();
             this.encoder = new DefaultEncoder();
-            this.decoder = new DefaultDecoder();
+            this.decoder = new JacksonDecoder();
             this.config =  HttpRequestConfig.defaultConfig();
             this.interceptors = new ArrayList<>();
         }

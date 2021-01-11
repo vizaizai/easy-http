@@ -7,6 +7,7 @@ import com.github.vizaizai.model.HttpMethod;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.model.body.InputStreamBody;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
@@ -120,13 +121,12 @@ public class ApacheHttpClient extends AbstractClient {
         try (CloseableHttpResponse response = httpClient.execute(request)){
             HttpEntity httpEntity = response.getEntity();
             if (httpEntity == null) {
-                result.setMessage("the body is null");
+                result.setMessage("Response body is null");
                 return result;
             }
-            String ret = EntityUtils.toString(httpEntity, Utils.UTF_8);
-            result.setBody(ret);
+            //String ret = EntityUtils.toString(httpEntity, Utils.UTF_8);
+            result.setBody(InputStreamBody.ofNullable(httpEntity.getContent(),(int) httpEntity.getContentLength()));
             result.setStatusCode(response.getStatusLine().getStatusCode());
-            result.setContentLength(response.getEntity().getContentLength());
             result.setMessage(response.getStatusLine().getReasonPhrase());
         }
         return result;

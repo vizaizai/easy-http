@@ -23,20 +23,21 @@ public class ResultInterceptor implements HttpInterceptor {
         if (!response.isOk()) {
             throw new EasyHttpException("请求错误~");
         }
-        if (StringUtils.isBlank(response.getBody())) {
-           return;
-        }
-        JSONObject ret = JSON.parseObject(response.getBody());
-        // 假设业务code：200 为操作成功
-        if (ret.getInteger("code") == 200) {
-            // 覆盖包含公共信息的json
-            JSONObject data = ret.getJSONObject("data");
-            if (data != null) {
-                response.setReturnObject(data.toJavaObject(response.getReturnType()));
-                return;
-            }
-        }
-        response.setReturnObject(null);
+//        if (StringUtils.isBlank(response.getBody())) {
+//           return;
+//        }
+//        JSONObject ret = JSON.parseObject(response.getBody());
+//        // 假设业务code：200 为操作成功
+//        if (ret.getInteger("code") == 200) {
+//            // 覆盖包含公共信息的json
+//            JSONObject data = ret.getJSONObject("data");
+//            if (data != null) {
+//                response.setReturnObject(data.toJavaObject(response.getReturnType()));
+//                return;
+//            }
+//        }
+//        response.setReturnObject(null);
+
     }
 
     @Override
