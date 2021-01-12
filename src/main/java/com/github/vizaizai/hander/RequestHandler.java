@@ -225,10 +225,17 @@ public class RequestHandler implements Handler<HttpResponse>{
     private void handleBody() {
         for (ArgParser argParser : this.argParsers) {
             if (Body.TYPE.equals(argParser.getType())) {
+                Object source = argParser.getSource();
+                // 存在warpRoot
+                if (StringUtils.isNotBlank(argParser.getVarName())) {
+                    Map<String,Object> wrap = new HashMap<>(1);
+                    wrap.put(argParser.getVarName(), source);
+                    source = wrap;
+                }
                 if (argParser.isSimple()) {
-                    this.request.setBody(argParser.getSource().toString());
+                    this.request.setBody(source.toString());
                 }else {
-                    this.request.setBody(encoder.encodeString(argParser.getSource()));
+                    this.request.setBody(encoder.encodeString(source));
                 }
                 return;
             }

@@ -7,11 +7,13 @@ import com.github.vizaizai.model.HttpMethod;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpRequestConfig;
 import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.model.body.InputStreamBody;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.Consts;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -118,15 +120,26 @@ public class ApacheHttpClient extends AbstractClient {
         }
 
         try (CloseableHttpResponse response = httpClient.execute(request)){
+            // 响应头
+            Header[] allHeaders = response.getAllHeaders();
+            if (allHeaders != null && allHeaders.length > 0) {
+                HeadersNameValues headersNameValues = new HeadersNameValues();
+                for (Header header : allHeaders) {
+                    if (header.getName() != null && header.getValue()!=null) {
+                        headersNameValues.add(header.getName(),header.getValue());
+                    }
+                }
+                result.setHeaders(headersNameValues);
+            }
+
             HttpEntity httpEntity = response.getEntity();
             if (httpEntity == null) {
-                result.setMessage("the body is null");
+                result.setMessage("Response body is null");
                 return result;
             }
-            String ret = EntityUtils.toString(httpEntity, Utils.UTF_8);
-            result.setBody(ret);
+            //String ret = EntityUtils.toString(httpEntity, Utils.UTF_8);
+            result.setBody(InputStreamBody.ofNullable(httpEntity.getContent(),(int) httpEntity.getContentLength()));
             result.setStatusCode(response.getStatusLine().getStatusCode());
-            result.setContentLength(response.getEntity().getContentLength());
             result.setMessage(response.getStatusLine().getReasonPhrase());
         }
         return result;

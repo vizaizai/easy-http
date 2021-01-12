@@ -1,14 +1,12 @@
 package demo.main;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.vizaizai.EasyHttp;
-import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
-import com.github.vizaizai.retry.loop.TimeLooper;
+import com.github.vizaizai.retry.DefaultRule;
+import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
 import demo.model.QueryForm;
@@ -27,14 +25,14 @@ import java.util.concurrent.CompletableFuture;
 
 public class BookServiceTest {
     BookHttpService bookHttpService;
-    //@Before
+    @Before
     public void init() {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
                                     .client(DefaultURLClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
-                                    .retryable(3,1000)
+                                    .retryable(3,1000, new DefaultRule())
                                     .build(BookHttpService.class);
     }
 
@@ -102,7 +100,9 @@ public class BookServiceTest {
 
     @Test
     public void bar(){
-        String[] bar = bookHttpService.bar(new String[]{"1","2"});
+        QueryForm form = new QueryForm();
+        form.setIds(Arrays.asList("123","555","lololo"));
+        String[] bar = bookHttpService.bar(new String[]{"1","2"}, form);
         System.out.println(JSON.toJSONString(bar));
     }
 
@@ -116,7 +116,9 @@ public class BookServiceTest {
     public void foo() {
         QueryForm form = new QueryForm();
         form.setIds(Arrays.asList("123","555","lololo"));
-        String[] bar = bookHttpService.foo(form, new JSONObject().fluentPut("HeaderName","121111"));
+        Map<String,String> h = new HashMap<>();
+        h.put("HeaderName","123123");
+        String[] bar = bookHttpService.foo1(form);
         System.out.println(JSON.toJSONString(bar));
     }
 
@@ -125,20 +127,22 @@ public class BookServiceTest {
         TimeConsuming.mark("jdk-create");
         bookHttpService = EasyHttp.builder()
                 .url("http://10.10.11.107:25068/inner")
-                .client(ApacheHttpClient.getInstance())
+                .client(DefaultURLClient.getInstance())
                 .withInterceptor(new LogInterceptor())
                 .withInterceptor(new ErrorInterceptor())
+                .withInterceptor(new ResultInterceptor())
                 .build(BookHttpService.class);
         TimeConsuming.printMS("jdk-create");
 
         long total = 0;
-        int n = 1000000;
+        int n = 3;
         for (int i = 0; i < n; i++) {
-            TimeLooper.sleep(3000);
+            //TimeLooper.sleep(3000);
             long time1= System.currentTimeMillis();
-            bookHttpService.man("dsy_Wlep4Af6LPQf","1290478984305881090");
+            Book r = bookHttpService.man("dsy_Wlep4Af6LPQf","1290478984305881090");
             long time = System.currentTimeMillis() - time1;
             System.out.println("执行时间:" + time);
+            System.out.println(r.getId());
             total = total + time;
         }
 

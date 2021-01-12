@@ -132,6 +132,9 @@ public class ArgParser {
         if (annotation == null) {
             return this.argName;
         }
+        if (annotation instanceof Body) {
+            return ((Body) annotation).wrapRoot();
+        }
         if (annotation instanceof Var) {
             name= ((Var) annotation).value();
         }else if (annotation instanceof Query) {

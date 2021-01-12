@@ -6,14 +6,14 @@
 
 ##### 1. 特性
 
-   + 注解简单： 遵循大家的命名习惯，@Body、@Query、@Var等注解见名之意。
+   + 注解简单： 遵循大众的命名习惯，@Body、@Query、@Var等注解见名之意。
    + 无侵入： 接口不需要继承。
    + 多客户端实现: 底层支持多种客户端，默认已实现Java原生URL和HttpClient，也可以自己实现。
    + 支持异步请求。
    + 支持自定义编解码：默认已经内置了JSON编解码(返回参数支持泛型)，如需支持xml，可自定义。
    + 支持自定义拦截器：请求前，和请求后的拦截。拦截器可满足大部分业务需求，如：计算请求耗时，动态添加公共请求头，返回错误统一处理等等。
+   + 支持请求重试，可自定义重试触发规则。
    + 提供spring-boot版本，使用更简单。
-   + todo列表：响应式编程、以及Java11的客户端。
 
 ##### 2. 安装
 
@@ -23,7 +23,7 @@ Java版本: 最低 `8`
    <dependency>
      <groupId>com.github.vizaizai</groupId>
      <artifactId>easy-http</artifactId>
-     <version>3.2.1</version>
+     <version>3.2.2</version>
    </dependency>
    ```
 
@@ -50,7 +50,7 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/vizaizai/ea
    System.out.println(bookRet.getData().getName());
    ```
 
-   像类似@GET的注解还有@Post、@Put、@Delete，@Post、@Put可指定content-type，默认是application/json。
+   像类似@GET的请求方法注解还有@Post、@Put、@Delete。
 
 ##### 4.方法参数注解
 
@@ -67,11 +67,15 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/vizaizai/ea
 
    + @Query
 
-     被注解的参数可以是任意类型，如果被注解的参数是简单类型，那么必须指定value(查询参数的key)。当一个参数没有任何注解时默认为查询参数。
+     被注解的参数可以是简单类型、数组、列表、Map 和 JavaBean，如果被注解的参数是简单类型，那么value查询参数的key，如没有指定value并且项目编译时设置了`-parameters`，则key会取被注解字段的名称，否则为arg1~n。当一个参数没有任何注解时默认为查询参数。
 
      ``` java
      @Get("/books")
-     ApiResult<List<Book>> listBooksByAuthor(@Query("author") String author);
+     ApiResult<List<Book>> listBooksByAuthor1(@Query("author") String author);
+     // 设置了-parameters
+     @Get("/books")
+     ApiResult<List<Book>> listBooksByAuthor2(@Query String author);
+     
      @Get("/books")
      ApiResult<List<Book>> listBooksByAuthor(@Query Map<String, String> params);
      @Get("/books")
@@ -105,18 +109,18 @@ spring-boot版本移步: [easy-http-boot-starter](https://github.com/vizaizai/ea
 
 ``` java
 public class CustomEncoder implements Encoder {
-     /**
-     * 将对象转化成成Map<String,String> 用于编码@Query和@Headers
+    /**
+     * 将对象转化成NameValue 用于编码@Query和@Headers注解的对象
      * @param object 待编码对象
      * @return map
      */
-    @Override
-    public Map<String, String> encodeMap(Object object) {
+	@Override
+    public StringNameValues encodeNameValue(Object object) {
         return null;
     }
-   /**
-     * 将对象转化成string，用于编码 @Body注解的对象（默认是解析成json字符串）
-     * @param object
+	/**
+     * 将对象转化成string（如果参数类型本身为简单类型，则直接转化成string），用于编码 @Body注解的对象（默		认是解析成json字符串）
+     * @param object 待编码对象
      * @return string
      */
     @Override
@@ -174,7 +178,7 @@ BookHttpService bookHttpService = EasyHttp.builder()
 ``` java
 public class ResultInterceptor implements HttpInterceptor {
     @Override
-    public boolean preHandle(HttpRequest request, HttpRequestConfig config) {
+    public boolean preHandle(HttpRequest request) {
         return true;
     }
 
@@ -249,6 +253,21 @@ foo.join();
 ```
 
 > 有关Java8`CompletableFuture`的更多操作，请前往 [Java8 CompletableFuture](https://blog.csdn.net/lcw158852/article/details/107981506)
+
+##### 9. 重试
+
+可以全局开启重试，也可以在请求方式注解上针对每一个请求设置重试。
+
+触发规则：默认规则为`当请求方式为GET并且HTTP状态码为5XX时`或者`当连接超时时`,支持自定义触发规则 `retryable(Integer retries, Integer interval, RetryTrigger retryTrigger)`, 实现RetryTrigger接口传入即可。
+
+``` java
+EasyHttp.builder()
+        .url("127.0.0.1:8888")
+        .client(DefaultURLClient.getInstance())
+        .retryable(3,1000,new DefaultRule())
+        .build(BookHttpService.class);
+```
+
 
 
 #### 联系作者

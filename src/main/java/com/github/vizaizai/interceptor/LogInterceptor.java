@@ -4,6 +4,7 @@ package com.github.vizaizai.interceptor;
 import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.util.StreamUtils;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import org.apache.commons.collections.CollectionUtils;
@@ -46,7 +47,7 @@ public class LogInterceptor implements HttpInterceptor{
             log.debug("请求参数: {}", Utils.asUrlEncoded(request.getQueryParams()));
         }
         if (request.getBody() != null) {
-            log.debug("请求体: {}",request.getBody());
+            log.debug("请求体: {}", request.getBody());
         }
         return true;
     }
@@ -58,7 +59,12 @@ public class LogInterceptor implements HttpInterceptor{
             return;
         }
         log.debug("请求响应: {} [{}]:{} ",request.getUrl(), response.getStatusCode(), text(response.getMessage()));
-        log.debug("响应体: {}", text(response.getBody()));
+        if (response.getBody()!= null && response.getBody().isRepeatable()) {
+            try {
+                log.debug("响应体: {}", text(StreamUtils.copyToString(response.getBody().asInputStream(),Utils.UTF_8)));
+            }catch (Exception ignored) {
+            }
+        }
         log.debug("耗时: {}ms",endTime - request.getStartTime());
     }
 

@@ -12,11 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.net.URLEncoder;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -135,40 +134,6 @@ public class Utils {
           return false;
       }
       return contentType.startsWith(ContentType.APPLICATION_FORM_URLENCODED_UTF8.substring(0, 33 - 1));
-    }
-
-
-    public static void ensureClosed(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException ignored) { // NOPMD
-            }
-        }
-    }
-
-
-    public static String toString(InputStream inputStream, Charset charset) throws IOException {
-        if (inputStream == null) {
-            return null;
-        }
-        if (charset == null) {
-            charset = UTF_8;
-        }
-        Reader reader = new InputStreamReader(inputStream, charset);
-        try {
-            StringBuilder to = new StringBuilder();
-            CharBuffer charBuf = CharBuffer.allocate(BUF_SIZE);
-            // must cast to super class Buffer otherwise break when running with java 11
-            while (reader.read(charBuf) != -1) {
-                charBuf.flip();
-                to.append(charBuf);
-                charBuf.clear();
-            }
-            return to.toString();
-        } finally {
-            ensureClosed(reader);
-        }
     }
 
     /**

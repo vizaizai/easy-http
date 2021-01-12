@@ -1,5 +1,7 @@
 package com.github.vizaizai.util.value;
 
+import com.github.vizaizai.util.Assert;
+
 import java.util.List;
 
 /**
@@ -10,6 +12,13 @@ import java.util.List;
 public class HeadersNameValues extends StringNameValues {
 
     public List<String> getHeaders(String name) {
-        return super.getValues(name);
+        return this.getValues(name);
+    }
+
+    public void addHeaders(String name, List<String> values) {
+        Assert.notNull(values, "values must be not null");
+        for (String value : values) {
+            this.add(name, value);
+        }
     }
 }
