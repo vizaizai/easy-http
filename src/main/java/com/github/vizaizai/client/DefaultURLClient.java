@@ -9,11 +9,15 @@ import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValue;
 import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.github.vizaizai.util.Utils.*;
 import static java.lang.String.format;
@@ -92,6 +96,19 @@ public class DefaultURLClient extends AbstractClient{
                     connection.getRequestMethod(), connection.getURL()));
         }
         // Charset charset = getCharset(connection.getHeaderField(CONTENT_TYPE));
+        // 响应头
+        Map<String, List<String>> allHeaders = connection.getHeaderFields();
+        if (MapUtils.isNotEmpty(allHeaders)) {
+            Set<Map.Entry<String, List<String>>> entries = allHeaders.entrySet();
+            HeadersNameValues headersNameValues = new HeadersNameValues();
+            for (Map.Entry<String, List<String>> entry : entries) {
+                if (entry.getKey() != null && entry.getValue()!= null) {
+                    headersNameValues.addHeaders(entry.getKey(), entry.getValue());
+                }
+            }
+            response.setHeaders(headersNameValues);
+        }
+
         if (status >= 400) {
             response.setBody(InputStreamBody.ofNullable(connection.getErrorStream(), connection.getContentLength()));
             //response.setBody(Utils.toString(connection.getErrorStream(), charset));

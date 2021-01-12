@@ -1,6 +1,5 @@
 package demo.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.vizaizai.annotation.*;
 import com.github.vizaizai.model.HttpMethod;
 import demo.interceptor.ResultInterceptor;
@@ -41,15 +40,19 @@ public interface BookHttpService {
     CompletableFuture<ApiResult<List<Book>>> foo();
 
     @Get(value = "/book/bar", retries = 1, interval = 10)
-    String[] bar(@Query("ids") String[] ids);
+    String[] bar(@Query("ids") String[] ids, @Headers QueryForm headers);
 
     @Get(value = "/book/bar", retries = 1, interval = 10)
     String[] bar1(@Query("ids") List<String> ids);
 
     @Headers({"client: easy-http1,okHttp","sign: 56c41d9e1142784770d2sc8cd1049c9e3"})
     @Get(value = "/book/bar")
-    String[] foo(QueryForm form, @Headers JSONObject headers);
+    String[] foo(QueryForm form, @Headers Map<String,String> headers);
 
+    @Post(value = "/book/foo")
+    String[] foo1(@Body(wrapRoot = "foo") QueryForm form);
+
+    @Get(value = "/book/foo")
     @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId",
             httpMethod = HttpMethod.GET,
             interceptors = ResultInterceptor.class,
@@ -57,5 +60,5 @@ public interface BookHttpService {
     CompletableFuture<String> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
 
     @Get(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId")
-    String man(@Query("platformId") String platformId, @Query("storeId") String storeId);
+    Book man(@Query("platformId") String platformId, @Query("storeId") String storeId);
 }

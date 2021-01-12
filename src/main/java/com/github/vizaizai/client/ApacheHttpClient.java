@@ -13,6 +13,7 @@ import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.Consts;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -119,6 +120,18 @@ public class ApacheHttpClient extends AbstractClient {
         }
 
         try (CloseableHttpResponse response = httpClient.execute(request)){
+            // 响应头
+            Header[] allHeaders = response.getAllHeaders();
+            if (allHeaders != null && allHeaders.length > 0) {
+                HeadersNameValues headersNameValues = new HeadersNameValues();
+                for (Header header : allHeaders) {
+                    if (header.getName() != null && header.getValue()!=null) {
+                        headersNameValues.add(header.getName(),header.getValue());
+                    }
+                }
+                result.setHeaders(headersNameValues);
+            }
+
             HttpEntity httpEntity = response.getEntity();
             if (httpEntity == null) {
                 result.setMessage("Response body is null");

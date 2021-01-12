@@ -1,6 +1,6 @@
 package com.github.vizaizai.codec;
 
-import com.github.vizaizai.exception.EasyHttpException;
+import com.github.vizaizai.exception.CodecException;
 import com.github.vizaizai.model.HttpResponse;
 import com.github.vizaizai.util.StreamUtils;
 import com.github.vizaizai.util.TypeUtils;
@@ -28,7 +28,7 @@ public class SimpleDecoder implements Decoder {
         try {
              bodyString = StreamUtils.copyToString(response.getBody().asInputStream(), Utils.UTF_8);
         }catch (Exception e) {
-            throw new EasyHttpException(e);
+            throw new CodecException(e);
         }
 
 

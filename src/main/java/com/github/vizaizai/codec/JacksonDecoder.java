@@ -3,6 +3,7 @@ package com.github.vizaizai.codec;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.vizaizai.exception.CodecException;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.model.HttpResponse;
 import com.github.vizaizai.util.Utils;
@@ -52,7 +53,7 @@ public class JacksonDecoder implements Decoder {
             reader.reset();
             return mapper.readValue(reader, mapper.constructType(type));
         } catch (IOException e) {
-            throw new EasyHttpException(e);
+            throw new CodecException(e);
         }
     }
 }

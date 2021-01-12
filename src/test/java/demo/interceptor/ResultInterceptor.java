@@ -1,18 +1,26 @@
 package demo.interceptor;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.model.HttpRequest;
 import com.github.vizaizai.model.HttpResponse;
-import org.apache.commons.lang3.StringUtils;
+import demo.model.ApiResult;
 
 /**
  * @author liaochongwei
  * @date 2020/8/3 13:46
  */
 public class ResultInterceptor implements HttpInterceptor {
+    private final ObjectMapper mapper;
+
+    public ResultInterceptor() {
+        this.mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
     @Override
     public boolean preHandle(HttpRequest request) {
         return true;
@@ -23,20 +31,30 @@ public class ResultInterceptor implements HttpInterceptor {
         if (!response.isOk()) {
             throw new EasyHttpException("请求错误~");
         }
-//        if (StringUtils.isBlank(response.getBody())) {
-//           return;
-//        }
-//        JSONObject ret = JSON.parseObject(response.getBody());
-//        // 假设业务code：200 为操作成功
-//        if (ret.getInteger("code") == 200) {
-//            // 覆盖包含公共信息的json
-//            JSONObject data = ret.getJSONObject("data");
-//            if (data != null) {
-//                response.setReturnObject(data.toJavaObject(response.getReturnType()));
-//                return;
-//            }
-//        }
-//        response.setReturnObject(null);
+        if (response.getBody() == null) {
+           return;
+        }
+
+        try {
+            JavaType javaType = mapper.getTypeFactory().constructParametricType(ApiResult.class,
+                    mapper.getTypeFactory().constructType(response.getReturnType()));
+            ApiResult<Object> bizRet = mapper.readValue(response.getBody().asInputStream(), javaType);
+
+            // 假设业务code：200 为操作成功
+            if (bizRet.getCode() == 200) {
+                if (bizRet.getData() != null) {
+                    // 取data作为返回值
+                    response.setReturnObject(bizRet.getData());
+                    return;
+                }
+            }
+            response.setReturnObject(null);
+        }catch (Exception e) {
+            throw new EasyHttpException(e);
+        }
+
+
+
 
     }
 

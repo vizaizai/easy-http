@@ -35,7 +35,7 @@ public class EasyHttp {
         private RetrySettings retrySettings;
         public Builder() {
             this.client = ApacheHttpClient.getInstance();
-            this.encoder = new DefaultEncoder();
+            this.encoder = new JacksonEncoder();
             this.decoder = new JacksonDecoder();
             this.config =  HttpRequestConfig.defaultConfig();
             this.interceptors = new ArrayList<>();

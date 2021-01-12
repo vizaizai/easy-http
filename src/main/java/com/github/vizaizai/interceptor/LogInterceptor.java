@@ -59,7 +59,7 @@ public class LogInterceptor implements HttpInterceptor{
             return;
         }
         log.debug("请求响应: {} [{}]:{} ",request.getUrl(), response.getStatusCode(), text(response.getMessage()));
-        if (response.getBody().isRepeatable()) {
+        if (response.getBody()!= null && response.getBody().isRepeatable()) {
             try {
                 log.debug("响应体: {}", text(StreamUtils.copyToString(response.getBody().asInputStream(),Utils.UTF_8)));
             }catch (Exception ignored) {

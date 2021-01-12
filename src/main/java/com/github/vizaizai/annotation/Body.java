@@ -8,4 +8,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Body {
     String TYPE = "body";
+    String wrapRoot() default "";
 }

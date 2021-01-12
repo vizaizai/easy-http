@@ -1,6 +1,7 @@
 package com.github.vizaizai.model;
 
 import com.github.vizaizai.model.body.Body;
+import com.github.vizaizai.util.value.HeadersNameValues;
 
 import java.lang.reflect.Type;
 
@@ -15,6 +16,10 @@ public class HttpResponse {
      * 响应体
      */
     private Body body;
+    /**
+     * 响应头
+     */
+    private HeadersNameValues headers;
     /**
      * 返回类型
      */
@@ -98,6 +103,14 @@ public class HttpResponse {
     public void setReturnObject(Object returnObject) {
         this.setDeserialize(true);
         this.returnObject = returnObject;
+    }
+
+    public HeadersNameValues getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(HeadersNameValues headers) {
+        this.headers = headers;
     }
 
     public static HttpResponse ok(Body body) {
