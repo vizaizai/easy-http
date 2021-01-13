@@ -6,7 +6,7 @@
 
     <groupId>com.github.vizaizai</groupId>
     <artifactId>easy-http</artifactId>
-    <version>3.2.2</version>
+    <version>3.2.3</version>
     <packaging>jar</packaging>
     <name>easy-http</name>
     <url>https://github.com/vizaizai/easy-http</url>

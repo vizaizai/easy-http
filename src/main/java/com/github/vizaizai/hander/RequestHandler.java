@@ -230,7 +230,8 @@ public class RequestHandler implements Handler<HttpResponse>{
                 if (StringUtils.isNotBlank(argParser.getVarName())) {
                     Map<String,Object> wrap = new HashMap<>(1);
                     wrap.put(argParser.getVarName(), source);
-                    source = wrap;
+                    this.request.setBody(encoder.encodeString(wrap));
+                    return;
                 }
                 if (argParser.isSimple()) {
                     this.request.setBody(source.toString());
