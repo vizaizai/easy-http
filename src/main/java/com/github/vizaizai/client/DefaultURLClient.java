@@ -195,4 +195,12 @@ public class DefaultURLClient extends AbstractClient{
             }
         }
     }
+
+    public SSLSocketFactory getSslContextFactory() {
+        return sslContextFactory;
+    }
+
+    public HostnameVerifier getHostnameVerifier() {
+        return hostnameVerifier;
+    }
 }
