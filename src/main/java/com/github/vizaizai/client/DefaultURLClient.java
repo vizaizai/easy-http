@@ -11,6 +11,9 @@ import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -27,17 +30,25 @@ import static java.lang.String.format;
  * @date 2020/8/26 14:28
  */
 public class DefaultURLClient extends AbstractClient{
+    private final SSLSocketFactory sslContextFactory;
+    private final HostnameVerifier hostnameVerifier;
+
+    public DefaultURLClient(SSLSocketFactory sslContextFactory, HostnameVerifier hostnameVerifier) {
+        this.sslContextFactory = sslContextFactory;
+        this.hostnameVerifier = hostnameVerifier;
+    }
 
     public static DefaultURLClient getInstance() {
-        return DefaultURLClient.ClientInstance.INSTANCE;
-
-    }
-    public static class ClientInstance {
-        private ClientInstance() {
-        }
-        private static final DefaultURLClient INSTANCE = new DefaultURLClient();
+        return new DefaultURLClient(null,null);
     }
 
+    public static DefaultURLClient getInstance(SSLSocketFactory sslContextFactory) {
+        return new DefaultURLClient(sslContextFactory,null);
+    }
+
+    public static DefaultURLClient getInstance(SSLSocketFactory sslContextFactory, HostnameVerifier hostnameVerifier) {
+        return new DefaultURLClient(sslContextFactory,hostnameVerifier);
+    }
 
     @Override
     public HttpResponse request(HttpRequest param) throws IOException{
@@ -54,6 +65,16 @@ public class DefaultURLClient extends AbstractClient{
         final HttpURLConnection connection;
         url = new URL(entity.url);
         connection = (HttpURLConnection) url.openConnection();
+        // ssl
+        if (connection instanceof HttpsURLConnection) {
+            HttpsURLConnection sslConnection = (HttpsURLConnection) connection;
+            if (this.sslContextFactory != null) {
+                sslConnection.setSSLSocketFactory(sslContextFactory);
+            }
+            if (this.hostnameVerifier != null) {
+                sslConnection.setHostnameVerifier(this.hostnameVerifier);
+            }
+        }
 
         connection.setConnectTimeout(config.getConnectTimeout());
         connection.setReadTimeout(config.getRequestTimeout());
