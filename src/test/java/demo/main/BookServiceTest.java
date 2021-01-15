@@ -2,6 +2,7 @@ package demo.main;
 
 
 import com.github.vizaizai.EasyHttp;
+import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
@@ -127,7 +128,7 @@ public class BookServiceTest {
         TimeConsuming.mark("jdk-create");
         bookHttpService = EasyHttp.builder()
                 .url("http://10.10.11.107:25068/inner")
-                .client(DefaultURLClient.getInstance())
+                .client(ApacheHttpClient.getInstance())
                 .withInterceptor(new LogInterceptor())
                 .withInterceptor(new ErrorInterceptor())
                 .withInterceptor(new ResultInterceptor())
@@ -135,7 +136,7 @@ public class BookServiceTest {
         TimeConsuming.printMS("jdk-create");
 
         long total = 0;
-        int n = 3;
+        int n = 10;
         for (int i = 0; i < n; i++) {
             //TimeLooper.sleep(3000);
             long time1= System.currentTimeMillis();
@@ -160,7 +161,7 @@ public class BookServiceTest {
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .build(BookHttpService.class);
-        CompletableFuture<String> s =  bookHttpService.baidu("dsy_Wlep4Af6LPQf","1290478984305881090");
+        CompletableFuture<Book> s =  bookHttpService.baidu("dsy_Wlep4Af6LPQf","1290478984305881090");
 
         s.thenAccept(e->System.out.println(e))
                 .thenRun(()->System.out.println("异步请求执行完毕"));

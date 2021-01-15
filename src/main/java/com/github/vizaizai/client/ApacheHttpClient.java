@@ -18,12 +18,14 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import javax.net.ssl.HostnameVerifier;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,22 +37,34 @@ import java.util.List;
 public class ApacheHttpClient extends AbstractClient {
     private RequestConfig config;
     private final CloseableHttpClient httpClient;
+    private final SSLConnectionSocketFactory sslConnectionSocketFactory;
+    private final HostnameVerifier hostnameVerifier;
 
-    private ApacheHttpClient() {
-        httpClient = HttpClientBuilder.create().build();
+    private ApacheHttpClient(SSLConnectionSocketFactory sslConnectionSocketFactory, HostnameVerifier hostnameVerifier) {
+        this.sslConnectionSocketFactory = sslConnectionSocketFactory;
+        this.hostnameVerifier = hostnameVerifier;
+
+        // SSL
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        if (sslConnectionSocketFactory != null) {
+            httpClientBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
+        }
+        if (hostnameVerifier != null) {
+            httpClientBuilder.setSSLHostnameVerifier(hostnameVerifier);
+        }
+        this.httpClient  = httpClientBuilder.build();
+
     }
 
     public static ApacheHttpClient getInstance() {
-        return ClientInstance.INSTANCE;
-
+        return new ApacheHttpClient(null, null);
     }
-
-    public static class ClientInstance {
-        private ClientInstance() {
-        }
-        private static final ApacheHttpClient INSTANCE = new ApacheHttpClient();
+    public static ApacheHttpClient getInstance(SSLConnectionSocketFactory sslConnectionSocketFactory) {
+        return new ApacheHttpClient(sslConnectionSocketFactory, null);
     }
-
+    public static ApacheHttpClient getInstance(SSLConnectionSocketFactory sslConnectionSocketFactory, HostnameVerifier hostnameVerifier) {
+        return new ApacheHttpClient(sslConnectionSocketFactory, hostnameVerifier);
+    }
 
     public void setConfig(HttpRequestConfig httpConfig) {
        super.setConfig(httpConfig);
@@ -201,5 +215,13 @@ public class ApacheHttpClient extends AbstractClient {
             return stringEntity;
         }
         return null;
+    }
+
+    public SSLConnectionSocketFactory getSslConnectionSocketFactory() {
+        return sslConnectionSocketFactory;
+    }
+
+    public HostnameVerifier getHostnameVerifier() {
+        return hostnameVerifier;
     }
 }

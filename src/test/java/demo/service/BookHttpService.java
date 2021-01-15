@@ -52,12 +52,12 @@ public interface BookHttpService {
     @Post(value = "/book/foo")
     String[] foo1(@Body(wrapRoot = "foo") QueryForm form);
 
-    @Get(value = "/book/foo")
+
     @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId",
             httpMethod = HttpMethod.GET,
             interceptors = ResultInterceptor.class,
             retries = 5)
-    CompletableFuture<String> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
+    CompletableFuture<Book> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
 
     @Get(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId")
     Book man(@Query("platformId") String platformId, @Query("storeId") String storeId);
