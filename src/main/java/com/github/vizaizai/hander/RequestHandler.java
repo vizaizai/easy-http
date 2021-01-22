@@ -183,8 +183,8 @@ public class RequestHandler implements Handler<HttpResponse>{
         for (ArgParser argParser : this.argParsers) {
             // var替换路径
             if (Var.TYPE.equals(argParser.getType()) && this.methodParser.getVarCount() > 0) {
-                String key = Utils.urlEncode(argParser.getVarName(),Utils.UTF_8.name());
-                String value = Utils.urlEncode(argParser.getSource().toString(),Utils.UTF_8.name());
+                String key = Utils.urlEncode(argParser.getVarName(), this.request.getEncoding().name());
+                String value = Utils.urlEncode(argParser.getSource().toString(),this.request.getEncoding().name());
                 pathParams.put(key,value);
             }
         }
@@ -205,7 +205,7 @@ public class RequestHandler implements Handler<HttpResponse>{
             if (argParser.isSimple()) {
                 // 基本数据类型
                 this.request.addQueryParam(argParser.getVarName(), argParser.getSource().toString());
-            }else if (TypeUtils.isArrayType(argParser.getArgClass())) {
+            }else if (TypeUtils.isArrayType(argParser.getDataType())) {
                 // 数组
                 this.request.addQueryParams(Utils.getNameValuesFromArray(argParser.getVarName(), argParser.getSource()));
             }else if (argParser.getSource() instanceof Iterable) {

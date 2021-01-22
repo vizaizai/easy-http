@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 
 /**
  * 参数解析
@@ -25,9 +26,9 @@ public class ArgParser {
      */
     private Object source;
     /**
-     * 参数clazz
+     * 数据类型
      */
-    private Class<?> argClass;
+    private Type dataType;
     /**
      * 方法
      */
@@ -65,10 +66,10 @@ public class ArgParser {
 
     private void parse() {
         // 判断参数时简单参数还是对象参数
-        Class<?> argClazz = source.getClass();
-        this.argClass =  argClazz;
+        Type argType = this.method.getParameters()[this.index].getParameterizedType();
+        this.dataType =  argType;
         // 是否为简单参数
-        this.isSimple = TypeUtils.isSimple(argClazz.getTypeName());
+        this.isSimple = TypeUtils.isSimple(argType.getTypeName());
         Annotation[] annotations = this.getParameterAnnotation();
 
         // 获取参数名称
@@ -153,12 +154,13 @@ public class ArgParser {
         this.source = source;
     }
 
-    public Class<?> getArgClass() {
-        return argClass;
+
+    public Type getDataType() {
+        return dataType;
     }
 
-    public void setArgClass(Class<?> argClass) {
-        this.argClass = argClass;
+    public void setDataType(Type dataType) {
+        this.dataType = dataType;
     }
 
     public boolean isSimple() {

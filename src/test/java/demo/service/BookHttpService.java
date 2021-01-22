@@ -2,6 +2,7 @@ package demo.service;
 
 import com.github.vizaizai.annotation.*;
 import com.github.vizaizai.model.HttpMethod;
+import com.github.vizaizai.model.HttpResponse;
 import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
@@ -50,8 +51,10 @@ public interface BookHttpService {
     String[] foo(QueryForm form, @Headers Map<String,String> headers);
 
     @Post(value = "/book/foo")
-    String[] foo1(@Body(wrapRoot = "foo") QueryForm form);
+    HttpResponse foo1(@Body(wrapRoot = "foo") QueryForm<String> form);
 
+    @Post(value = "/book/foo1?params={params}")
+    HttpResponse foo1(@Var String params);
 
     @Mapping(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId",
             httpMethod = HttpMethod.GET,

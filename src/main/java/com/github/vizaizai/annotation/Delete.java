@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface Delete {
     String value() default "";
-    String contentType() default ContentType.APPLICATION_JSON_UTF8;
+    String contentType() default ContentType.APPLICATION_JSON;
     /**
      * @return 拦截器
      */

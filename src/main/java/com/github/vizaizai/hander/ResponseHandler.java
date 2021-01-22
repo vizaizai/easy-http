@@ -29,6 +29,7 @@ public class ResponseHandler implements Handler<Object>{
     public ResponseHandler response(HttpResponse response) {
         this.response = response;
         this.response.setReturnType(this.returnType);
+        this.response.setEncoding(this.decoder.getEncoding());
         return this;
     }
 
@@ -54,6 +55,10 @@ public class ResponseHandler implements Handler<Object>{
         }
         // 执行后置拦截
         interceptorOps.doPostInterceptors(this.request, this.response);
+        // 返回类型为HttpResponse
+        if (this.returnType == HttpResponse.class) {
+            return response;
+        }
         // 如果已经序列化,则直接返回
         if (this.response.isDeserialize()) {
             return this.response.getReturnObject();

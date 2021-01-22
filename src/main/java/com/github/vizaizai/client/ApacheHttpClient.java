@@ -132,7 +132,6 @@ public class ApacheHttpClient extends AbstractClient {
         if (headers != null) {
             headers.forEach(e-> request.addHeader(e.getName(), e.getValue()));
         }
-
         try (CloseableHttpResponse response = httpClient.execute(request)){
             // 响应头
             Header[] allHeaders = response.getAllHeaders();
@@ -193,7 +192,7 @@ public class ApacheHttpClient extends AbstractClient {
      * @return String
      */
     private static String convertUrl(String url,  List<BasicNameValuePair> queryParams, String contentType) {
-        if (Utils.isForm(contentType)) {
+        if (Utils.isUrlEncodeForm(contentType)) {
             return url;
         }
         return convertUrl(url, queryParams);
@@ -206,7 +205,7 @@ public class ApacheHttpClient extends AbstractClient {
      * @return HttpEntity
      */
     private static HttpEntity genEntity(List<BasicNameValuePair> queryParams, String content,String contentType) {
-        if (Utils.isForm(contentType)) {
+        if (Utils.isUrlEncodeForm(contentType)) {
            return new UrlEncodedFormEntity(queryParams, Consts.UTF_8);
         }
         if (content != null) {

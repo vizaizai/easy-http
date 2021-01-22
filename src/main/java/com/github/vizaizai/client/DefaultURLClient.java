@@ -167,7 +167,7 @@ public class DefaultURLClient extends AbstractClient{
                 this.handleUrl(request.getQueryParams());
                 return;
             }
-            if (isForm(request.getContentType())) {
+            if (isUrlEncodeForm(request.getContentType())) {
                 this.addBody(asUrlEncoded(request.getQueryParams()));
             }else {
                 this.addBody(request.getBody());

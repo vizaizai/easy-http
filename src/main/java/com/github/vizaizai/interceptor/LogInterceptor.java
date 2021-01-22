@@ -44,7 +44,7 @@ public class LogInterceptor implements HttpInterceptor{
             log.debug("请求头: {}", sb);
         }
         if (CollectionUtils.isNotEmpty(request.getQueryParams())) {
-            log.debug("请求参数: {}", Utils.asUrlEncoded(request.getQueryParams()));
+            log.debug("查询参数: {}", Utils.asUrlEncoded(request.getQueryParams()));
         }
         if (request.getBody() != null) {
             log.debug("请求体: {}", request.getBody());
@@ -61,7 +61,7 @@ public class LogInterceptor implements HttpInterceptor{
         log.debug("请求响应: {} [{}]:{} ",request.getUrl(), response.getStatusCode(), text(response.getMessage()));
         if (response.getBody()!= null && response.getBody().isRepeatable()) {
             try {
-                log.debug("响应体: {}", text(StreamUtils.copyToString(response.getBody().asInputStream(),Utils.UTF_8)));
+                log.debug("响应体: {}", text(StreamUtils.copyToString(response.getBody().asInputStream(), response.getEncoding())));
             }catch (Exception ignored) {
             }
         }

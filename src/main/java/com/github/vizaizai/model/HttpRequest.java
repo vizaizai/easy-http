@@ -1,8 +1,10 @@
 package com.github.vizaizai.model;
 
+import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -36,6 +38,10 @@ public class HttpRequest {
      * 请求体文本内容
      */
     private String body;
+    /**
+     * 字符编码
+     */
+    private Charset encoding = Utils.UTF_8;
     /**
      * 扩展参数
      */
@@ -151,5 +157,13 @@ public class HttpRequest {
 
     public void setConfig(HttpRequestConfig config) {
         this.config = config;
+    }
+
+    public Charset getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(Charset encoding) {
+        this.encoding = encoding;
     }
 }

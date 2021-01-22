@@ -55,4 +55,5 @@ public class JacksonDecoder implements Decoder {
             throw new CodecException(e);
         }
     }
+
 }

@@ -2,8 +2,10 @@ package com.github.vizaizai.codec;
 
 
 import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.util.Utils;
 
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 
 /**
  * @author liaochongwei
@@ -17,4 +19,12 @@ public interface Decoder {
      * @return Object
      */
     Object decode(HttpResponse response, Type type);
+
+    /**
+     * 字符编码
+     * @return 字符编码
+     */
+    default Charset getEncoding(){
+        return Utils.UTF_8;
+    }
 }

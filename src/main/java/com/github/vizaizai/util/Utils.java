@@ -91,6 +91,9 @@ public class Utils {
         while (iterator.hasNext()){
             StringNameValue nameValue = iterator.next();
             String key = nameValue.getName();
+            if (encode != null) {
+                key = urlEncode(key,encode);
+            }
             String value = nameValue.getValue();
             if (StringUtils.isBlank(value)){
                 continue;
@@ -125,15 +128,29 @@ public class Utils {
     }
 
     /**
-     * 是否表单提交
+     * Body是否x-www-form-urlencode
      * @param contentType
      * @return boolean
      */
-    public static boolean isForm(String contentType) {
+    public static boolean isUrlEncodeForm(String contentType) {
       if (StringUtils.isBlank(contentType) || contentType.length() < 33) {
           return false;
       }
-      return contentType.startsWith(ContentType.APPLICATION_FORM_URLENCODED_UTF8.substring(0, 33 - 1));
+      // ContentType.APPLICATION_FORM_URLENCODED.substring(0, 33 - 1)
+      return contentType.startsWith(ContentType.APPLICATION_FORM_URLENCODED);
+    }
+
+    /**
+     * Body是为为Raw(JSON,XML,Text等)
+     * @param contentType
+     * @return
+     */
+    public static boolean isRaw(String contentType) {
+        if (StringUtils.isBlank(contentType) || contentType.length() < 33) {
+            return false;
+        }
+        // ContentType.APPLICATION_FORM_URLENCODED.substring(0, 33 - 1)
+        return contentType.startsWith(ContentType.APPLICATION_FORM_URLENCODED);
     }
 
     /**
@@ -277,4 +294,5 @@ public class Utils {
         }
         return nameValues;
     }
+
 }
