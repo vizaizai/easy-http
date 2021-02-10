@@ -1,6 +1,5 @@
 package com.github.vizaizai.util;
 
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.stream.Stream;
@@ -11,7 +10,7 @@ import java.util.stream.Stream;
  * @date 2020/7/31 11:34
  */
 public class TypeUtils {
-    public static final String[] SIMPLE_TYPES =
+    public static final String[] BASE_TYPES =
             new String[] {"integer","short", "byte","long","char",
                     "float", "double","boolean","string", "void"};
 
@@ -32,18 +31,18 @@ public class TypeUtils {
      */
     public static String getType(String typeName) {
         String typeLower = typeName.toLowerCase();
-        return Stream.of(SIMPLE_TYPES)
+        return Stream.of(BASE_TYPES)
                      .filter(typeLower::contains)
                      .findFirst().orElse(null);
     }
     /**
-     * 是否为简单参数
+     * 是否为基本类型
      * @param typeName
      * @return isSimple
      */
-    public static boolean isSimple(String typeName) {
+    public static boolean isBaseType(String typeName) {
         String typeLower = typeName.toLowerCase();
-        return Stream.of(SIMPLE_TYPES).anyMatch(e->{
+        return Stream.of(BASE_TYPES).anyMatch(e->{
             if (typeLower.endsWith(SUFFIX)) {
                 return false;
             }
@@ -88,42 +87,46 @@ public class TypeUtils {
        return Object.class;
     }
 
+    public String getContentType() {
+        return "";
+    }
+
     /**
-     * 获取所有简单类型
+     * 获取所有基本类型
      * @return allTypes
      */
-    public static String[] getTypes() {
-        return SIMPLE_TYPES;
+    public static String[] getBaseTypes() {
+        return BASE_TYPES;
     }
 
     public static String getIntType() {
-        return SIMPLE_TYPES[0];
+        return BASE_TYPES[0];
     }
     public static String getShortType() {
-        return SIMPLE_TYPES[1];
+        return BASE_TYPES[1];
     }
     public static String getByteType() {
-        return SIMPLE_TYPES[2];
+        return BASE_TYPES[2];
     }
     public static String getLongType() {
-        return SIMPLE_TYPES[3];
+        return BASE_TYPES[3];
     }
     public static String getCharType() {
-        return SIMPLE_TYPES[4];
+        return BASE_TYPES[4];
     }
     public static String getFloatType() {
-        return SIMPLE_TYPES[5];
+        return BASE_TYPES[5];
     }
     public static String getDoubleType() {
-        return SIMPLE_TYPES[6];
+        return BASE_TYPES[6];
     }
     public static String getBoolType() {
-        return SIMPLE_TYPES[7];
+        return BASE_TYPES[7];
     }
     public static String getStringType() {
-        return SIMPLE_TYPES[8];
+        return BASE_TYPES[8];
     }
     public static String getVoidType() {
-        return SIMPLE_TYPES[9];
+        return BASE_TYPES[9];
     }
 }

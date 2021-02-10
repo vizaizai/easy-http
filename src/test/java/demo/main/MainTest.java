@@ -1,6 +1,8 @@
 package demo.main;
 
-import com.github.vizaizai.model.RetrySettings;
+import com.github.vizaizai.util.Utils;
+
+import java.util.UUID;
 
 /**
  * @author liaochongwei
@@ -9,12 +11,6 @@ import com.github.vizaizai.model.RetrySettings;
 public class MainTest {
     public static void main(String[] args) throws ClassNotFoundException {
 
-        RetrySettings retrySettings1 = new RetrySettings();
-        RetrySettings retrySettings2 = new RetrySettings();
-
-        System.out.println(retrySettings1.getClass() == retrySettings2.getClass());
-        System.out.println(RetrySettings.class == retrySettings2.getClass());
-        Class<?> aClass = Class.forName("com.github.vizaizai.model.RetrySettings");
-        System.out.println(aClass == retrySettings2.getClass());
+        System.out.println(UUID.randomUUID().toString().replace("-",""));
     }
 }

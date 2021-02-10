@@ -3,10 +3,10 @@ package com.github.vizaizai.hander;
 import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.Encoder;
 import com.github.vizaizai.interceptor.HttpInterceptor;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
-import com.github.vizaizai.model.RetrySettings;
-import com.github.vizaizai.parser.ArgParser;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
+import com.github.vizaizai.entity.RetrySettings;
+import com.github.vizaizai.parser.ArgsParser;
 import com.github.vizaizai.parser.InterfaceParser;
 import com.github.vizaizai.parser.MethodParser;
 
@@ -43,9 +43,9 @@ public interface Context {
     MethodParser getMethodParser();
     /**
      * 方法参数解析
-     * @return List<ArgParser>
+     * @return ArgsParser
      */
-    List<ArgParser> getArgParsers();
+    ArgsParser ArgsParser();
 
     /**
      * 接口解析

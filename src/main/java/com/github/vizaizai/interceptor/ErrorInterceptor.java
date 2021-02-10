@@ -2,8 +2,8 @@ package com.github.vizaizai.interceptor;
 
 
 import com.github.vizaizai.exception.CodeStatusException;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
 import org.slf4j.Logger;
 import com.github.vizaizai.logging.LoggerFactory;
 

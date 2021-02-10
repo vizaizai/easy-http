@@ -1,4 +1,4 @@
-package com.github.vizaizai.model.body;
+package com.github.vizaizai.entity.body;
 
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.Assert;
@@ -13,24 +13,29 @@ import java.nio.charset.Charset;
  */
 public class InputStreamBody implements Body {
     private final InputStream source;
-    private final Integer length;
+    private Integer length;
     private byte[] copyBytes;
     private final boolean repeatable;
 
-    private InputStreamBody(InputStream inputStream, Integer length,boolean repeatable) {
+    private InputStreamBody(InputStream inputStream, Integer length, boolean repeatable) {
         this.source = inputStream;
         this.length = length;
         this.repeatable = repeatable;
-        // 支持重复读
-        if (this.repeatable) {
-            try {
+        try {
+            // 支持重复读
+            if (this.repeatable) {
                 this.copyBytes = StreamUtils.copyToByteArray(inputStream);
-            }catch (IOException e) {
-                throw new EasyHttpException(e);
             }
-        }
-    }
+            // 长度为空
+            if (length == null) {
+                 this.length = inputStream.available();
+            }
 
+        }catch (IOException e) {
+            throw new EasyHttpException(e);
+        }
+
+    }
     public static Body ofNullable(InputStream inputStream, Integer length) {
         if (inputStream == null) {
             return null;
@@ -45,7 +50,7 @@ public class InputStreamBody implements Body {
     }
 
     @Override
-    public Integer length() {
+    public long length() {
         return length;
     }
 
@@ -72,5 +77,15 @@ public class InputStreamBody implements Body {
     public Reader asReader(Charset charset) throws IOException {
         Assert.notNull(charset, "charset should not be null");
         return new InputStreamReader(this.asInputStream(), charset);
+    }
+
+    @Override
+    public String asString(Charset charset) throws IOException {
+        return StreamUtils.copyToString(this.asInputStream(),charset);
+    }
+
+    @Override
+    public void writeTo(OutputStream os) throws IOException {
+        StreamUtils.copy(source, os);
     }
 }

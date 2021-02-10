@@ -13,7 +13,6 @@ public class StringNameValue implements NameValue<String,String> {
 
     public StringNameValue(String name, String value) {
         Assert.notNull(name);
-        Assert.notNull(value);
         this.name = name;
         this.value = value;
     }

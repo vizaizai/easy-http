@@ -3,11 +3,11 @@ package com.github.vizaizai.client;
 
 import com.github.vizaizai.apache.HttpDeleteWithBody;
 import com.github.vizaizai.exception.EasyHttpException;
-import com.github.vizaizai.model.HttpMethod;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.HttpResponse;
-import com.github.vizaizai.model.body.InputStreamBody;
+import com.github.vizaizai.entity.HttpMethod;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpRequestConfig;
+import com.github.vizaizai.entity.HttpResponse;
+import com.github.vizaizai.entity.body.InputStreamBody;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
@@ -81,8 +81,10 @@ public class ApacheHttpClient extends AbstractClient {
         HttpMethod method = param.getMethod();
         String url = param.getUrl();
         HeadersNameValues headers = param.getHeaders();
-        StringNameValues params = param.getQueryParams();
-        String content = param.getBody();
+        StringNameValues params = param.getParams();
+        //String content = param.getBody();
+        // TODO: 2021/2/7
+        String content = "1";
 
         if (config == null) {
             throw new EasyHttpException("HttpClient request configuration is null");
@@ -109,7 +111,6 @@ public class ApacheHttpClient extends AbstractClient {
                 httpPost.setEntity(genEntity(queryParams,content,param.getContentType()));
                 httpPost.setConfig(config);
                 request = httpPost;
-
                 break;
             case PUT:
                 HttpPut httpPut = new HttpPut(convertUrl(url, queryParams, param.getContentType()));

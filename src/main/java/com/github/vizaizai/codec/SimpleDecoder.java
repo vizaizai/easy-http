@@ -1,10 +1,8 @@
 package com.github.vizaizai.codec;
 
 import com.github.vizaizai.exception.CodecException;
-import com.github.vizaizai.model.HttpResponse;
-import com.github.vizaizai.util.StreamUtils;
+import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.util.TypeUtils;
-import com.github.vizaizai.util.Utils;
 
 import java.lang.reflect.Type;
 
@@ -18,7 +16,7 @@ public class SimpleDecoder implements Decoder {
     @Override
     public Object decode(HttpResponse response, Type type) {
 
-        if (!TypeUtils.isSimple(type.getTypeName())) {
+        if (!TypeUtils.isBaseType(type.getTypeName())) {
             return null;
         }
         if (response.getBody() == null) {
@@ -26,7 +24,7 @@ public class SimpleDecoder implements Decoder {
         }
         String bodyString;
         try {
-             bodyString = StreamUtils.copyToString(response.getBody().asInputStream(), Utils.UTF_8);
+             bodyString = response.getBody().asString(this.getEncoding());
         }catch (Exception e) {
             throw new CodecException(e);
         }

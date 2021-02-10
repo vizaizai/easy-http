@@ -1,8 +1,8 @@
 package demo.service;
 
 import com.github.vizaizai.annotation.*;
-import com.github.vizaizai.model.HttpMethod;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpMethod;
+import com.github.vizaizai.entity.HttpResponse;
 import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
@@ -35,16 +35,16 @@ public interface BookHttpService {
     ApiResult<List<Book>> listAllBooks();
 
     @Get("/books/search")
-    ApiResult<List<Book>> searchBooks(@Query("keyword") String keyword);
+    ApiResult<List<Book>> searchBooks(@Param("keyword") String keyword);
 
     @Get("/books")
     CompletableFuture<ApiResult<List<Book>>> foo();
 
     @Get(value = "/book/bar", retries = 1, interval = 10)
-    String[] bar(@Query("ids") String[] ids, @Headers QueryForm headers);
+    String[] bar(@Param("ids") String[] ids, @Headers QueryForm headers);
 
     @Get(value = "/book/bar", retries = 1, interval = 10)
-    String[] bar1(@Query("ids") List<String> ids);
+    String[] bar1(@Param("ids") List<String> ids);
 
     @Headers({"client: easy-http1,okHttp","sign: 56c41d9e1142784770d2sc8cd1049c9e3"})
     @Get(value = "/book/bar")
@@ -60,8 +60,8 @@ public interface BookHttpService {
             httpMethod = HttpMethod.GET,
             interceptors = ResultInterceptor.class,
             retries = 5)
-    CompletableFuture<Book> baidu(@Query("platformId") String platformId, @Query("storeId") String storeId);
+    CompletableFuture<Book> baidu(@Param("platformId") String platformId, @Param("storeId") String storeId);
 
     @Get(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId")
-    Book man(@Query("platformId") String platformId, @Query("storeId") String storeId);
+    Book man(@Param("platformId") String platformId, @Param("storeId") String storeId);
 }

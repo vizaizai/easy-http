@@ -1,7 +1,7 @@
 package com.github.vizaizai.codec;
 
 
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.util.Utils;
 
 import java.lang.reflect.Type;

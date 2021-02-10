@@ -6,7 +6,7 @@
 
     <groupId>com.github.vizaizai</groupId>
     <artifactId>easy-http</artifactId>
-    <version>3.2.5</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
     <name>easy-http</name>
     <url>https://github.com/vizaizai/easy-http</url>
@@ -71,6 +71,12 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>${httpclient.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.12</version>
         </dependency>
 
         <dependency>

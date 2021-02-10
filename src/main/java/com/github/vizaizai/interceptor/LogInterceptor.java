@@ -2,8 +2,8 @@ package com.github.vizaizai.interceptor;
 
 
 import com.github.vizaizai.logging.LoggerFactory;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.util.StreamUtils;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
@@ -27,6 +27,7 @@ public class LogInterceptor implements HttpInterceptor{
         if (!log.isDebugEnabled()) {
            return true;
         }
+
         String method = request.getMethod() == null ? "" : request.getMethod().name();
         log.debug("请求行: {} {}",method, request.getUrl());
         if (CollectionUtils.isNotEmpty(request.getHeaders())) {
@@ -43,8 +44,8 @@ public class LogInterceptor implements HttpInterceptor{
             }
             log.debug("请求头: {}", sb);
         }
-        if (CollectionUtils.isNotEmpty(request.getQueryParams())) {
-            log.debug("查询参数: {}", Utils.asUrlEncoded(request.getQueryParams()));
+        if (CollectionUtils.isNotEmpty(request.getParams())) {
+            log.debug("查询参数: {}", Utils.asUrlEncoded(request.getParams()));
         }
         if (request.getBody() != null) {
             log.debug("请求体: {}", request.getBody());

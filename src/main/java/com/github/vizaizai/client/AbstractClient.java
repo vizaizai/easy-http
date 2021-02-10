@@ -1,8 +1,8 @@
 package com.github.vizaizai.client;
 
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpRequestConfig;
+import com.github.vizaizai.entity.HttpResponse;
 
 import java.io.IOException;
 

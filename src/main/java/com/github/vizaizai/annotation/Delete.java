@@ -2,7 +2,7 @@ package com.github.vizaizai.annotation;
 
 
 import com.github.vizaizai.interceptor.HttpInterceptor;
-import com.github.vizaizai.model.ContentType;
+import com.github.vizaizai.entity.body.RequestBodyType;
 
 import java.lang.annotation.*;
 
@@ -11,7 +11,11 @@ import java.lang.annotation.*;
 @Documented
 public @interface Delete {
     String value() default "";
-    String contentType() default ContentType.APPLICATION_JSON;
+    String contentType() default "";
+    /**
+     * @return 请求体类型
+     */
+    RequestBodyType bodyType() default RequestBodyType.AUTO;
     /**
      * @return 拦截器
      */

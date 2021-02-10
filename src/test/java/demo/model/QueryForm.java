@@ -11,7 +11,6 @@ public class QueryForm<T> {
 
     private List<String> ids;
     private T tt;
-
     public T getTt() {
         return tt;
     }

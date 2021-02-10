@@ -1,7 +1,7 @@
 package com.github.vizaizai.hander;
 
 import com.github.vizaizai.exception.EasyHttpException;
-import com.github.vizaizai.model.RetrySettings;
+import com.github.vizaizai.entity.RetrySettings;
 import com.github.vizaizai.retry.DefaultRule;
 import com.github.vizaizai.retry.RetryTrigger;
 import com.github.vizaizai.retry.attempt.Modes;

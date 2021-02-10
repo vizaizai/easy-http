@@ -2,27 +2,31 @@ package com.github.vizaizai.hander;
 
 import com.github.vizaizai.annotation.Body;
 import com.github.vizaizai.annotation.Headers;
-import com.github.vizaizai.annotation.Query;
+import com.github.vizaizai.annotation.Param;
 import com.github.vizaizai.annotation.Var;
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.codec.Encoder;
+import com.github.vizaizai.entity.form.*;
 import com.github.vizaizai.interceptor.InterceptorOperations;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.HttpResponse;
-import com.github.vizaizai.model.RetrySettings;
-import com.github.vizaizai.parser.ArgParser;
+import com.github.vizaizai.entity.*;
+import com.github.vizaizai.entity.body.RequestBody;
+import com.github.vizaizai.entity.body.RequestBodyType;
+import com.github.vizaizai.parser.Arg;
+import com.github.vizaizai.parser.ArgsParser;
 import com.github.vizaizai.parser.InterfaceParser;
 import com.github.vizaizai.parser.MethodParser;
 import com.github.vizaizai.proxy.ProxyContext;
+import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.Utils;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.TypeUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 请求处理器
@@ -45,7 +49,7 @@ public class RequestHandler implements Handler<HttpResponse>{
     /**
      * 参数解析器
      */
-    private List<ArgParser> argParsers;
+    private ArgsParser argsParser;
     /**
      * 编码器
      */
@@ -82,17 +86,19 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 方法解析
         MethodParser methodParser = MethodParser.doParse(method);
         // 参数解析
-        List<ArgParser> argParsers = new LinkedList<>();
+        List<Arg> argList = new LinkedList<>();
         for (int i = 0; args != null && i < args.length; i++) {
-            argParsers.add(ArgParser.doParse(args[i],method, i));
+            argList.add(Arg.instance(args[i],method, i));
         }
+        ArgsParser argsParser = ArgsParser.doParse(argList);
+
         RequestHandler handler = new RequestHandler();
         handler.url = proxyContext.getUrl();
         handler.encoder = proxyContext.getEncoder();
         handler.client(proxyContext.getClient(),proxyContext.getRequestConfig());
 
         handler.interfaceParser = interfaceParser;
-        handler.argParsers = argParsers;
+        handler.argsParser = argsParser;
         handler.methodParser = methodParser;
         handler.retrySettings = proxyContext.getRetrySettings();
 
@@ -117,9 +123,6 @@ public class RequestHandler implements Handler<HttpResponse>{
     }
 
     private void initRequest() {
-        // 校验方法参数
-        this.checkArgs();
-
         // 处理http://
         this.handleUrl();
 
@@ -134,8 +137,8 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 设置请求方式
         this.request.setMethod(methodParser.getHttpMethod());
 
-        // 设置ContentType
-        this.request.setContentType(methodParser.getContentType());
+        // 处理请求体类型
+        RequestBodyType bodyType = this.handleBodyType();
 
         // 处理请求路径
         this.handlePath();
@@ -147,11 +150,11 @@ public class RequestHandler implements Handler<HttpResponse>{
         this.handleRetry();
 
         // 参数解析列表不为空，则需要解析方法参数
-        if (CollectionUtils.isNotEmpty(argParsers)) {
+        if (!argsParser.isEmpty()) {
             // 处理请求query参数
-            this.handleQuery();
+            this.handleParam();
             // 处理请求body参数
-            this.handleBody();
+            this.handleBody(bodyType);
 
         }
     }
@@ -180,11 +183,12 @@ public class RequestHandler implements Handler<HttpResponse>{
     private void handlePath() {
         String path = this.methodParser.getPath();
         Map<String,String> pathParams = new HashMap<>();
-        for (ArgParser argParser : this.argParsers) {
+        List<Arg> args = argsParser.getArgs(Var.TYPE);
+        for (Arg arg : args) {
             // var替换路径
-            if (Var.TYPE.equals(argParser.getType()) && this.methodParser.getVarCount() > 0) {
-                String key = Utils.urlEncode(argParser.getVarName(), this.request.getEncoding().name());
-                String value = Utils.urlEncode(argParser.getSource().toString(),this.request.getEncoding().name());
+            if (this.methodParser.getVarCount() > 0) {
+                String key = Utils.urlEncode(arg.getVarName(), this.request.getEncoding().name());
+                String value = Utils.urlEncode(Utils.toString(arg.getSource()),this.request.getEncoding().name());
                 pathParams.put(key,value);
             }
         }
@@ -192,55 +196,61 @@ public class RequestHandler implements Handler<HttpResponse>{
     }
 
     /**
-     * 处理query参数
+     * 处理Param
      */
-    private void handleQuery() {
-        for (ArgParser argParser : this.argParsers) {
-            if (argParser.isSimple() && StringUtils.isBlank(argParser.getVarName())) {
-                throw new IllegalArgumentException("The value of @Query is empty");
+    private void handleParam() {
+        List<Arg> args = argsParser.getArgs(Param.TYPE);
+        for (Arg arg : args) {
+            if (arg.isBaseType() && StringUtils.isBlank(arg.getVarName())) {
+                throw new IllegalArgumentException("The value of @Param is empty");
             }
-            if(!Query.TYPE.equals(argParser.getType())) {
-                break;
-            }
-            if (argParser.isSimple()) {
-                // 基本数据类型
-                this.request.addQueryParam(argParser.getVarName(), argParser.getSource().toString());
-            }else if (TypeUtils.isArrayType(argParser.getDataType())) {
-                // 数组
-                this.request.addQueryParams(Utils.getNameValuesFromArray(argParser.getVarName(), argParser.getSource()));
-            }else if (argParser.getSource() instanceof Iterable) {
-                // 集合
-                this.request.addQueryParams(Utils.getNameValuesFromList(argParser.getVarName(), (Iterable<?>) argParser.getSource()));
-            } else {
-                // JavaBean或者map
-                this.request.addQueryParams(encoder.encodeNameValue(argParser.getSource()));
-            }
-
+            request.addParams(Utils.encodeNameValue(arg.getVarName(),arg.getSource(),arg.getDataType()));
         }
     }
 
     /**
-     * 处理查询body参数
+     * 处理body参数
      */
-    private void handleBody() {
-        for (ArgParser argParser : this.argParsers) {
-            if (Body.TYPE.equals(argParser.getType())) {
-                Object source = argParser.getSource();
+    private void handleBody(RequestBodyType type) {
+        List<Arg> args = argsParser.getArgs(Body.TYPE);
+        Charset charset = config.getEncoding();
+        Arg arg = args.isEmpty() ? null : args.get(0);
+        switch (type) {
+            case RAW:
+                Assert.notNull(arg);
                 // 存在warpRoot
-                if (StringUtils.isNotBlank(argParser.getVarName())) {
+                if (StringUtils.isNotBlank(arg.getVarName())) {
                     Map<String,Object> wrap = new HashMap<>(1);
-                    wrap.put(argParser.getVarName(), source);
-                    this.request.setBody(encoder.encodeString(wrap));
-                    return;
+                    wrap.put(arg.getVarName(), arg.getSource());
+                    this.request.setBody(RequestBody.create(encoder.encode(wrap,arg.getDataType()), arg.getSource(),type));
+                    break;
                 }
-                if (argParser.isSimple()) {
-                    this.request.setBody(source.toString());
-                }else {
-                    this.request.setBody(encoder.encodeString(source));
+                if (arg.isBaseType()) {
+                    this.request.setBody(RequestBody.create(Utils.toString(arg.getSource()),charset,type));
+                    break;
                 }
-                return;
-            }
+                request.setBody(RequestBody.create(encoder.encode(arg.getSource(),arg.getDataType()),arg.getSource(),type));
+                break;
+            case X_WWW_FROM_URL_ENCODED:
+                request.setBody(RequestBody.create(this.request.getParams(),charset,type));
+                request.setEmptyParams();
+                break;
+            case FORM_DATA:
+                Assert.notNull(arg);
+                FormBodyParts parts = (FormBodyParts) arg.getSource();
+                request.setContentType(Utils.getMultiContentType(parts.getBoundary()));
+                request.setBody(RequestBody.create(parts,type));
+                break;
+            case BINARY:
+                Assert.notNull(arg);
+                BodyContent content = (BodyContent) arg.getSource();
+                request.setBody(RequestBody.create(content,type));
+                break;
+            default:
+                break;
         }
+
+
     }
 
     /**
@@ -253,14 +263,11 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 添加方法级别的headers
         this.request.addHeaders(this.methodParser.getHeaders());
 
-        if (CollectionUtils.isEmpty(argParsers)) {
-            return;
-        }
+        List<Arg> args = argsParser.getArgs(Headers.TYPE);
         // 参数级别的headers
-        for (ArgParser argParser : this.argParsers) {
-            if (Headers.TYPE.equals(argParser.getType()) && !argParser.isSimple()) {
-                this.request.addHeaders(encoder.encodeNameValue(argParser.getSource()));
-                return;
+        for (Arg arg : args) {
+            if (!arg.isBaseType()) {
+                this.request.addHeaders(Utils.encodeNameValue(arg.getVarName(),arg.getSource(),arg.getDataType()));
             }
         }
     }
@@ -292,38 +299,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         }
 
     }
-    private void checkArgs() {
 
-        if ("".equals(this.url)) {
-            throw new IllegalArgumentException("The url is \"\"");
-        }
-        if (this.methodParser == null) {
-            throw new IllegalArgumentException("The method is null");
-        }
-        if (this.encoder == null) {
-            throw new IllegalArgumentException("no default encoder");
-        }
-        // 1. 只能包含一个@Body
-        // 2. 只能包含一个@Headers
-        int has1 = 0;
-        int has2 = 0;
-        for (ArgParser argParser : this.argParsers) {
-            if (Body.TYPE.equals(argParser.getType())) {
-                has1 ++;
-                if (has1 > 1) {
-                    throw new IllegalArgumentException("Only one @Body can be included");
-                }
-            }
-            if (Headers.TYPE.equals(argParser.getType())) {
-                has2 ++;
-                if (has2 > 1) {
-                    throw new IllegalArgumentException("Only one @Headers can be included");
-                }
-            }
-        }
-
-
-    }
     private void handleUrl() {
         if (this.url == null) {
             this.url = "";
@@ -332,10 +308,120 @@ public class RequestHandler implements Handler<HttpResponse>{
                 !url.startsWith( "http://") && !url.startsWith("https://")) {
             url = "http://" + url;
         }
-
-
     }
 
+
+    /**
+     * 处理请求体类型
+     */
+    private RequestBodyType handleBodyType() {
+        // 设置ContentType
+        request.setContentType(methodParser.getContentType());
+        RequestBodyType bodyType = methodParser.getBodyType();
+        if (bodyType == null) {
+            return null;
+        }
+        if (RequestBodyType.AUTO.equals(bodyType)) {
+            // 分析请求体类型
+            bodyType =  this.analysisBodyType();
+        }
+        // 校验bodyType
+        Assert.isTrue(bodyType.check(request.getContentType()),"The body's type is error.");
+        return bodyType;
+
+    }
+    /**
+     * 动态分析请求体类型
+     */
+    private RequestBodyType analysisBodyType() {
+        // GET请求的bodyType固定的规范为None
+        if (request.getMethod().equals(HttpMethod.GET)) {
+            return RequestBodyType.NONE;
+        }
+        // 优先根据contentType判断bodyType
+        String contentType = methodParser.getContentType();
+        if (StringUtils.isNotBlank(contentType)) {
+            if (contentType.contains(ContentType.APPLICATION_FORM_URLENCODED)) {
+                // form-urlEncode
+                return RequestBodyType.X_WWW_FROM_URL_ENCODED;
+            }
+            if (contentType.contains(ContentType.FORM_DATA)) {
+                // form-data
+                return RequestBodyType.FORM_DATA;
+            }
+            if (contentType.contains(ContentType.APPLICATION_JSON)
+                    || contentType.contains(ContentType.APPLICATION_XML)
+                    || contentType.contains(ContentType.TEXT_XML)) {
+                // 文本
+               return RequestBodyType.RAW;
+            }
+        }
+        int paramCount = argsParser.getCount(Param.TYPE);
+        int bodyCount = argsParser.getCount(Body.TYPE);
+        // 只存在@Param， bodyType取X_WWW_FROM_URL_ENCODED
+        if (paramCount > 0 && bodyCount == 0) {
+            if (StringUtils.isBlank(contentType)) {
+                request.setContentType(ContentType.APPLICATION_FORM_URLENCODED);
+            }
+            return RequestBodyType.X_WWW_FROM_URL_ENCODED;
+        }
+
+        if (bodyCount == 0) {
+            return RequestBodyType.NONE;
+        }
+        // body源对象
+        Object bodySource = argsParser.getArgs(Body.TYPE).get(0).getSource();
+        RequestBodyType bodyType = this.getTypeByBodySource(bodySource);
+        if (StringUtils.isNotBlank(contentType)) {
+            return bodyType;
+        }
+        // content-type未指定，设置content-type
+        this.resetContentType(bodyType, bodySource);
+        return bodyType;
+    }
+
+    /**
+     * 根据body源对象获取bodyType
+     * @param bodySource
+     */
+    private RequestBodyType getTypeByBodySource(Object bodySource) {
+        RequestBodyType bodyType;
+        if (bodySource instanceof FormBodyParts) {
+            // FormBodyParts-> form-data
+            bodyType = RequestBodyType.FORM_DATA;
+        }else if (bodySource instanceof FileContent) {
+            // 文件->二进制
+            bodyType = RequestBodyType.BINARY;
+        }else if (bodySource instanceof InputStreamContent) {
+            // 输入流->二进制
+            bodyType = RequestBodyType.BINARY;
+        }else {
+            // 文本
+            bodyType = RequestBodyType.RAW;
+        }
+        return bodyType;
+    }
+    /**
+     * 设置contentType
+     * @param bodyType
+     * @param bodySource
+     */
+    private void resetContentType(RequestBodyType bodyType, Object bodySource) {
+        switch (bodyType) {
+            case RAW:
+                request.setContentType(ContentType.APPLICATION_JSON);
+                break;
+            case FORM_DATA:
+                request.setContentType(ContentType.FORM_DATA);
+                break;
+            case BINARY:
+                BodyContent bodyContent = (BodyContent) bodySource;
+                request.setContentType(bodyContent.getContentType());
+                break;
+            default:
+                break;
+        }
+    }
 
     public String getUrl() {
         return url;
@@ -344,8 +430,9 @@ public class RequestHandler implements Handler<HttpResponse>{
     public MethodParser getMethodParser() {
         return methodParser;
     }
-    public List<ArgParser> getArgParsers() {
-        return argParsers;
+
+    public ArgsParser getArgsParser() {
+        return argsParser;
     }
 
     public Encoder getEncoder() {

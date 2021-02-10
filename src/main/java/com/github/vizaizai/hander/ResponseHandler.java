@@ -4,8 +4,8 @@ import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.SimpleDecoder;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.interceptor.InterceptorOperations;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.TypeUtils;
 
@@ -64,7 +64,7 @@ public class ResponseHandler implements Handler<Object>{
             return this.response.getReturnObject();
         }
         // 响应解码
-        if (TypeUtils.isSimple(this.returnType.getTypeName())) {
+        if (TypeUtils.isBaseType(this.returnType.getTypeName())) {
             this.decoder = new SimpleDecoder();
         }
         Object returnObject = this.decoder.decode(this.response, this.returnType);

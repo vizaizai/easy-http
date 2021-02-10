@@ -4,8 +4,8 @@ import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.Encoder;
 import com.github.vizaizai.interceptor.HttpInterceptor;
-import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.RetrySettings;
+import com.github.vizaizai.entity.HttpRequestConfig;
+import com.github.vizaizai.entity.RetrySettings;
 
 import java.util.List;
 import java.util.concurrent.Executor;

@@ -1,6 +1,6 @@
-package com.github.vizaizai.model;
+package com.github.vizaizai.entity;
 
-import com.github.vizaizai.model.body.Body;
+import com.github.vizaizai.entity.body.Body;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 

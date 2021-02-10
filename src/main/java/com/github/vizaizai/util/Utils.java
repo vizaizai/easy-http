@@ -1,11 +1,13 @@
 package com.github.vizaizai.util;
 
 import com.github.vizaizai.annotation.Headers;
+import com.github.vizaizai.entity.ContentType;
 import com.github.vizaizai.logging.LoggerFactory;
-import com.github.vizaizai.model.ContentType;
 import com.github.vizaizai.util.value.HeadersNameValues;
+import com.github.vizaizai.util.value.NameValue;
 import com.github.vizaizai.util.value.StringNameValue;
 import com.github.vizaizai.util.value.StringNameValues;
+import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +17,7 @@ import org.slf4j.Logger;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -57,7 +60,7 @@ public class Utils {
      * UTF-8: eight-bit UCS Transformation Format.
      */
     public static final Charset UTF_8 = StandardCharsets.UTF_8;
-
+    public static final Charset ASCII = StandardCharsets.US_ASCII;
     private static final int BUF_SIZE = 0x800; // 2K chars (4K bytes)
 
     public static final String PLACEHOLDER_PREFIX = "{";
@@ -67,6 +70,9 @@ public class Utils {
 
     public static final String COMMA = ",";
 
+    private static final Random rand = new Random();
+    private static final char[] MULTIPART_CHARS =
+            "_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
@@ -86,17 +92,17 @@ public class Utils {
         if (CollectionUtils.isEmpty(source)) {
             return null;
         }
-        Iterator<StringNameValue> iterator = source.iterator();
+        Iterator<NameValue<String,String>> iterator = source.iterator();
         StringBuilder sb = new StringBuilder();
         while (iterator.hasNext()){
-            StringNameValue nameValue = iterator.next();
+            NameValue<String,String> nameValue = iterator.next();
             String key = nameValue.getName();
+            String value = nameValue.getValue();
+            if (key == null || value == null){
+                continue;
+            }
             if (encode != null) {
                 key = urlEncode(key,encode);
-            }
-            String value = nameValue.getValue();
-            if (StringUtils.isBlank(value)){
-                continue;
             }
             if (encode != null) {
                 value = urlEncode(value,encode);
@@ -115,6 +121,10 @@ public class Utils {
         }
     }
 
+    public static String toString(Object o) {
+        if (o == null) return null;
+        return o.toString();
+    }
 
     public static Charset getCharset(String contentType) {
         if (StringUtils.isBlank(contentType)) {
@@ -141,7 +151,7 @@ public class Utils {
     }
 
     /**
-     * Body是为为Raw(JSON,XML,Text等)
+     * Body是为Raw(JSON,XML,Text等)
      * @param contentType
      * @return
      */
@@ -216,31 +226,62 @@ public class Utils {
         return headersNameValues;
     }
 
-
     /**
-     * 转化为NameMap
-     * @param queryObj
+     * 转化为StringNameValues
+     * @param varName
+     * @param object
      * @return StringNameValues
      */
-    public static StringNameValues toNameValues(Map<?,?> queryObj) {
-        StringNameValues nameValues = new StringNameValues();
-        for (Map.Entry<?, ?> entry : queryObj.entrySet()) {
+    public static StringNameValues encodeNameValue(String varName, Object object, Type type) {
+        if (object == null) {
+            return null;
+        }
+        StringNameValues nameValues = getNameValues(varName, object, type);
+        if (nameValues != null) {
+            return nameValues;
+        }
+        // 参数值为JavaBean或者map
+        Map<?,?> values;
+        if (object instanceof  Map) {
+            values = (Map<?, ?>) object;
+        } else {
+            values = new HashMap<>(new BeanMap(object));
+            if (values.get("class") != null) {
+                values.remove("class");
+            }
+        }
+        nameValues = new StringNameValues();
+        for (Map.Entry<?, ?> entry : values.entrySet()) {
             Object key = entry.getKey();
-            Object value = queryObj.get(entry.getKey());
+            Object value = values.get(entry.getKey());
             if (value == null) {
                 continue;
             }
-            String strKey = String.valueOf(key);
-            if (TypeUtils.isArrayType(value.getClass())) { // 值为数组
-                nameValues.addAll(getNameValuesFromArray(strKey, value));
-            } else if (value instanceof Iterable) { // 值为集合
-                nameValues.addAll(getNameValuesFromList(strKey, (Iterable<?>) value));
-            } else {
-                nameValues.add(strKey, String.valueOf(value));
+            String strKey = toString(key);
+            StringNameValues itemNameValues = getNameValues(strKey, value, value.getClass());
+            if (itemNameValues != null) {
+                nameValues.addAll(itemNameValues);
             }
-
         }
         return nameValues;
+    }
+
+    private static StringNameValues getNameValues(String key, Object value, Type type) {
+        // 基本类型
+        if (com.github.vizaizai.util.TypeUtils.isBaseType(type.getTypeName())) {
+            StringNameValues nameValues = new StringNameValues();
+            nameValues.add(key,toString(value));
+            return nameValues;
+        }
+
+        if (TypeUtils.isArrayType(type)) { // 值为数组
+            return getNameValuesFromArray(key, value);
+        }
+        if (value instanceof Iterable) { // 值为集合
+            return getNameValuesFromList(key, (Iterable<?>) value);
+        }
+        // 其它类型（JavaBean、map）
+        return null;
     }
 
     /**
@@ -259,7 +300,7 @@ public class Utils {
             return null;
         }
         for (int i = 0; i < length; i++) {
-            nameValues.add(key, String.valueOf(Array.get(value, i)));
+            nameValues.add(key, toString(Array.get(value, i)));
         }
         return nameValues;
     }
@@ -273,7 +314,7 @@ public class Utils {
     public static StringNameValues getNameValuesFromList(String key, Iterable<?> iterable) {
         StringNameValues nameValues = new StringNameValues();
         for (Object item : iterable) {
-            nameValues.add(key, String.valueOf(item));
+            nameValues.add(key,toString(item));
         }
         return nameValues;
     }
@@ -295,4 +336,20 @@ public class Utils {
         return nameValues;
     }
 
+
+    public static String uuid() {
+        return UUID.randomUUID().toString().replace("-","");
+    }
+
+    public static String getMultiContentType(String boundary) {
+        return "multipart/form-data; boundary=" + boundary;
+    }
+    public static String generateBoundary() {
+        final StringBuilder buffer = new StringBuilder();
+        final int count = rand.nextInt(11) + 30; // a random size from 30 to 40
+        for (int i = 0; i < count; i++) {
+            buffer.append(MULTIPART_CHARS[rand.nextInt(MULTIPART_CHARS.length)]);
+        }
+        return buffer.toString();
+    }
 }

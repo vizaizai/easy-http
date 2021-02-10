@@ -1,6 +1,7 @@
-package com.github.vizaizai.model;
+package com.github.vizaizai.entity;
 
 import com.github.vizaizai.interceptor.HttpInterceptor;
+import com.github.vizaizai.entity.body.RequestBodyType;
 
 /**
  * 映射信息
@@ -20,6 +21,10 @@ public class MappingInfo {
      * contentType
      */
     private String contentType;
+    /**
+     * 请求体类型
+     */
+    private RequestBodyType bodyType;
     /**
      * 拦截器
      */
@@ -51,6 +56,14 @@ public class MappingInfo {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public RequestBodyType getBodyType() {
+        return bodyType;
+    }
+
+    public void setBodyType(RequestBodyType bodyType) {
+        this.bodyType = bodyType;
     }
 
     public Class<? extends HttpInterceptor>[] getInterceptors() {

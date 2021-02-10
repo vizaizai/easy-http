@@ -1,7 +1,7 @@
 package demo.codec;
 
 import com.github.vizaizai.codec.Decoder;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpResponse;
 
 import java.lang.reflect.Type;
 

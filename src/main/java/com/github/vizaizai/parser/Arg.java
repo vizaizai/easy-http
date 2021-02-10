@@ -3,7 +3,7 @@ package com.github.vizaizai.parser;
 
 import com.github.vizaizai.annotation.Body;
 import com.github.vizaizai.annotation.Headers;
-import com.github.vizaizai.annotation.Query;
+import com.github.vizaizai.annotation.Param;
 import com.github.vizaizai.annotation.Var;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.TypeUtils;
@@ -15,11 +15,11 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
 /**
- * 参数解析
+ * 参数
  * @author liaochongwei
  * @date 2020/7/30 15:40
  */
-public class ArgParser {
+public class Arg {
 
     /**
      * 参数源
@@ -38,9 +38,9 @@ public class ArgParser {
      */
     private int index;
     /**
-     * 是否为简单类型
+     * 是否为基本类型(基本数据类型+包装类型+void+String)
      */
-    private boolean isSimple;
+    private boolean baseType;
     /**
      * 参数类型
      */
@@ -54,22 +54,21 @@ public class ArgParser {
      */
     private String argName;
 
-    public static ArgParser doParse(Object source, Method method, int index) {
-        return new ArgParser(source, method, index);
+    public static Arg instance(Object source, Method method, int index) {
+        return new Arg(source, method, index);
     }
-    private ArgParser(Object source, Method method, int index) {
+    private Arg(Object source, Method method, int index) {
         this.source = source;
         this.method = method;
         this.index = index;
-        this.parse();
     }
 
-    private void parse() {
+    public void parse() {
         // 判断参数时简单参数还是对象参数
         Type argType = this.method.getParameters()[this.index].getParameterizedType();
         this.dataType =  argType;
         // 是否为简单参数
-        this.isSimple = TypeUtils.isSimple(argType.getTypeName());
+        this.baseType = TypeUtils.isBaseType(argType.getTypeName());
         Annotation[] annotations = this.getParameterAnnotation();
 
         // 获取参数名称
@@ -81,7 +80,7 @@ public class ArgParser {
             throw new EasyHttpException("At most one annotation on a parameter");
         }
         if (annotations.length == 0) {
-            this.type = Query.TYPE;
+            this.type = Param.TYPE;
             this.varName = this.varNameFor(null);
         }else {
             Annotation annotation = annotations[0];
@@ -89,8 +88,8 @@ public class ArgParser {
 
             if (annotation instanceof Var) {
                 this.type = Var.TYPE;
-            }else if (annotation instanceof Query) {
-                this.type = Query.TYPE;
+            }else if (annotation instanceof Param) {
+                this.type = Param.TYPE;
             }else if (annotation instanceof Body) {
                 this.type = Body.TYPE;
             }else if (annotation instanceof Headers) {
@@ -101,12 +100,12 @@ public class ArgParser {
         }
 
         // 规则校验1: @Var只能注解在简单类型上
-        if (Var.TYPE.equals(this.type) && !this.isSimple) {
-            throw new EasyHttpException("@var only can annotate on a simple parameter");
+        if (Var.TYPE.equals(this.type) && !this.baseType) {
+            throw new EasyHttpException("@Var must annotate on basic parameter. eg: String,Integer...");
         }
-        // 规则校验2: @Headers只能注解在复杂类型上
-        if (Headers.TYPE.equals(this.type) && this.isSimple) {
-            throw new EasyHttpException("@Headers only can annotate on a complex parameter");
+        // 规则校验2: @Headers只能注解在JavaBean或者map上
+        if (Headers.TYPE.equals(this.type) && this.baseType) {
+            throw new EasyHttpException("@Headers must annotate on JavaBean or Map.");
         }
 
     }
@@ -138,8 +137,8 @@ public class ArgParser {
         }
         if (annotation instanceof Var) {
             name= ((Var) annotation).value();
-        }else if (annotation instanceof Query) {
-            name = ((Query) annotation).value();
+        }else if (annotation instanceof Param) {
+            name = ((Param) annotation).value();
         }else {
             name = "";
         }
@@ -163,12 +162,12 @@ public class ArgParser {
         this.dataType = dataType;
     }
 
-    public boolean isSimple() {
-        return isSimple;
+    public boolean isBaseType() {
+        return baseType;
     }
 
-    public void setSimple(boolean simple) {
-        isSimple = simple;
+    public void setBaseType(boolean baseType) {
+        this.baseType = baseType;
     }
 
     public String getType() {
