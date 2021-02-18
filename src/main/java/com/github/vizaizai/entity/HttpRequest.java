@@ -42,7 +42,7 @@ public class HttpRequest {
     /**
      * 字符编码
      */
-    private Charset encoding = Utils.UTF_8;
+    private Charset encoding;
     /**
      * 扩展参数
      */

@@ -90,7 +90,7 @@ public class DefaultURLClient extends AbstractClient{
             connection.setChunkedStreamingMode(8192);
             connection.setDoOutput(true);
             try (OutputStream out = connection.getOutputStream()) {
-                entity.body.writeTo(out, config.getEncoding());
+                entity.body.writeTo(out, param.getEncoding());
             }
         }
         connection.connect();
@@ -150,7 +150,7 @@ public class DefaultURLClient extends AbstractClient{
             headers.add(CONTENT_TYPE, request.getContentType());
         }
         if (request.getContentType() != null && request.getBody() != null) {
-            headers.add(CONTENT_LENGTH, Utils.toString(request.getBody().length()));
+            headers.add(CONTENT_LENGTH, Utils.toString(request.getBody().length(request.getEncoding())));
         }
         if (request.getHeaders().getHeaders(ACCEPT).isEmpty()) {
             headers.add(ACCEPT,"*/*");

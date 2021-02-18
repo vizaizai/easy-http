@@ -1,5 +1,6 @@
 package com.github.vizaizai.entity.form;
 
+import com.github.vizaizai.entity.ContentType;
 import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.Utils;
 
@@ -16,6 +17,7 @@ import java.nio.charset.Charset;
 public class StringContent implements BodyContent {
     private final byte[] content;
     private StringContent(String content, Charset charset) {
+        Assert.notNull(content,"content must be not null");
         this.content = content.getBytes(charset == null ? Utils.UTF_8 : charset);
     }
 
@@ -24,6 +26,10 @@ public class StringContent implements BodyContent {
         return new StringContent(content, charset);
     }
 
+    public static  StringContent of(String content) {
+
+        return new StringContent(content, Utils.UTF_8);
+    }
     @Override
     public String getFilename() {
         return null;
@@ -31,7 +37,7 @@ public class StringContent implements BodyContent {
 
     @Override
     public String getContentType() {
-        return null;
+        return ContentType.TEXT_PLAIN;
     }
 
     @Override

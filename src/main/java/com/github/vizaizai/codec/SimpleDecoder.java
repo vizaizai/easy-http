@@ -24,7 +24,7 @@ public class SimpleDecoder implements Decoder {
         }
         String bodyString;
         try {
-             bodyString = response.getBody().asString(this.getEncoding());
+             bodyString = response.getBody().asString(this.encoding());
         }catch (Exception e) {
             throw new CodecException(e);
         }

@@ -1,12 +1,15 @@
 package com.github.vizaizai.entity.body;
 
-import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.entity.form.BodyContent;
 import com.github.vizaizai.entity.form.FormBodyParts;
+import com.github.vizaizai.exception.EasyHttpException;
+import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.StringNameValues;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
@@ -46,6 +49,7 @@ public class RequestBody {
     }
 
     public static RequestBody create(BodyContent source, RequestBodyType type) {
+        Assert.notNull(source,"The source must be not null");
         RequestBody requestBody = new RequestBody(source,type);
         try {
             requestBody.content = InputStreamBody.ofNullable(source.getInputStream(),null,false);
@@ -57,7 +61,7 @@ public class RequestBody {
 
     public static RequestBody create(String source, Charset encoding, RequestBodyType type) {
         RequestBody requestBody = new RequestBody(source,type);
-        requestBody.content = ByteArrayBody.ofNullable(source,encoding);
+        requestBody.content = ByteArrayBody.ofNullable(source, encoding);
         return requestBody;
     }
 
@@ -88,14 +92,26 @@ public class RequestBody {
         }
 
     }
-    public long length() {
+
+    public InputStream getInputStream(Charset charset) throws IOException {
+        if (this.content != null) {
+            return this.getContent().asInputStream();
+        }
+        if (source instanceof FormBodyParts) {
+            FormBodyParts formBodyParts = (FormBodyParts) source;
+            return new ByteArrayInputStream(formBodyParts.getBytes(charset));
+        }
+        return null;
+    }
+
+    public long length(Charset charset) {
         if (this.content != null) {
             return this.content.length();
         }
         // form-data
         if (source instanceof FormBodyParts) {
             FormBodyParts formBodyParts = (FormBodyParts) source;
-            return formBodyParts.getLength();
+            return formBodyParts.getLength(charset);
         }
         return 0;
     }

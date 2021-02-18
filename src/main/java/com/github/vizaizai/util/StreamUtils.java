@@ -66,7 +66,6 @@ public class StreamUtils {
     public static void copy(byte[] in, OutputStream out) throws IOException {
         Assert.notNull(in, "No input byte array specified");
         Assert.notNull(out, "No OutputStream specified");
-
         out.write(in);
     }
 

@@ -24,7 +24,7 @@ public interface Decoder {
      * 字符编码
      * @return 字符编码
      */
-    default Charset getEncoding(){
+    default Charset encoding(){
         return Utils.UTF_8;
     }
 }

@@ -29,7 +29,7 @@ public class ResponseHandler implements Handler<Object>{
     public ResponseHandler response(HttpResponse response) {
         this.response = response;
         this.response.setReturnType(this.returnType);
-        this.response.setEncoding(this.decoder.getEncoding());
+        this.response.setEncoding(this.decoder.encoding());
         return this;
     }
 

@@ -1,15 +1,17 @@
 package com.github.vizaizai.entity.form;
 
+import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.StreamUtils;
-import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.NameValue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import static com.github.vizaizai.util.Utils.ASCII;
 
@@ -21,6 +23,11 @@ import static com.github.vizaizai.util.Utils.ASCII;
 public class FormDataEncoder {
 
     private long length;
+    private byte[] data;
+    private final String boundary;
+    private final Charset charset;
+    private final List<NameValue<String, BodyContent>> bodies;
+
     private static final ByteBuffer FIELD_SEP = encode(ASCII,": ");
     private static final ByteBuffer ITEM_SEP = encode(ASCII,"; ");
     private static final ByteBuffer CR_LF = encode(ASCII,"\r\n");
@@ -28,6 +35,17 @@ public class FormDataEncoder {
     private static final ByteBuffer CONTENT_DISPOSITION = encode(ASCII,"Content-Disposition");
     private static final ByteBuffer CONTENT_TYPE = encode(ASCII,"Content-Type");
     private static final ByteBuffer FORM_DATA = encode(ASCII,"form-data");
+
+    public FormDataEncoder(String boundary, Charset charset, List<NameValue<String, BodyContent>> bodies) {
+        this.boundary = boundary;
+        this.bodies = bodies;
+        this.charset = charset;
+        try {
+            this.init();
+        }catch (Exception e) {
+            throw new EasyHttpException(e);
+        }
+    }
 
     private static ByteBuffer encode(
             final Charset charset, final String string) {
@@ -52,16 +70,16 @@ public class FormDataEncoder {
         StreamUtils.copy(is, out);
     }
 
-    public void encode(FormBodyParts parts, OutputStream os, Charset charset) throws IOException {
-
-        for (NameValue<String, BodyContent> nameValue : parts) {
+    private void init() throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        for (NameValue<String, BodyContent> nameValue : this.bodies) {
             BodyContent value = nameValue.getValue();
             if (value == null) {
                 continue;
             }
             /* ----------boundary start--------*/
             writeBytes(TWO_DASHES, os); // --
-            writeBytes(parts.getBoundary(), charset, os); // boundary
+            writeBytes(this.boundary, this.charset, os); // boundary
             writeBytes(CR_LF, os); // 换行
             /* ----------boundary end--------*/
 
@@ -70,12 +88,12 @@ public class FormDataEncoder {
             writeBytes(FIELD_SEP, os); // :
             writeBytes(FORM_DATA, os); // form-data
             writeBytes(ITEM_SEP, os); // ;
-            writeBytes("name=\"" + nameValue.getName() + "\"", charset, os); // name=""
+            writeBytes("name=\"" + nameValue.getName() + "\"", this.charset, os); // name=""
             // 文件
             if (value.isFile()) {
-                String filename = value.getFilename() == null ? Utils.uuid() : value.getFilename();
+                String filename = value.getFilename() == null ? "" : value.getFilename();
                 writeBytes(ITEM_SEP, os); // ;
-                writeBytes("filename=\"" + filename + "\"", charset, os); // filename=""
+                writeBytes("filename=\"" + filename + "\"", this.charset, os); // filename=""
             }
             writeBytes(CR_LF, os); // 换行
             /* -----------Content-Disposition end--------*/
@@ -84,7 +102,7 @@ public class FormDataEncoder {
             if (value.isFile() && value.getContentType() != null) {
                 writeBytes(CONTENT_TYPE, os); // Content-Type
                 writeBytes(FIELD_SEP, os); // :
-                writeBytes(value.getContentType(), charset, os);
+                writeBytes(value.getContentType(), this.charset, os);
                 writeBytes(CR_LF, os); // 换行
             }
             /* -----------Content-Type end--------*/
@@ -100,14 +118,22 @@ public class FormDataEncoder {
         }
         /* ----------boundary start--------*/
         writeBytes(TWO_DASHES, os); // --
-        writeBytes(parts.getBoundary(), charset, os); // boundary
+        writeBytes(this.boundary, this.charset, os); // boundary
         writeBytes(TWO_DASHES, os); // --
         writeBytes(CR_LF, os); // 换行
         /* ----------boundary end--------*/
+        this.data = os.toByteArray();
+    }
 
+    public void encode(OutputStream os) throws IOException {
+        StreamUtils.copy(this.data, os);
     }
 
     public long getLength() {
         return length;
+    }
+
+    public byte[] getData() {
+        return data;
     }
 }

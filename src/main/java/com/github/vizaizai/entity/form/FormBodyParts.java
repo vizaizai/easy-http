@@ -14,24 +14,40 @@ import java.nio.charset.Charset;
  */
 public class FormBodyParts extends NameValues<String, BodyContent> {
     private final String boundary;
-    private final FormDataEncoder encoder;
+    private FormDataEncoder encoder;
     public FormBodyParts() {
         boundary = Utils.generateBoundary();
-        encoder = new FormDataEncoder();
     }
 
     public void add(String name, BodyContent value) {
         this.add(new FormDataNameValue(name, value));
     }
     public void writeTo(OutputStream os, Charset charset) throws IOException {
-        encoder.encode(this, os, charset);
-
+        this.checkEncoder(charset);
+        encoder.encode(os);
     }
 
     public String getBoundary() {
         return boundary;
     }
-    public long getLength() {
+    public long getLength(Charset charset) {
+        this.checkEncoder(charset);
         return encoder.getLength();
+    }
+    public byte[] getBytes(Charset charset) {
+        this.checkEncoder(charset);
+        return encoder.getData();
+    }
+
+    private void checkEncoder(Charset charset) {
+        if (encoder == null) {
+            encoder = new FormDataEncoder(this.boundary, charset, this.getNameValues());
+        }
+    }
+    public static FormBodyParts cast(Object object) {
+        if (object == null) {
+            return new FormBodyParts();
+        }
+        return (FormBodyParts) object;
     }
 }

@@ -18,10 +18,12 @@ import com.github.vizaizai.parser.MethodParser;
 import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.Utils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -131,6 +133,9 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 设置配置
         this.request.setConfig(this.config);
 
+        // 字符编码
+        this.request.setEncoding(this.config.getEncoding());
+
         // 是否异步
         this.request.setAsync(this.getMethodParser().isAsync());
 
@@ -213,7 +218,7 @@ public class RequestHandler implements Handler<HttpResponse>{
      */
     private void handleBody(RequestBodyType type) {
         List<Arg> args = argsParser.getArgs(Body.TYPE);
-        Charset charset = config.getEncoding();
+        Charset charset = request.getEncoding();
         Arg arg = args.isEmpty() ? null : args.get(0);
         switch (type) {
             case RAW:
@@ -237,7 +242,7 @@ public class RequestHandler implements Handler<HttpResponse>{
                 break;
             case FORM_DATA:
                 Assert.notNull(arg);
-                FormBodyParts parts = (FormBodyParts) arg.getSource();
+                FormBodyParts parts = FormBodyParts.cast(arg.getSource());
                 request.setContentType(Utils.getMultiContentType(parts.getBoundary()));
                 request.setBody(RequestBody.create(parts,type));
                 break;
@@ -249,8 +254,6 @@ public class RequestHandler implements Handler<HttpResponse>{
             default:
                 break;
         }
-
-
     }
 
     /**
@@ -319,11 +322,15 @@ public class RequestHandler implements Handler<HttpResponse>{
         request.setContentType(methodParser.getContentType());
         RequestBodyType bodyType = methodParser.getBodyType();
         if (bodyType == null) {
-            return null;
+            bodyType =  RequestBodyType.NONE;
         }
         if (RequestBodyType.AUTO.equals(bodyType)) {
             // 分析请求体类型
             bodyType =  this.analysisBodyType();
+        }
+        // 重设contentType
+        if (StringUtils.isBlank(request.getContentType())) {
+            this.setContentType(bodyType);
         }
         // 校验bodyType
         Assert.isTrue(bodyType.check(request.getContentType()),"The body's type is error.");
@@ -360,39 +367,27 @@ public class RequestHandler implements Handler<HttpResponse>{
         int bodyCount = argsParser.getCount(Body.TYPE);
         // 只存在@Param， bodyType取X_WWW_FROM_URL_ENCODED
         if (paramCount > 0 && bodyCount == 0) {
-            if (StringUtils.isBlank(contentType)) {
-                request.setContentType(ContentType.APPLICATION_FORM_URLENCODED);
-            }
             return RequestBodyType.X_WWW_FROM_URL_ENCODED;
         }
-
         if (bodyCount == 0) {
             return RequestBodyType.NONE;
         }
-        // body源对象
-        Object bodySource = argsParser.getArgs(Body.TYPE).get(0).getSource();
-        RequestBodyType bodyType = this.getTypeByBodySource(bodySource);
-        if (StringUtils.isNotBlank(contentType)) {
-            return bodyType;
-        }
-        // content-type未指定，设置content-type
-        this.resetContentType(bodyType, bodySource);
-        return bodyType;
+        return this.getTypeByDataType(argsParser.getArgs(Body.TYPE).get(0).getDataType());
     }
 
     /**
-     * 根据body源对象获取bodyType
-     * @param bodySource
+     * 根据源对象类型获取bodyType
+     * @param sourceDataType
      */
-    private RequestBodyType getTypeByBodySource(Object bodySource) {
+    private RequestBodyType getTypeByDataType(Type sourceDataType) {
         RequestBodyType bodyType;
-        if (bodySource instanceof FormBodyParts) {
+        if (FormBodyParts.class.equals(sourceDataType)) {
             // FormBodyParts-> form-data
             bodyType = RequestBodyType.FORM_DATA;
-        }else if (bodySource instanceof FileContent) {
+        }else if (FileContent.class.equals(sourceDataType)) {
             // 文件->二进制
             bodyType = RequestBodyType.BINARY;
-        }else if (bodySource instanceof InputStreamContent) {
+        }else if (InputStreamContent.class.equals(sourceDataType)) {
             // 输入流->二进制
             bodyType = RequestBodyType.BINARY;
         }else {
@@ -404,10 +399,12 @@ public class RequestHandler implements Handler<HttpResponse>{
     /**
      * 设置contentType
      * @param bodyType
-     * @param bodySource
      */
-    private void resetContentType(RequestBodyType bodyType, Object bodySource) {
+    private void setContentType(RequestBodyType bodyType) {
         switch (bodyType) {
+            case X_WWW_FROM_URL_ENCODED:
+                request.setContentType(ContentType.APPLICATION_FORM_URLENCODED);
+                break;
             case RAW:
                 request.setContentType(ContentType.APPLICATION_JSON);
                 break;
@@ -415,7 +412,16 @@ public class RequestHandler implements Handler<HttpResponse>{
                 request.setContentType(ContentType.FORM_DATA);
                 break;
             case BINARY:
-                BodyContent bodyContent = (BodyContent) bodySource;
+                List<Arg> args = argsParser.getArgs(Body.TYPE);
+                if (CollectionUtils.isEmpty(args)) {
+                    request.setContentType(ContentType.STREAM);
+                    break;
+                }
+                BodyContent bodyContent = (BodyContent) args.get(0).getSource();
+                if (bodyContent == null) {
+                    request.setContentType(ContentType.STREAM);
+                    break;
+                }
                 request.setContentType(bodyContent.getContentType());
                 break;
             default:

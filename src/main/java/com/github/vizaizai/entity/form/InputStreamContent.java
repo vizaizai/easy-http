@@ -1,5 +1,6 @@
 package com.github.vizaizai.entity.form;
 
+import com.github.vizaizai.entity.ContentType;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.Assert;
 
@@ -20,18 +21,20 @@ public class InputStreamContent implements BodyContent {
         this.inputStream = inputStream;
     }
 
-    public static InputStreamContent of(InputStream inputStream, String filename) {
-        Assert.notNull(inputStream,"file must be not null");
-        Assert.notNull(filename,"filename must be not null");
-        return toFileBody(inputStream).fileName(filename);
+    public static InputStreamContent of(InputStream inputStream) {
+        return of(inputStream,null);
     }
 
-    public static InputStreamContent of(InputStream inputStream, String contentType, String filename) {
-        Assert.notNull(contentType,"contentType must be not null");
-        return of(inputStream,filename).contentType(contentType);
+    public static InputStreamContent of(InputStream inputStream, String filename) {
+        return of(inputStream, filename, null);
+    }
+
+    public static InputStreamContent of(InputStream inputStream, String filename,String contentType) {
+        return toFileBody(inputStream).fileName(filename).contentType(contentType);
     }
 
     private static InputStreamContent toFileBody(InputStream inputStream) {
+        Assert.notNull(inputStream,"inputStream must be not null");
         try {
             InputStreamContent content = new InputStreamContent(inputStream);
             content.length = inputStream.available();
@@ -42,6 +45,9 @@ public class InputStreamContent implements BodyContent {
     }
 
     public InputStreamContent contentType(String contentType) {
+        if (contentType == null) {
+            contentType = ContentType.STREAM;
+        }
         this.contentType = contentType;
         return this;
     }

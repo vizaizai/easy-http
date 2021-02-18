@@ -1,7 +1,10 @@
 package com.github.vizaizai.client;
 
 
+import com.github.vizaizai.apache.BodyEntity;
 import com.github.vizaizai.apache.HttpDeleteWithBody;
+import com.github.vizaizai.entity.body.RequestBody;
+import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.HttpRequest;
@@ -82,9 +85,6 @@ public class ApacheHttpClient extends AbstractClient {
         String url = param.getUrl();
         HeadersNameValues headers = param.getHeaders();
         StringNameValues params = param.getParams();
-        //String content = param.getBody();
-        // TODO: 2021/2/7
-        String content = "1";
 
         if (config == null) {
             throw new EasyHttpException("HttpClient request configuration is null");
@@ -102,25 +102,28 @@ public class ApacheHttpClient extends AbstractClient {
         switch (method) {
 
             case GET:
+                // TODO: 2021/2/18  
                 HttpGet httpGet = new HttpGet(convertUrl(url,queryParams));
                 httpGet.setConfig(config);
                 request = httpGet;
                 break;
             case POST:
                 HttpPost httpPost = new HttpPost(convertUrl(url, queryParams, param.getContentType()));
-                httpPost.setEntity(genEntity(queryParams,content,param.getContentType()));
+                //httpPost.setEntity(genEntity(queryParams,content,param.getContentType()));
+                httpPost.setEntity(assembleEntity(param));
                 httpPost.setConfig(config);
                 request = httpPost;
                 break;
             case PUT:
                 HttpPut httpPut = new HttpPut(convertUrl(url, queryParams, param.getContentType()));
-                httpPut.setEntity(genEntity(queryParams,content,param.getContentType()));
+                // TODO: 2021/2/18  
+                //httpPut.setEntity(genEntity(queryParams,content,param.getContentType()));
                 httpPut.setConfig(config);
                 request = httpPut;
                 break;
             case DELETE:
                 HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(convertUrl(url,queryParams,param.getContentType()));
-                httpDelete.setEntity(genEntity(queryParams,content,param.getContentType()));
+                //httpDelete.setEntity(genEntity(queryParams,content,param.getContentType()));
                 httpDelete.setConfig(config);
                 request = httpDelete;
                 break;
@@ -151,7 +154,6 @@ public class ApacheHttpClient extends AbstractClient {
                 result.setMessage("Response body is null");
                 return result;
             }
-            //String ret = EntityUtils.toString(httpEntity, Utils.UTF_8);
             result.setBody(InputStreamBody.ofNullable(httpEntity.getContent(),(int) httpEntity.getContentLength()));
             result.setStatusCode(response.getStatusLine().getStatusCode());
             result.setMessage(response.getStatusLine().getReasonPhrase());
@@ -215,6 +217,18 @@ public class ApacheHttpClient extends AbstractClient {
             return stringEntity;
         }
         return null;
+    }
+
+    /**
+     * 组装实体
+     */
+    private static HttpEntity assembleEntity(HttpRequest request) {
+        RequestBody body = request.getBody();
+        // 无请求体
+        if (body == null || RequestBodyType.NONE.equals(body.getType())) {
+            return null;
+        }
+        return new BodyEntity(request.getBody(), request.getEncoding(), request.getContentType());
     }
 
     public SSLConnectionSocketFactory getSslConnectionSocketFactory() {

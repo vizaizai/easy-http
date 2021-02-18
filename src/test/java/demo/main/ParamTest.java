@@ -2,6 +2,7 @@ package demo.main;
 
 import com.github.vizaizai.EasyHttp;
 import com.github.vizaizai.client.DefaultURLClient;
+import com.github.vizaizai.interceptor.LogInterceptor;
 import demo.model.QueryForm;
 import demo.service.ParamService;
 import org.junit.Before;
@@ -21,6 +22,7 @@ public class ParamTest {
         paramService = EasyHttp.builder()
                 .url("127.0.0.1:8888")
                 .client(DefaultURLClient.getInstance())
+                .withInterceptor(new LogInterceptor())
                 .build(ParamService.class);
     }
     @Test

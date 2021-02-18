@@ -1,7 +1,6 @@
 package com.github.vizaizai.entity;
 
 import com.github.vizaizai.entity.body.Body;
-import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 
 import java.lang.reflect.Type;
@@ -21,7 +20,7 @@ public class HttpResponse {
     /**
      * 字符编码
      */
-    private Charset encoding = Utils.UTF_8;
+    private Charset encoding;
     /**
      * 响应头
      */

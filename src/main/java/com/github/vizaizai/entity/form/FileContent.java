@@ -26,16 +26,15 @@ public class FileContent implements BodyContent {
     }
 
     public static FileContent of(File file) {
-        Assert.notNull(file,"file must be not null");
-        return toFileBody(file).fileName(file.getName()).contentType(ContentType.STREAM);
+        return of(file,null);
     }
 
     public static FileContent of(File file, String contentType) {
-        Assert.notNull(contentType,"contentType must be not null");
-        return of(file).contentType(contentType);
+        return toFileBody(file).fileName(file.getName()).contentType(contentType);
     }
 
     private static FileContent toFileBody(File file) {
+        Assert.notNull(file,"file must be not null");
         FileInputStream inputStream;
         try {
             inputStream = new FileInputStream(file);
@@ -50,6 +49,9 @@ public class FileContent implements BodyContent {
 
 
     public FileContent contentType(String contentType) {
+        if (contentType == null) {
+            contentType = ContentType.STREAM;
+        }
         this.contentType = contentType;
         return this;
     }
