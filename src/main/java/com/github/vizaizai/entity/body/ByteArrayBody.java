@@ -43,7 +43,7 @@ public class ByteArrayBody implements Body{
     }
 
     @Override
-    public InputStream asInputStream() throws IOException {
+    public InputStream asInputStream() {
         return new ByteArrayInputStream(data);
     }
 

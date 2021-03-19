@@ -3,15 +3,14 @@ package com.github.vizaizai.client;
 
 import com.github.vizaizai.apache.BodyEntity;
 import com.github.vizaizai.apache.HttpDeleteWithBody;
-import com.github.vizaizai.entity.body.RequestBody;
-import com.github.vizaizai.entity.body.RequestBodyType;
-import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpRequestConfig;
 import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.entity.body.InputStreamBody;
-import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.entity.body.RequestBody;
+import com.github.vizaizai.entity.body.RequestBodyType;
+import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,7 +21,8 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
@@ -85,7 +85,7 @@ public class ApacheHttpClient extends AbstractClient {
         String url = param.getUrl();
         HeadersNameValues headers = param.getHeaders();
         StringNameValues params = param.getParams();
-
+        RequestBodyType bodyType = param.getBody().getType();
         if (config == null) {
             throw new EasyHttpException("HttpClient request configuration is null");
         }
@@ -99,31 +99,28 @@ public class ApacheHttpClient extends AbstractClient {
             params.forEach(e-> queryParams.add(new BasicNameValuePair(e.getName(), e.getValue())));
         }
         HttpUriRequest request;
-        switch (method) {
 
+        switch (method) {
             case GET:
-                // TODO: 2021/2/18  
-                HttpGet httpGet = new HttpGet(convertUrl(url,queryParams));
+                HttpGet httpGet = new HttpGet(convertUrl(url,  queryParams, bodyType));
                 httpGet.setConfig(config);
                 request = httpGet;
                 break;
             case POST:
-                HttpPost httpPost = new HttpPost(convertUrl(url, queryParams, param.getContentType()));
-                //httpPost.setEntity(genEntity(queryParams,content,param.getContentType()));
+                HttpPost httpPost = new HttpPost(convertUrl(url, queryParams, bodyType));
                 httpPost.setEntity(assembleEntity(param));
                 httpPost.setConfig(config);
                 request = httpPost;
                 break;
             case PUT:
-                HttpPut httpPut = new HttpPut(convertUrl(url, queryParams, param.getContentType()));
-                // TODO: 2021/2/18  
-                //httpPut.setEntity(genEntity(queryParams,content,param.getContentType()));
+                HttpPut httpPut = new HttpPut(convertUrl(url, queryParams, bodyType));
+                httpPut.setEntity(assembleEntity(param));
                 httpPut.setConfig(config);
                 request = httpPut;
                 break;
             case DELETE:
-                HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(convertUrl(url,queryParams,param.getContentType()));
-                //httpDelete.setEntity(genEntity(queryParams,content,param.getContentType()));
+                HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(convertUrl(url, queryParams, bodyType));
+                httpDelete.setEntity(assembleEntity(param));
                 httpDelete.setConfig(config);
                 request = httpDelete;
                 break;
@@ -170,8 +167,8 @@ public class ApacheHttpClient extends AbstractClient {
      * @param queryParams 待拼接参数
      * @return String
      */
-    private static String convertUrl(String url,  List<BasicNameValuePair> queryParams) {
-        if (CollectionUtils.isEmpty(queryParams)) {
+    private static String convertUrl(String url,  List<BasicNameValuePair> queryParams, RequestBodyType bodyType) {
+        if (CollectionUtils.isEmpty(queryParams) || RequestBodyType.X_WWW_FROM_URL_ENCODED.equals(bodyType)) {
             return url;
         }
         try {
@@ -188,38 +185,6 @@ public class ApacheHttpClient extends AbstractClient {
     }
 
     /**
-     * 转化url
-     * @param url 原url
-     * @param queryParams 待拼接参数
-     * @param contentType contentType
-     * @return String
-     */
-    private static String convertUrl(String url,  List<BasicNameValuePair> queryParams, String contentType) {
-        if (Utils.isUrlEncodeForm(contentType)) {
-            return url;
-        }
-        return convertUrl(url, queryParams);
-    }
-    /**
-     * 生成Entity
-     * @param contentType contentType
-     * @param queryParams 请求参数
-     * @param content 请求体字符串
-     * @return HttpEntity
-     */
-    private static HttpEntity genEntity(List<BasicNameValuePair> queryParams, String content,String contentType) {
-        if (Utils.isUrlEncodeForm(contentType)) {
-           return new UrlEncodedFormEntity(queryParams, Consts.UTF_8);
-        }
-        if (content != null) {
-            StringEntity stringEntity = new StringEntity(content, Consts.UTF_8);
-            stringEntity.setContentType(contentType);
-            return stringEntity;
-        }
-        return null;
-    }
-
-    /**
      * 组装实体
      */
     private static HttpEntity assembleEntity(HttpRequest request) {
@@ -228,7 +193,15 @@ public class ApacheHttpClient extends AbstractClient {
         if (body == null || RequestBodyType.NONE.equals(body.getType())) {
             return null;
         }
-        return new BodyEntity(request.getBody(), request.getEncoding(), request.getContentType());
+        // 文件上传类: 二进制和form-data
+        if (RequestBodyType.BINARY.equals(body.getType())
+                || RequestBodyType.FORM_DATA.equals(body.getType())) {
+            return new BodyEntity(body, request.getEncoding(), request.getContentType());
+        }
+        if (body.getContent()!= null) {
+            return new InputStreamEntity(body.getContent().asInputStream(), ContentType.create(request.getContentType()));
+        }
+        return null;
     }
 
     public SSLConnectionSocketFactory getSslConnectionSocketFactory() {

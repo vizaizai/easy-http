@@ -56,7 +56,7 @@ public class ResponseHandler implements Handler<Object>{
         // 执行后置拦截
         interceptorOps.doPostInterceptors(this.request, this.response);
         // 返回类型为HttpResponse
-        if (this.returnType == HttpResponse.class) {
+        if (TypeUtils.equals(this.returnType, HttpResponse.class)) {
             return response;
         }
         // 如果已经序列化,则直接返回
@@ -64,7 +64,7 @@ public class ResponseHandler implements Handler<Object>{
             return this.response.getReturnObject();
         }
         // 响应解码
-        if (TypeUtils.isBaseType(this.returnType.getTypeName())) {
+        if (TypeUtils.isBaseType(this.returnType)) {
             this.decoder = new SimpleDecoder();
         }
         Object returnObject = this.decoder.decode(this.response, this.returnType);

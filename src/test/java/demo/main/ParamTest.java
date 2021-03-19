@@ -9,6 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author liaochongwei
@@ -39,5 +41,26 @@ public class ParamTest {
         queryForm.setTt("123123");
         queryForm.setIds(Arrays.asList(null,"222","333"));
         System.out.println(paramService.test3(queryForm, "balabala"));
+    }
+
+    @Test
+    public void test5() {
+        Map<String,Integer> map = new HashMap<>();
+        System.out.println(paramService.test5(map));
+    }
+
+    @Test
+    public void test7() {
+        System.out.println(paramService.test7(null));
+    }
+
+    @Test
+    public void test8() {
+        System.out.println(paramService.test8("12312"));
+    }
+
+    @Test
+    public void test9() {
+        System.out.println(paramService.test9("123123","1123"));
     }
 }

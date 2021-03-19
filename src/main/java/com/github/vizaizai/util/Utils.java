@@ -137,31 +137,6 @@ public class Utils {
         return Charset.forName(contentType.substring(index + CHARSET_S_F.length()));
     }
 
-    /**
-     * Body是否x-www-form-urlencode
-     * @param contentType
-     * @return boolean
-     */
-    public static boolean isUrlEncodeForm(String contentType) {
-      if (StringUtils.isBlank(contentType) || contentType.length() < 33) {
-          return false;
-      }
-      // ContentType.APPLICATION_FORM_URLENCODED.substring(0, 33 - 1)
-      return contentType.startsWith(ContentType.APPLICATION_FORM_URLENCODED);
-    }
-
-    /**
-     * Body是为Raw(JSON,XML,Text等)
-     * @param contentType
-     * @return
-     */
-    public static boolean isRaw(String contentType) {
-        if (StringUtils.isBlank(contentType) || contentType.length() < 33) {
-            return false;
-        }
-        // ContentType.APPLICATION_FORM_URLENCODED.substring(0, 33 - 1)
-        return contentType.startsWith(ContentType.APPLICATION_FORM_URLENCODED);
-    }
 
     /**
      * 格式化占位符
@@ -268,7 +243,7 @@ public class Utils {
 
     private static StringNameValues getNameValues(String key, Object value, Type type) {
         // 基本类型
-        if (com.github.vizaizai.util.TypeUtils.isBaseType(type.getTypeName())) {
+        if (com.github.vizaizai.util.TypeUtils.isBaseType(type, value)) {
             StringNameValues nameValues = new StringNameValues();
             nameValues.add(key,toString(value));
             return nameValues;

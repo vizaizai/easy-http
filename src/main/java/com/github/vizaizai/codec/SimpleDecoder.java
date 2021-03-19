@@ -1,24 +1,25 @@
 package com.github.vizaizai.codec;
 
-import com.github.vizaizai.exception.CodecException;
 import com.github.vizaizai.entity.HttpResponse;
+import com.github.vizaizai.exception.CodecException;
 import com.github.vizaizai.util.TypeUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import static java.lang.String.format;
 
 
 /**
- * 简单类型解码器
+ * 基础类型解码器
  * @author liaochongwei
  * @date 2020/7/31 9:45
  */
 public class SimpleDecoder implements Decoder {
     @Override
     public Object decode(HttpResponse response, Type type) {
-
-        if (!TypeUtils.isBaseType(type.getTypeName())) {
-            return null;
-        }
         if (response.getBody() == null) {
             return null;
         }
@@ -29,36 +30,59 @@ public class SimpleDecoder implements Decoder {
             throw new CodecException(e);
         }
 
-
-        String typeStr = TypeUtils.getType(type.getTypeName());
-        if (TypeUtils.getIntType().equals(typeStr)) {
-            return Integer.valueOf(bodyString);
-
-        }else if (TypeUtils.getShortType().equals(typeStr)) {
-            return Short.valueOf(bodyString);
-
-        }else if (TypeUtils.getLongType().equals(typeStr)) {
-            return Long.valueOf(bodyString);
-
-        }else if (TypeUtils.getByteType().equals(typeStr)) {
-            return Byte.valueOf(bodyString);
-
-        }else if (TypeUtils.getDoubleType().equals(typeStr)) {
-            return Double.valueOf(bodyString);
-
-        }else if (TypeUtils.getFloatType().equals(typeStr)) {
-            return Float.valueOf(bodyString);
-
-        }else if (TypeUtils.getBoolType().equals(typeStr)) {
-            return Boolean.valueOf(bodyString);
-
-        }else if (TypeUtils.getCharType().equals(typeStr)) {
-            return bodyString.charAt(0);
-
-        } else if (TypeUtils.getVoidType().equals(typeStr)) {
-            return null;
-        }else {
+        if (TypeUtils.equals(String.class, type)) {
             return bodyString;
         }
+
+        if (TypeUtils.isVoid(type)) {
+            return null;
+        }
+
+        if (TypeUtils.isInt(type)) {
+            return Integer.valueOf(bodyString);
+        }
+
+        if (TypeUtils.isShort(type)) {
+            return Short.valueOf(bodyString);
+        }
+
+        if (TypeUtils.isLong(type)) {
+            return Long.valueOf(bodyString);
+        }
+
+        if (TypeUtils.isByte(type)) {
+            return Byte.valueOf(bodyString);
+        }
+
+        if (TypeUtils.isDouble(type)) {
+            return Double.valueOf(bodyString);
+        }
+
+        if (TypeUtils.isFloat(type)) {
+            return Float.valueOf(bodyString);
+        }
+
+        if (TypeUtils.isBool(type)) {
+            return Boolean.valueOf(bodyString);
+        }
+
+        if (TypeUtils.isChar(type)) {
+            return bodyString.charAt(0);
+        }
+
+        if (TypeUtils.isBigDecimal(type)) {
+            return new BigDecimal(bodyString);
+        }
+
+        if (TypeUtils.isBigInteger(type)) {
+            return new BigInteger(bodyString);
+        }
+
+        if (TypeUtils.isNumber(type)) {
+            return NumberUtils.createNumber(bodyString);
+        }
+
+        throw new CodecException(format("%s is not a type supported by this decoder.", type));
+
     }
 }

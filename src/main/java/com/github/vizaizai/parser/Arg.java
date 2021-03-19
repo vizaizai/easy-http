@@ -38,7 +38,7 @@ public class Arg {
      */
     private int index;
     /**
-     * 是否为基本类型(基本数据类型+包装类型+void+String)
+     * 是否为基础类型(基本数据类型+包装类型+void+String + Number或Number派生类)
      */
     private boolean baseType;
     /**
@@ -67,8 +67,8 @@ public class Arg {
         // 判断参数时简单参数还是对象参数
         Type argType = this.method.getParameters()[this.index].getParameterizedType();
         this.dataType =  argType;
-        // 是否为简单参数
-        this.baseType = TypeUtils.isBaseType(argType.getTypeName());
+        // 是否基础类型
+        this.baseType = TypeUtils.isBaseType(argType, this.getSource());
         Annotation[] annotations = this.getParameterAnnotation();
 
         // 获取参数名称
@@ -77,7 +77,7 @@ public class Arg {
 
         // 一个参数最多一个注解
         if (annotations.length > 1) {
-            throw new EasyHttpException("At most one annotation on a parameter");
+            throw new EasyHttpException("There is at most one annotation on a parameter");
         }
         if (annotations.length == 0) {
             this.type = Param.TYPE;

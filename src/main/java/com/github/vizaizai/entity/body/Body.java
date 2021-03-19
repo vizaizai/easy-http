@@ -25,7 +25,7 @@ public interface Body {
     /**
      * 转化为InputStream
      */
-    InputStream asInputStream() throws IOException;
+    InputStream asInputStream();
 
     /**
      * 转化为Reader
