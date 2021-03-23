@@ -85,7 +85,7 @@ public class ApacheHttpClient extends AbstractClient {
         String url = param.getUrl();
         HeadersNameValues headers = param.getHeaders();
         StringNameValues params = param.getParams();
-        RequestBodyType bodyType = param.getBody().getType();
+        RequestBodyType bodyType = param.getBody() == null ? null : param.getBody().getType();
         if (config == null) {
             throw new EasyHttpException("HttpClient request configuration is null");
         }

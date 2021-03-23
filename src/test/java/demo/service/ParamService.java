@@ -3,7 +3,9 @@ package demo.service;
 import com.github.vizaizai.annotation.Get;
 import com.github.vizaizai.annotation.Param;
 import com.github.vizaizai.annotation.Post;
+import com.github.vizaizai.annotation.Var;
 import com.github.vizaizai.entity.body.RequestBodyType;
+import demo.model.Book1;
 import demo.model.QueryForm;
 
 import java.util.List;
@@ -15,18 +17,23 @@ import java.util.concurrent.CompletableFuture;
  * @date 2021/2/7 11:21
  */
 public interface ParamService {
-    @Get("/test1")
+    @Get("/listAllBooks")
     String test1();
 
-    @Get("/test2")
-    String test2(@Param String p1, @Param String p2);
+    @Get("/getBookById/{id}")
+    String test2(@Var String id);
 
-    @Post(value = "/test3")
-    String test3(@Param QueryForm<String> p1, @Param String p2);
+    @Get(value = "/listBooks")
+    String test3(@Param String author, @Param String lang);
 
-    @Post(value = "/test4", bodyType = RequestBodyType.NONE)
-    String test4(@Param QueryForm<String> p1, @Param String p2);
+    @Get(value = "/listBooks")
+    String test3_1(Map<String,String> params);
 
+    @Get(value = "/listBooks")
+    String test3_2(Book1 book1);
+
+    @Get(value = "/listBooks/categories/{cid}/books")
+    String test4(@Var String cid, @Param String author, @Param String lang);
 
     @Get("/test5")
     String test5(Map<String,Integer> p1);

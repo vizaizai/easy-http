@@ -1,8 +1,10 @@
 package demo.main;
 
 import com.github.vizaizai.EasyHttp;
+import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.LogInterceptor;
+import demo.model.Book1;
 import demo.model.QueryForm;
 import demo.service.ParamService;
 import org.junit.Before;
@@ -23,7 +25,8 @@ public class ParamTest {
     public void init() {
         paramService = EasyHttp.builder()
                 .url("127.0.0.1:8888")
-                .client(DefaultURLClient.getInstance())
+                //.client(DefaultURLClient.getInstance())
+                .client(ApacheHttpClient.getInstance())
                 .withInterceptor(new LogInterceptor())
                 .build(ParamService.class);
     }
@@ -33,14 +36,26 @@ public class ParamTest {
     }
     @Test
     public void test2() {
-        System.out.println(paramService.test2("123",null));
+        System.out.println(paramService.test2("84669922357412893"));
     }
     @Test
     public void test3() {
-        QueryForm<String> queryForm = new QueryForm<>();
-        queryForm.setTt("123123");
-        queryForm.setIds(Arrays.asList(null,"222","333"));
-        System.out.println(paramService.test3(queryForm, "balabala"));
+        System.out.println(paramService.test3("吴承恩", "chinese"));
+
+        Map<String,String> map = new HashMap<>();
+        map.put("author","吴承恩");
+        map.put("lang","chinese");
+        System.out.println(paramService.test3_1(map));
+
+        Book1 book = new Book1();
+        book.setAuthor("吴承恩");
+        book.setLang("chinese");
+        System.out.println(paramService.test3_2(book));
+
+    }
+    @Test
+    public void test4() {
+        System.out.println(paramService.test4("23","西游记", "chinese"));
     }
 
     @Test
