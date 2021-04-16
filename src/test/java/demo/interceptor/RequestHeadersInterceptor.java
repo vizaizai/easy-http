@@ -2,8 +2,8 @@ package demo.interceptor;
 
 
 import com.github.vizaizai.interceptor.HttpInterceptor;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
 
 /**
  * 请求头拦截器

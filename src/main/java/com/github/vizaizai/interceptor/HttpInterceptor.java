@@ -1,9 +1,9 @@
 package com.github.vizaizai.interceptor;
 
 
-import com.github.vizaizai.model.ExcludePath;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.ExcludePath;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
 
 import java.util.Collections;
 import java.util.List;

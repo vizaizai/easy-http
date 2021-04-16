@@ -1,12 +1,14 @@
 package com.github.vizaizai.client;
 
-import com.github.vizaizai.model.HttpMethod;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.HttpResponse;
-import com.github.vizaizai.model.body.InputStreamBody;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpRequestConfig;
+import com.github.vizaizai.entity.HttpResponse;
+import com.github.vizaizai.entity.body.InputStreamBody;
+import com.github.vizaizai.entity.body.RequestBody;
+import com.github.vizaizai.entity.body.RequestBodyType;
+import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
-import com.github.vizaizai.util.value.StringNameValue;
+import com.github.vizaizai.util.value.NameValue;
 import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,15 +54,12 @@ public class DefaultURLClient extends AbstractClient{
     }
 
     @Override
-    public HttpResponse request(HttpRequest param) throws IOException{
-        HttpRequestConfig config = super.getConfig();
+    public HttpResponse request(HttpRequest request) throws IOException{
+        HttpRequestConfig config = super.getHttpRequestConfig();
 
-        Entity entity = new Entity();
-        entity.init(param);
-
+        Entity entity = new Entity(request);
         HeadersNameValues headers = new HeadersNameValues();
-        this.addHeaders(param, headers);
-
+        this.addHeaders(request, headers);
 
         final URL url;
         final HttpURLConnection connection;
@@ -80,18 +80,18 @@ public class DefaultURLClient extends AbstractClient{
         connection.setReadTimeout(config.getRequestTimeout());
         connection.setAllowUserInteraction(false);
         connection.setInstanceFollowRedirects(false);
-        connection.setRequestMethod(param.getMethod().name());
+        connection.setRequestMethod(request.getMethod().name());
 
 
-        for (StringNameValue nameValue : headers) {
+        for (NameValue<String,String> nameValue : headers) {
             connection.addRequestProperty(nameValue.getName(), nameValue.getValue());
         }
 
         if (entity.body != null) {
-            connection.setChunkedStreamingMode(8196);
+            connection.setChunkedStreamingMode(8192);
             connection.setDoOutput(true);
             try (OutputStream out = connection.getOutputStream()) {
-                out.write(entity.body);
+                entity.body.writeTo(out, request.getEncoding());
             }
         }
         connection.connect();
@@ -116,7 +116,6 @@ public class DefaultURLClient extends AbstractClient{
             throw new IOException(format("Invalid status(%s) executing %s %s", status,
                     connection.getRequestMethod(), connection.getURL()));
         }
-        // Charset charset = getCharset(connection.getHeaderField(CONTENT_TYPE));
         // 响应头
         Map<String, List<String>> allHeaders = connection.getHeaderFields();
         if (MapUtils.isNotEmpty(allHeaders)) {
@@ -132,7 +131,6 @@ public class DefaultURLClient extends AbstractClient{
 
         if (status >= 400) {
             response.setBody(InputStreamBody.ofNullable(connection.getErrorStream(), connection.getContentLength()));
-            //response.setBody(Utils.toString(connection.getErrorStream(), charset));
         } else {
             response.setBody(InputStreamBody.ofNullable(connection.getInputStream(), connection.getContentLength()));
         }
@@ -152,39 +150,30 @@ public class DefaultURLClient extends AbstractClient{
         if (request.getContentType() != null) {
             headers.add(CONTENT_TYPE, request.getContentType());
         }
+        if (request.getContentType() != null && request.getBody() != null) {
+            headers.add(CONTENT_LENGTH, Utils.toString(request.getBody().length(request.getEncoding())));
+        }
         if (request.getHeaders().getHeaders(ACCEPT).isEmpty()) {
             headers.add(ACCEPT,"*/*");
         }
     }
 
     public static class Entity {
-        private byte[] body;
+        private RequestBody body;
         private String url;
 
-        public void init(HttpRequest request) {
+        public Entity(HttpRequest request) {
             url = request.getUrl();
-            if (HttpMethod.GET.equals(request.getMethod())) {
-                this.handleUrl(request.getQueryParams());
+            RequestBody requestBody = request.getBody();
+            if (requestBody == null || requestBody.getType().equals(RequestBodyType.NONE)) {
+                this.handleUrl(request.getParams(),request.getEncoding());
                 return;
             }
-            if (isForm(request.getContentType())) {
-                this.addBody(asUrlEncoded(request.getQueryParams()));
-            }else {
-                this.addBody(request.getBody());
-                this.handleUrl(request.getQueryParams());
-            }
-
-
+            body = requestBody;
         }
 
-        private void addBody(String content) {
-            if (content != null) {
-                this.body = content.getBytes(UTF_8);
-            }
-        }
-
-        private void handleUrl(StringNameValues params) {
-            String urlParams = asUrlEncoded(params, UTF_8.name());
+        private void handleUrl(StringNameValues params, Charset charset) {
+            String urlParams = asUrlEncoded(params, charset.name());
             if (urlParams == null) {
                 return;
             }

@@ -1,9 +1,9 @@
 package com.github.vizaizai.interceptor;
 
 import com.github.vizaizai.exception.HttpInterceptorException;
-import com.github.vizaizai.model.HttpMethod;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpMethod;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;

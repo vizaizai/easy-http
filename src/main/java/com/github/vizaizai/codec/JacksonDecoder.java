@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.vizaizai.exception.CodecException;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.util.Utils;
 
 import java.io.BufferedReader;
@@ -41,7 +41,7 @@ public class JacksonDecoder implements Decoder {
             return null;
         }
         try {
-            Reader reader = response.getBody().asReader(Utils.UTF_8);
+            Reader reader = response.getBody().asReader(this.encoding());
             if (!reader.markSupported()) {
                 reader = new BufferedReader(reader, 1);
             }
@@ -55,4 +55,5 @@ public class JacksonDecoder implements Decoder {
             throw new CodecException(e);
         }
     }
+
 }

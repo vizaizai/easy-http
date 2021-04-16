@@ -1,7 +1,8 @@
-package com.github.vizaizai.model.body;
+package com.github.vizaizai.entity.body;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
@@ -14,7 +15,7 @@ public interface Body {
     /**
      * 字节数
      */
-    Integer length();
+    long length();
 
     /**
      * 是否可重复读取
@@ -24,7 +25,7 @@ public interface Body {
     /**
      * 转化为InputStream
      */
-    InputStream asInputStream() throws IOException;
+    InputStream asInputStream();
 
     /**
      * 转化为Reader
@@ -32,4 +33,14 @@ public interface Body {
      */
     Reader asReader(Charset charset) throws IOException;
 
+    /**
+     * 转化为字符串
+     * @param charset 编码
+     */
+    String asString(Charset charset) throws IOException;
+
+    /**
+     * 写入输出流
+     */
+    void writeTo(OutputStream os) throws IOException;
 }

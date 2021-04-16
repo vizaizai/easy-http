@@ -1,8 +1,8 @@
 package com.github.vizaizai.client;
 
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpRequestConfig;
+import com.github.vizaizai.entity.HttpResponse;
 
 import java.io.IOException;
 
@@ -11,19 +11,19 @@ import java.io.IOException;
  * @date 2020/8/20 10:09
  */
 public abstract class AbstractClient {
-    private HttpRequestConfig config;
+    private HttpRequestConfig httpRequestConfig;
     /**
      * 执行HTTP请求
-     * @param param HttpRequest
+     * @param request HttpRequest
      * @return HttpResponse
      */
-    public abstract HttpResponse request(HttpRequest param) throws IOException;
+    public abstract HttpResponse request(HttpRequest request) throws IOException;
 
-    public HttpRequestConfig getConfig() {
-        return config;
+    public HttpRequestConfig getHttpRequestConfig() {
+        return httpRequestConfig;
     }
 
     public void setConfig(HttpRequestConfig config) {
-        this.config = config;
+        this.httpRequestConfig = config;
     }
 }

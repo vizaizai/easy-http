@@ -1,6 +1,8 @@
 package com.github.vizaizai.codec;
 
-import com.github.vizaizai.util.value.StringNameValues;
+import com.github.vizaizai.entity.body.Body;
+
+import java.lang.reflect.Type;
 
 /**
  * @author liaochongwei
@@ -8,15 +10,10 @@ import com.github.vizaizai.util.value.StringNameValues;
  */
 public interface Encoder {
     /**
-     * 将对象转化成NameValue 用于编码@Query和@Headers注解的对象
+     * 将对象转化成Body（如果参数类型本身为简单类型，则直接转化成string），用于编码 @Body注解的对象（默认JSON编码）
      * @param object 待编码对象
-     * @return map
+     * @param bodyType 请求体对象类型
+     * @return Body
      */
-     StringNameValues encodeNameValue(Object object);
-    /**
-     * 将对象转化成string（如果参数类型本身为简单类型，则直接转化成string），用于编码 @Body注解的对象（默认是解析成json字符串）
-     * @param object 待编码对象
-     * @return string
-     */
-     String encodeString(Object object);
+    Body encode(Object object, Type bodyType);
 }

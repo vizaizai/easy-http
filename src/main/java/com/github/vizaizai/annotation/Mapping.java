@@ -2,7 +2,8 @@ package com.github.vizaizai.annotation;
 
 
 import com.github.vizaizai.interceptor.HttpInterceptor;
-import com.github.vizaizai.model.HttpMethod;
+import com.github.vizaizai.entity.HttpMethod;
+import com.github.vizaizai.entity.body.RequestBodyType;
 
 import java.lang.annotation.*;
 
@@ -15,6 +16,10 @@ public @interface Mapping {
     HttpMethod httpMethod() default HttpMethod.GET;
 
     String contentType() default "";
+    /**
+     * @return 请求体类型
+     */
+    RequestBodyType bodyType() default RequestBodyType.AUTO;
     /**
      * @return 拦截器
      */

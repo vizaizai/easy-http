@@ -8,5 +8,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface Body {
     String TYPE = "body";
+    /**
+     * 自动包装一层，body被序列化文本时生效
+     */
     String wrapRoot() default "";
 }

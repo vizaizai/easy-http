@@ -4,9 +4,10 @@ import com.github.vizaizai.annotation.Mapping;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.hander.mapping.Mappings;
 import com.github.vizaizai.interceptor.HttpInterceptor;
-import com.github.vizaizai.model.HttpMethod;
-import com.github.vizaizai.model.MappingInfo;
-import com.github.vizaizai.model.RetrySettings;
+import com.github.vizaizai.entity.HttpMethod;
+import com.github.vizaizai.entity.MappingInfo;
+import com.github.vizaizai.entity.RetrySettings;
+import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
@@ -47,6 +48,10 @@ public class MethodParser {
      * contentType
      */
     private String contentType;
+    /**
+     * 请求体类型
+     */
+    private RequestBodyType bodyType;
     /**
      * 方法级别的headers
      */
@@ -92,6 +97,7 @@ public class MethodParser {
         this.contentType = mappingInfo.getContentType();
         this.httpMethod = mappingInfo.getHttpMethod();
         this.retrySettings = mappingInfo.getRetrySettings();
+        this.bodyType = mappingInfo.getBodyType();
         interceptorClasses = mappingInfo.getInterceptors();
 
         // 添加拦截器
@@ -211,6 +217,14 @@ public class MethodParser {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public RequestBodyType getBodyType() {
+        return bodyType;
+    }
+
+    public void setBodyType(RequestBodyType bodyType) {
+        this.bodyType = bodyType;
     }
 
     public HeadersNameValues getHeaders() {

@@ -1,6 +1,6 @@
 package com.github.vizaizai.hander.mapping;
 
-import com.github.vizaizai.model.MappingInfo;
+import com.github.vizaizai.entity.MappingInfo;
 
 import java.lang.annotation.Annotation;
 

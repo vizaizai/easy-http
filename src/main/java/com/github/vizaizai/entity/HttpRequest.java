@@ -1,8 +1,10 @@
-package com.github.vizaizai.model;
+package com.github.vizaizai.entity;
 
+import com.github.vizaizai.entity.body.RequestBody;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -33,9 +35,13 @@ public class HttpRequest {
      */
     private StringNameValues params;
     /**
-     * 请求体文本内容
+     * 请求体类型
      */
-    private String body;
+    private RequestBody body;
+    /**
+     * 字符编码
+     */
+    private Charset encoding;
     /**
      * 扩展参数
      */
@@ -67,25 +73,28 @@ public class HttpRequest {
         this.headers.addAll(headers);
     }
 
-    public void addQueryParam(String key, String value) {
+    public void addParam(String key, String value) {
         if (this.params == null) {
             this.params = new StringNameValues();
         }
         this.params.add(key, value);
     }
 
-    public void addQueryParams(StringNameValues nameValues) {
+    public void addParams(StringNameValues nameValues) {
         if (this.params == null) {
             this.params = new StringNameValues();
         }
         this.params.addAll(nameValues);
+    }
+    public void setEmptyParams() {
+         params = new StringNameValues();
     }
 
     public HeadersNameValues getHeaders() {
         return headers == null ? new HeadersNameValues() : headers;
     }
 
-    public StringNameValues getQueryParams() {
+    public StringNameValues getParams() {
         return params;
     }
 
@@ -113,11 +122,11 @@ public class HttpRequest {
         this.contentType = contentType;
     }
 
-    public String getBody() {
+    public RequestBody getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(RequestBody body) {
         this.body = body;
     }
 
@@ -151,5 +160,13 @@ public class HttpRequest {
 
     public void setConfig(HttpRequestConfig config) {
         this.config = config;
+    }
+
+    public Charset getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(Charset encoding) {
+        this.encoding = encoding;
     }
 }

@@ -4,8 +4,8 @@ import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.SimpleDecoder;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.interceptor.InterceptorOperations;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.TypeUtils;
 
@@ -29,6 +29,7 @@ public class ResponseHandler implements Handler<Object>{
     public ResponseHandler response(HttpResponse response) {
         this.response = response;
         this.response.setReturnType(this.returnType);
+        this.response.setEncoding(this.decoder.encoding());
         return this;
     }
 
@@ -54,12 +55,16 @@ public class ResponseHandler implements Handler<Object>{
         }
         // 执行后置拦截
         interceptorOps.doPostInterceptors(this.request, this.response);
+        // 返回类型为HttpResponse
+        if (TypeUtils.equals(this.returnType, HttpResponse.class)) {
+            return response;
+        }
         // 如果已经序列化,则直接返回
         if (this.response.isDeserialize()) {
             return this.response.getReturnObject();
         }
         // 响应解码
-        if (TypeUtils.isSimple(this.returnType.getTypeName())) {
+        if (TypeUtils.isBaseType(this.returnType)) {
             this.decoder = new SimpleDecoder();
         }
         Object returnObject = this.decoder.decode(this.response, this.returnType);

@@ -1,10 +1,16 @@
 package demo.main;
 
+import com.github.vizaizai.util.Utils;
+
+import java.util.UUID;
+
 /**
  * @author liaochongwei
  * @date 2021/1/6 14:36
  */
 public class MainTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException {
+
+        System.out.println(UUID.randomUUID().toString().replace("-",""));
     }
 }

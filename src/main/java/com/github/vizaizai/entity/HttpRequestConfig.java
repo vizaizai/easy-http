@@ -1,4 +1,8 @@
-package com.github.vizaizai.model;
+package com.github.vizaizai.entity;
+
+import com.github.vizaizai.util.Utils;
+
+import java.nio.charset.Charset;
 
 /**
  * http请求配置
@@ -8,6 +12,7 @@ package com.github.vizaizai.model;
 public class HttpRequestConfig {
     private Integer connectTimeout;
     private Integer requestTimeout;
+    private Charset encoding;
 
     public HttpRequestConfig() {
     }
@@ -16,12 +21,14 @@ public class HttpRequestConfig {
         HttpRequestConfig config = new HttpRequestConfig();
         config.setConnectTimeout(15000);
         config.setRequestTimeout(30000);
+        config.setEncoding(Utils.UTF_8);
         return config;
     }
 
-    public HttpRequestConfig(Integer connectTimeout, Integer requestTimeout) {
+    public HttpRequestConfig(Integer connectTimeout, Integer requestTimeout,Charset encoding) {
         this.connectTimeout = connectTimeout;
         this.requestTimeout = requestTimeout;
+        this.encoding = encoding;
     }
 
     public Integer getConnectTimeout() {
@@ -38,5 +45,13 @@ public class HttpRequestConfig {
 
     public void setRequestTimeout(Integer requestTimeout) {
         this.requestTimeout = requestTimeout;
+    }
+
+    public Charset getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(Charset encoding) {
+        this.encoding = encoding;
     }
 }

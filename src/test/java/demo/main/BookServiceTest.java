@@ -6,6 +6,7 @@ import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
+import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.retry.DefaultRule;
 import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
@@ -115,12 +116,18 @@ public class BookServiceTest {
 
     @Test
     public void foo() {
-        QueryForm form = new QueryForm();
+        QueryForm<String> form = new QueryForm<>();
         form.setIds(Arrays.asList("123","555","lololo"));
+        form.setTt("123123");
         Map<String,String> h = new HashMap<>();
         h.put("HeaderName","123123");
-        String[] bar = bookHttpService.foo1(form);
-        System.out.println(JSON.toJSONString(bar));
+        HttpResponse response = bookHttpService.foo1(form);
+        System.out.println(response.isOk());
+    }
+
+    @Test
+    public void foo1(){
+        bookHttpService.foo1("你好");
     }
 
     @Test

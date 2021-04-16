@@ -3,17 +3,16 @@ package com.github.vizaizai.codec;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.vizaizai.exception.CodecException;
-import com.github.vizaizai.util.Utils;
-import com.github.vizaizai.util.value.StringNameValues;
-import org.apache.commons.beanutils.BeanMap;
+import com.github.vizaizai.entity.body.Body;
+import com.github.vizaizai.entity.body.ByteArrayBody;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 默认编码
@@ -38,32 +37,17 @@ public class JacksonEncoder implements Encoder {
     public JacksonEncoder(ObjectMapper mapper) {
         this.mapper = mapper;
     }
-    @Override
-    public StringNameValues encodeNameValue(Object object) {
-        if (object == null) {
-            return null;
-        }
-        Map<?,?> map;
-        if (object instanceof  Map) {
-            map = (Map<?, ?>) object;
-        } else {
-            map = new HashMap<>(new BeanMap(object));
-            if (map.get("class") != null) {
-                map.remove("class");
-            }
-        }
-        return Utils.toNameValues(map);
-    }
 
     @Override
-    public String encodeString(Object object) {
+    public Body encode(Object object, Type bodyType) {
         if (object == null) {
             return null;
         }
+        JavaType javaType = mapper.getTypeFactory().constructType(bodyType);
         try {
-           return mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-           throw new CodecException(e);
+            return ByteArrayBody.ofNullable(mapper.writerFor(javaType).writeValueAsBytes(object));
+        }catch (JsonProcessingException e) {
+            throw new CodecException(e);
         }
     }
 }

@@ -1,6 +1,7 @@
-package com.github.vizaizai.model.body;
+package com.github.vizaizai.entity.body;
 
 import com.github.vizaizai.util.Assert;
+import com.github.vizaizai.util.StreamUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -32,7 +33,7 @@ public class ByteArrayBody implements Body{
     }
 
     @Override
-    public Integer length() {
+    public long length() {
         return data.length;
     }
 
@@ -42,7 +43,7 @@ public class ByteArrayBody implements Body{
     }
 
     @Override
-    public InputStream asInputStream() throws IOException {
+    public InputStream asInputStream() {
         return new ByteArrayInputStream(data);
     }
 
@@ -50,5 +51,15 @@ public class ByteArrayBody implements Body{
     public Reader asReader(Charset charset) throws IOException {
         Assert.notNull(charset, "charset should not be null");
         return new InputStreamReader(asInputStream(), charset);
+    }
+
+    @Override
+    public String asString(Charset charset) throws IOException {
+        return new String(this.data, charset);
+    }
+
+    @Override
+    public void writeTo(OutputStream os) throws IOException {
+        StreamUtils.copy(this.asInputStream(),os);
     }
 }

@@ -4,8 +4,8 @@ import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.codec.*;
 import com.github.vizaizai.interceptor.HttpInterceptor;
-import com.github.vizaizai.model.HttpRequestConfig;
-import com.github.vizaizai.model.RetrySettings;
+import com.github.vizaizai.entity.HttpRequestConfig;
+import com.github.vizaizai.entity.RetrySettings;
 import com.github.vizaizai.proxy.ProxyHandler;
 import com.github.vizaizai.retry.RetryTrigger;
 

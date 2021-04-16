@@ -1,4 +1,4 @@
-package com.github.vizaizai.model;
+package com.github.vizaizai.entity;
 
 /**
  * @author liaochongwei

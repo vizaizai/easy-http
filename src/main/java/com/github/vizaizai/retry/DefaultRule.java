@@ -1,9 +1,9 @@
 package com.github.vizaizai.retry;
 
 import com.github.vizaizai.hander.Context;
-import com.github.vizaizai.model.HttpMethod;
-import com.github.vizaizai.model.HttpRequest;
-import com.github.vizaizai.model.HttpResponse;
+import com.github.vizaizai.entity.HttpMethod;
+import com.github.vizaizai.entity.HttpRequest;
+import com.github.vizaizai.entity.HttpResponse;
 
 import java.net.ConnectException;
 

@@ -1,9 +1,10 @@
-package com.github.vizaizai.model;
+package com.github.vizaizai.entity;
 
-import com.github.vizaizai.model.body.Body;
+import com.github.vizaizai.entity.body.Body;
 import com.github.vizaizai.util.value.HeadersNameValues;
 
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 
 /**
  * 响应
@@ -16,6 +17,10 @@ public class HttpResponse {
      * 响应体
      */
     private Body body;
+    /**
+     * 字符编码
+     */
+    private Charset encoding;
     /**
      * 响应头
      */
@@ -111,6 +116,14 @@ public class HttpResponse {
 
     public void setHeaders(HeadersNameValues headers) {
         this.headers = headers;
+    }
+
+    public Charset getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(Charset encoding) {
+        this.encoding = encoding;
     }
 
     public static HttpResponse ok(Body body) {
