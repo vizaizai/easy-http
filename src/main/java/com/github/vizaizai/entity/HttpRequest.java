@@ -1,7 +1,6 @@
 package com.github.vizaizai.entity;
 
 import com.github.vizaizai.entity.body.RequestBody;
-import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
 

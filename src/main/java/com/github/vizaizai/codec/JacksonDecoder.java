@@ -41,7 +41,7 @@ public class JacksonDecoder implements Decoder {
             return null;
         }
         try {
-            Reader reader = response.getBody().asReader(Utils.UTF_8);
+            Reader reader = response.getBody().asReader(this.encoding());
             if (!reader.markSupported()) {
                 reader = new BufferedReader(reader, 1);
             }

@@ -61,5 +61,7 @@ public class ReturnTest {
         System.out.println(returnService.testDouble_1());
         System.out.println(returnService.testDouble_2());
         System.out.println(returnService.testDouble_3());
+        System.out.println(returnService.testDouble_5());
+        returnService.testDouble_4();
     }
 }

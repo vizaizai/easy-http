@@ -97,6 +97,8 @@ public class ParamTest {
         map.put("name","西游记");
         map.put("lang","chinese");
         System.out.println(paramService.test6_1(map));
+        System.out.println(paramService.test6_1(map));
+        System.out.println(paramService.test6_1(map));
     }
 
     @Test

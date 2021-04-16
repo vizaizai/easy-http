@@ -44,4 +44,10 @@ public interface ReturnService {
 
     @Get("/testDouble")
     Number testDouble_3();
+
+    @Get("/testDouble")
+    void testDouble_4();
+
+    @Get("/testDouble")
+    Double testDouble_5();
 }

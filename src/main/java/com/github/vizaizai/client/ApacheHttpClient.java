@@ -69,6 +69,7 @@ public class ApacheHttpClient extends AbstractClient {
         return new ApacheHttpClient(sslConnectionSocketFactory, hostnameVerifier);
     }
 
+    @Override
     public void setConfig(HttpRequestConfig httpConfig) {
        super.setConfig(httpConfig);
        if (config == null) {
@@ -80,12 +81,13 @@ public class ApacheHttpClient extends AbstractClient {
        }
     }
 
-    public HttpResponse request(HttpRequest param) throws IOException{
-        HttpMethod method = param.getMethod();
-        String url = param.getUrl();
-        HeadersNameValues headers = param.getHeaders();
-        StringNameValues params = param.getParams();
-        RequestBodyType bodyType = param.getBody() == null ? null : param.getBody().getType();
+    @Override
+    public HttpResponse request(HttpRequest request) throws IOException{
+        HttpMethod method = request.getMethod();
+        String url = request.getUrl();
+        HeadersNameValues headers = request.getHeaders();
+        StringNameValues params = request.getParams();
+        RequestBodyType bodyType = request.getBody() == null ? null : request.getBody().getType();
         if (config == null) {
             throw new EasyHttpException("HttpClient request configuration is null");
         }
@@ -94,35 +96,35 @@ public class ApacheHttpClient extends AbstractClient {
         }
 
         List<BasicNameValuePair> queryParams = new ArrayList<>();
-        HttpResponse result = new HttpResponse();
         if (params != null && !params.isEmpty()) {
             params.forEach(e-> queryParams.add(new BasicNameValuePair(e.getName(), e.getValue())));
         }
-        HttpUriRequest request;
-
+        url = this.convertUrl(url, queryParams, bodyType);
+        HttpUriRequest httpUriRequest;
+        HttpResponse result = new HttpResponse();
         switch (method) {
             case GET:
-                HttpGet httpGet = new HttpGet(convertUrl(url,  queryParams, bodyType));
+                HttpGet httpGet = new HttpGet(url);
                 httpGet.setConfig(config);
-                request = httpGet;
+                httpUriRequest = httpGet;
                 break;
             case POST:
-                HttpPost httpPost = new HttpPost(convertUrl(url, queryParams, bodyType));
-                httpPost.setEntity(assembleEntity(param));
+                HttpPost httpPost = new HttpPost(url);
+                httpPost.setEntity(assembleEntity(request));
                 httpPost.setConfig(config);
-                request = httpPost;
+                httpUriRequest = httpPost;
                 break;
             case PUT:
-                HttpPut httpPut = new HttpPut(convertUrl(url, queryParams, bodyType));
-                httpPut.setEntity(assembleEntity(param));
+                HttpPut httpPut = new HttpPut(url);
+                httpPut.setEntity(assembleEntity(request));
                 httpPut.setConfig(config);
-                request = httpPut;
+                httpUriRequest = httpPut;
                 break;
             case DELETE:
-                HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(convertUrl(url, queryParams, bodyType));
-                httpDelete.setEntity(assembleEntity(param));
+                HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(url);
+                httpDelete.setEntity(assembleEntity(request));
                 httpDelete.setConfig(config);
-                request = httpDelete;
+                httpUriRequest = httpDelete;
                 break;
             default:
                 result.setMessage("request method is not supported");
@@ -133,7 +135,7 @@ public class ApacheHttpClient extends AbstractClient {
         if (headers != null) {
             headers.forEach(e-> request.addHeader(e.getName(), e.getValue()));
         }
-        try (CloseableHttpResponse response = httpClient.execute(request)){
+        try (CloseableHttpResponse response = httpClient.execute(httpUriRequest)){
             // 响应头
             Header[] allHeaders = response.getAllHeaders();
             if (allHeaders != null && allHeaders.length > 0) {
@@ -159,20 +161,18 @@ public class ApacheHttpClient extends AbstractClient {
 
     }
 
-
-
     /**
      * 转化url
      * @param url 原url
      * @param queryParams 待拼接参数
      * @return String
      */
-    private static String convertUrl(String url,  List<BasicNameValuePair> queryParams, RequestBodyType bodyType) {
+    private String convertUrl(String url,  List<BasicNameValuePair> queryParams, RequestBodyType bodyType) {
         if (CollectionUtils.isEmpty(queryParams) || RequestBodyType.X_WWW_FROM_URL_ENCODED.equals(bodyType)) {
             return url;
         }
         try {
-            String urlParam = EntityUtils.toString(new UrlEncodedFormEntity(queryParams, Consts.UTF_8));
+            String urlParam = EntityUtils.toString(new UrlEncodedFormEntity(queryParams, this.getHttpRequestConfig().getEncoding()));
             if (url.contains("?")) {
                 url = url + "&" + urlParam;
             }else {

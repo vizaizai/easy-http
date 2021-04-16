@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,12 +54,12 @@ public class DefaultURLClient extends AbstractClient{
     }
 
     @Override
-    public HttpResponse request(HttpRequest param) throws IOException{
-        HttpRequestConfig config = super.getConfig();
+    public HttpResponse request(HttpRequest request) throws IOException{
+        HttpRequestConfig config = super.getHttpRequestConfig();
 
-        Entity entity = new Entity(param);
+        Entity entity = new Entity(request);
         HeadersNameValues headers = new HeadersNameValues();
-        this.addHeaders(param, headers);
+        this.addHeaders(request, headers);
 
         final URL url;
         final HttpURLConnection connection;
@@ -79,7 +80,7 @@ public class DefaultURLClient extends AbstractClient{
         connection.setReadTimeout(config.getRequestTimeout());
         connection.setAllowUserInteraction(false);
         connection.setInstanceFollowRedirects(false);
-        connection.setRequestMethod(param.getMethod().name());
+        connection.setRequestMethod(request.getMethod().name());
 
 
         for (NameValue<String,String> nameValue : headers) {
@@ -90,7 +91,7 @@ public class DefaultURLClient extends AbstractClient{
             connection.setChunkedStreamingMode(8192);
             connection.setDoOutput(true);
             try (OutputStream out = connection.getOutputStream()) {
-                entity.body.writeTo(out, param.getEncoding());
+                entity.body.writeTo(out, request.getEncoding());
             }
         }
         connection.connect();
@@ -165,14 +166,14 @@ public class DefaultURLClient extends AbstractClient{
             url = request.getUrl();
             RequestBody requestBody = request.getBody();
             if (requestBody == null || requestBody.getType().equals(RequestBodyType.NONE)) {
-                this.handleUrl(request.getParams());
+                this.handleUrl(request.getParams(),request.getEncoding());
                 return;
             }
             body = requestBody;
         }
 
-        private void handleUrl(StringNameValues params) {
-            String urlParams = asUrlEncoded(params, UTF_8.name());
+        private void handleUrl(StringNameValues params, Charset charset) {
+            String urlParams = asUrlEncoded(params, charset.name());
             if (urlParams == null) {
                 return;
             }

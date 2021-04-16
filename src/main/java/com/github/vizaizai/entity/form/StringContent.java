@@ -26,7 +26,7 @@ public class StringContent implements BodyContent {
         return new StringContent(content, charset);
     }
 
-    public static  StringContent of(String content) {
+    public static StringContent of(String content) {
 
         return new StringContent(content, Utils.UTF_8);
     }

@@ -124,7 +124,7 @@ public class LogInterceptor implements HttpInterceptor {
                     logText.deleteCharAt(logText.length() - 1);
                 }
                 logText.append("]");
-                log.info(logText.toString());
+                log.info("{},长度：{}",logText, parts.getLength(request.getEncoding()));
                 return;
             }
             if (RequestBodyType.BINARY.equals(type)) {
