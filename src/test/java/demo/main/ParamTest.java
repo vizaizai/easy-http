@@ -3,6 +3,9 @@ package demo.main;
 import com.github.vizaizai.EasyHttp;
 import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
+import com.github.vizaizai.entity.form.FileContent;
+import com.github.vizaizai.entity.form.FormBodyParts;
+import com.github.vizaizai.entity.form.FormData;
 import com.github.vizaizai.interceptor.LogInterceptor;
 import demo.model.Book1;
 import demo.model.QueryForm;
@@ -10,6 +13,8 @@ import demo.service.ParamService;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +57,8 @@ public class ParamTest {
         book.setLang("chinese");
         System.out.println(paramService.test3_2(book));
 
+        System.out.println(paramService.test3_3("吴承恩","chinese"));
+
     }
     @Test
     public void test4() {
@@ -60,22 +67,61 @@ public class ParamTest {
 
     @Test
     public void test5() {
-        Map<String,Integer> map = new HashMap<>();
-        System.out.println(paramService.test5(map));
+        Book1 book = new Book1();
+        book.setAuthor("吴承恩");
+        book.setLang("chinese");
+        book.setName("西游记");
+        System.out.println(paramService.test5(book));
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("author","吴承恩");
+        map.put("name","西游记");
+        map.put("lang","chinese");
+        System.out.println(paramService.test5_1(map));
+        System.out.println(paramService.test5_1(map));
+        System.out.println(paramService.test5_1(map));
+        System.out.println(paramService.test5_1(map));
+    }
+
+
+    @Test
+    public void test6() {
+        Book1 book = new Book1();
+        book.setAuthor("吴承恩");
+        book.setLang("chinese");
+        book.setName("西游记");
+        System.out.println(paramService.test6(book));
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("author","吴承恩");
+        map.put("name","西游记");
+        map.put("lang","chinese");
+        System.out.println(paramService.test6_1(map));
     }
 
     @Test
     public void test7() {
-        System.out.println(paramService.test7(null));
+        System.out.println(paramService.test7(new String[]{"1","2"}));
+
+        System.out.println(paramService.test7_1(Arrays.asList("1","2")));
+
+        System.out.println(paramService.test7_2("1","2"));
     }
 
     @Test
     public void test8() {
-        System.out.println(paramService.test8("12312"));
+        FormData formData = new FormData();
+        formData.addText("author","吴承恩");
+        formData.addText("name","西游记");
+        formData.addText("lang","chinese");
+        formData.addFile("files", new File("C:\\Users\\dell\\Desktop\\logo.png"));
+        formData.addFile("files", new File("C:\\Users\\dell\\Desktop\\Dingtalk_20210317145859.jpg"));
+        formData.addFile("files", new File("C:\\Users\\dell\\Desktop\\jsd_pro_back.rar"));
+        System.out.println(paramService.test8(formData));
     }
 
     @Test
     public void test9() {
-        System.out.println(paramService.test9("123123","1123"));
+        System.out.println(paramService.test9("123",FileContent.of(new File("C:\\Users\\dell\\Desktop\\jsd_pro_back.rar"))));
     }
 }

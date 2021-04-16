@@ -6,17 +6,20 @@ import com.github.vizaizai.annotation.Param;
 import com.github.vizaizai.annotation.Var;
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.codec.Encoder;
-import com.github.vizaizai.entity.form.*;
-import com.github.vizaizai.interceptor.InterceptorOperations;
 import com.github.vizaizai.entity.*;
 import com.github.vizaizai.entity.body.RequestBody;
 import com.github.vizaizai.entity.body.RequestBodyType;
+import com.github.vizaizai.entity.form.BodyContent;
+import com.github.vizaizai.entity.form.FormBodyParts;
+import com.github.vizaizai.entity.form.FormData;
+import com.github.vizaizai.interceptor.InterceptorOperations;
 import com.github.vizaizai.parser.Arg;
 import com.github.vizaizai.parser.ArgsParser;
 import com.github.vizaizai.parser.InterfaceParser;
 import com.github.vizaizai.parser.MethodParser;
 import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.Assert;
+import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -193,7 +196,7 @@ public class RequestHandler implements Handler<HttpResponse>{
             // var替换路径
             if (this.methodParser.getVarCount() > 0) {
                 String key = Utils.urlEncode(arg.getVarName(), this.request.getEncoding().name());
-                String value = Utils.urlEncode(Utils.toString(arg.getSource()),this.request.getEncoding().name());
+                String value = Utils.urlEncode(Utils.toText(arg.getSource()),this.request.getEncoding().name());
                 pathParams.put(key,value);
             }
         }
@@ -242,7 +245,8 @@ public class RequestHandler implements Handler<HttpResponse>{
                 break;
             case FORM_DATA:
                 Assert.notNull(arg);
-                FormBodyParts parts = FormBodyParts.cast(arg.getSource());
+                FormData formData = (FormData) arg.getSource();
+                FormBodyParts parts = formData == null ? new FormBodyParts() : formData.getFormBodyParts();
                 request.setContentType(Utils.getMultiContentType(parts.getBoundary()));
                 request.setBody(RequestBody.create(parts,type));
                 break;
@@ -321,10 +325,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 设置ContentType
         request.setContentType(methodParser.getContentType());
         RequestBodyType bodyType = methodParser.getBodyType();
-        if (bodyType == null) {
-            bodyType =  RequestBodyType.NONE;
-        }
-        if (RequestBodyType.AUTO.equals(bodyType)) {
+        if ( bodyType == null || RequestBodyType.AUTO.equals(bodyType)) {
             // 分析请求体类型
             bodyType =  this.analysisBodyType();
         }
@@ -341,10 +342,6 @@ public class RequestHandler implements Handler<HttpResponse>{
      * 动态分析请求体类型
      */
     private RequestBodyType analysisBodyType() {
-        // GET请求的bodyType固定的规范为None
-        if (request.getMethod().equals(HttpMethod.GET)) {
-            return RequestBodyType.NONE;
-        }
         // 优先根据contentType判断bodyType
         String contentType = methodParser.getContentType();
         if (StringUtils.isNotBlank(contentType)) {
@@ -365,30 +362,31 @@ public class RequestHandler implements Handler<HttpResponse>{
         }
         int paramCount = argsParser.getCount(Param.TYPE);
         int bodyCount = argsParser.getCount(Body.TYPE);
-        // 只存在@Param， bodyType取X_WWW_FROM_URL_ENCODED
+        // 只存在@Param，GET请求bodyType为NONE，其它请求bodyType为X_WWW_FROM_URL_ENCODED
         if (paramCount > 0 && bodyCount == 0) {
+            if (request.getMethod().equals(HttpMethod.GET)) {
+                return RequestBodyType.NONE;
+            }
             return RequestBodyType.X_WWW_FROM_URL_ENCODED;
         }
         if (bodyCount == 0) {
             return RequestBodyType.NONE;
         }
-        return this.getTypeByDataType(argsParser.getArgs(Body.TYPE).get(0).getDataType());
+        return this.getBodyTypeFromSource(argsParser.getArgs(Body.TYPE).get(0));
     }
 
     /**
      * 根据源对象类型获取bodyType
-     * @param sourceDataType
+     * @param source body参数对象
      */
-    private RequestBodyType getTypeByDataType(Type sourceDataType) {
+    private RequestBodyType getBodyTypeFromSource(Arg source) {
+        Type sourceDataType = source.getDataType();
         RequestBodyType bodyType;
-        if (FormBodyParts.class.equals(sourceDataType)) {
-            // FormBodyParts-> form-data
+        if (TypeUtils.equals(FormData.class, sourceDataType)) {
+            // FormData-> form-data
             bodyType = RequestBodyType.FORM_DATA;
-        }else if (FileContent.class.equals(sourceDataType)) {
+        }else if (sourceDataType instanceof Class &&  TypeUtils.isThisType(BodyContent.class, (Class<?>) sourceDataType)) {
             // 文件->二进制
-            bodyType = RequestBodyType.BINARY;
-        }else if (InputStreamContent.class.equals(sourceDataType)) {
-            // 输入流->二进制
             bodyType = RequestBodyType.BINARY;
         }else {
             // 文本

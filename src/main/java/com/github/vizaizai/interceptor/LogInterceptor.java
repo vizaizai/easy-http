@@ -111,9 +111,8 @@ public class LogInterceptor implements HttpInterceptor {
                     if (bodyContent.isFile()) {
                         logText.append("\"FILE");
                         if (bodyContent.getFilename() != null) {
-                            logText.append("<");
+                            logText.append("-");
                             logText.append(bodyContent.getFilename());
-                            logText.append(">");
                         }
                         logText.append("\"");
                     }else {

@@ -44,7 +44,6 @@ public class RequestBody {
      * @return RequestBody
      */
     public static RequestBody create(FormBodyParts source, RequestBodyType type) {
-
         return new RequestBody(source,type);
     }
 

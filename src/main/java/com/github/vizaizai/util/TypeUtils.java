@@ -67,25 +67,26 @@ public class TypeUtils {
 
         // Number或者Number的子类
         if (type instanceof Class) {
-            return isNumberType((Class<?>) type);
+            return isThisType(Number.class, (Class<?>) type);
         }
         return false;
     }
 
 
     /**
-     * 是否为Number或Number派生类型
-     * @param type clazz
+     * 是否为给定类或给定类的派生类
+     * @param thisType 给定类
+     * @param otherType 待确认类
      * @return true or false
      */
-    public static boolean isNumberType(Class<?> type) {
-        if (equals(type, Number.class)) {
+    public static boolean isThisType(Class<?> thisType, Class<?> otherType) {
+        if (equals(thisType, otherType)) {
             return true;
         }
-        Class<?> superclass = type.getSuperclass();
+        Class<?> superclass = otherType.getSuperclass();
         // 如果父类不是Object
         if (superclass != null && !equals(superclass,Object.class)) {
-            return isNumberType(superclass);
+            return isThisType(thisType, superclass);
         }
         return false;
     }

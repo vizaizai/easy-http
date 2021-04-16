@@ -125,6 +125,10 @@ public class Utils {
         if (o == null) return null;
         return o.toString();
     }
+    public static String toText(Object o) {
+        if (o == null) return "";
+        return o.toString();
+    }
 
     public static Charset getCharset(String contentType) {
         if (StringUtils.isBlank(contentType)) {
