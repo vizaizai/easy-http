@@ -133,7 +133,7 @@ public class ApacheHttpClient extends AbstractClient {
 
         //添加请求头
         if (headers != null) {
-            headers.forEach(e-> request.addHeader(e.getName(), e.getValue()));
+            headers.forEach(e-> httpUriRequest.addHeader(e.getName(), e.getValue()));
         }
         try (CloseableHttpResponse response = httpClient.execute(httpUriRequest)){
             // 响应头

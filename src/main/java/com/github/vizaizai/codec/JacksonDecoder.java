@@ -3,9 +3,8 @@ package com.github.vizaizai.codec;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.vizaizai.exception.CodecException;
 import com.github.vizaizai.entity.HttpResponse;
-import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.exception.CodecException;
 
 import java.io.BufferedReader;
 import java.io.IOException;

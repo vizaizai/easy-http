@@ -17,6 +17,8 @@ import java.util.concurrent.CompletableFuture;
  * @date 2021/2/7 11:21
  */
 public interface ParamService {
+
+    @Headers("key: 123123")
     @Get("/listAllBooks")
     String test1();
 
