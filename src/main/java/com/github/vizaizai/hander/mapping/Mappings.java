@@ -4,7 +4,7 @@ import com.github.vizaizai.annotation.*;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.MappingInfo;
 import com.github.vizaizai.entity.RetrySettings;
-import org.apache.commons.lang3.StringUtils;
+import com.github.vizaizai.util.StringUtils;
 
 import java.lang.annotation.Annotation;
 

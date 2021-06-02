@@ -23,6 +23,16 @@ public class TypeUtils {
     private TypeUtils() {
     }
 
+
+    /**
+     * 是否为数组
+     * @param type Type
+     * @return true or false
+     */
+    public static boolean isArrayType(final Type type) {
+        return type instanceof GenericArrayType || type instanceof Class<?> && ((Class<?>) type).isArray();
+    }
+
     /**
      * 对象声明类型和对象本身共同判断是否为基础类型
      * @param type

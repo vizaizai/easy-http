@@ -1,12 +1,11 @@
 package com.github.vizaizai.hander;
 
-import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.entity.RetrySettings;
+import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.retry.DefaultRule;
 import com.github.vizaizai.retry.RetryTrigger;
 import com.github.vizaizai.retry.attempt.Modes;
 import com.github.vizaizai.retry.core.Retry;
-import org.apache.commons.lang3.BooleanUtils;
 
 import java.time.temporal.ChronoUnit;
 
@@ -55,6 +54,6 @@ public class RetryHandler implements Handler<Object>{
      * @return boolean
      */
     public static boolean enableRetry(RetrySettings retrySettings) {
-        return retrySettings != null && BooleanUtils.isTrue(retrySettings.getEnable());
+        return retrySettings != null && Boolean.TRUE.equals(retrySettings.getEnable());
     }
 }

@@ -7,7 +7,7 @@ import com.github.vizaizai.annotation.Param;
 import com.github.vizaizai.annotation.Var;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.TypeUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.github.vizaizai.util.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

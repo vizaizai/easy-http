@@ -22,7 +22,7 @@ import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.github.vizaizai.util.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

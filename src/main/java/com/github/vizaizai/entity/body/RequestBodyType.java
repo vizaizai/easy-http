@@ -1,7 +1,7 @@
 package com.github.vizaizai.entity.body;
 
 import com.github.vizaizai.entity.ContentType;
-import org.apache.commons.lang3.StringUtils;
+import com.github.vizaizai.util.StringUtils;
 
 /**
  * 请求体类型

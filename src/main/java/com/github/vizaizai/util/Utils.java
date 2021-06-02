@@ -1,22 +1,23 @@
 package com.github.vizaizai.util;
 
 import com.github.vizaizai.annotation.Headers;
-import com.github.vizaizai.entity.ContentType;
+import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
 import com.github.vizaizai.util.value.StringNameValue;
 import com.github.vizaizai.util.value.StringNameValues;
-import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.TypeUtils;
 import org.slf4j.Logger;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 public class Utils {
 
     public static final String CHARSET_S_F = "charset=";
+    public static final String CLASS = "class";
 
     private Utils() {
     }
@@ -206,9 +208,38 @@ public class Utils {
     }
 
     /**
+     * JavaBean转化为Map
+     * @param bean JavaBean
+     * @return Map
+     */
+    public static Map<String,Object> bean2Map(Object bean) {
+        Class<?> beanClazz = bean.getClass();
+        Map<String,Object> beanMap = new HashMap<>();
+        try {
+            // 获取Bean信息
+            BeanInfo beanInfo = Introspector.getBeanInfo(beanClazz);
+            // 获取属性描述
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            for (PropertyDescriptor property : propertyDescriptors) {
+                String name = property.getName();
+                // 过滤class属性
+                if (!name.equals(CLASS)) {
+                    // 得到属性对应的getter方法
+                    Method getter = property.getReadMethod();
+                    // 执行getter方法得到属性值
+                    Object value = getter.invoke(bean);
+                    beanMap.put(name, value);
+                }
+            }
+            return beanMap;
+        }catch (Exception e) {
+            throw new EasyHttpException("JavaBean convert to map error.");
+        }
+    }
+    /**
      * 转化为StringNameValues
-     * @param varName
-     * @param object
+     * @param varName 方法参数名
+     * @param object 方法参数
      * @return StringNameValues
      */
     public static StringNameValues encodeNameValue(String varName, Object object, Type type) {
@@ -221,13 +252,10 @@ public class Utils {
         }
         // 参数值为JavaBean或者map
         Map<?,?> values;
-        if (object instanceof  Map) {
+        if (object instanceof Map) {
             values = (Map<?, ?>) object;
         } else {
-            values = new HashMap<>(new BeanMap(object));
-            if (values.get("class") != null) {
-                values.remove("class");
-            }
+            values = bean2Map(object);
         }
         nameValues = new StringNameValues();
         for (Map.Entry<?, ?> entry : values.entrySet()) {
@@ -247,7 +275,7 @@ public class Utils {
 
     private static StringNameValues getNameValues(String key, Object value, Type type) {
         // 基本类型
-        if (com.github.vizaizai.util.TypeUtils.isBaseType(type, value)) {
+        if (TypeUtils.isBaseType(type, value)) {
             StringNameValues nameValues = new StringNameValues();
             nameValues.add(key,toString(value));
             return nameValues;
