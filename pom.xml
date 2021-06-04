@@ -45,7 +45,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <httpclient.version>4.5.12</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <slf4j-jul.version>1.0.1</slf4j-jul.version>
         <retry.version>1.1.2</retry.version>
         <jackson.version>2.12.1</jackson.version>
