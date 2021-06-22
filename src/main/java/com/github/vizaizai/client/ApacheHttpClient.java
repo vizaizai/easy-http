@@ -101,7 +101,6 @@ public class ApacheHttpClient extends AbstractClient {
         }
         url = this.convertUrl(url, queryParams, bodyType);
         HttpUriRequest httpUriRequest;
-        HttpResponse result = new HttpResponse();
         switch (method) {
             case GET:
                 HttpGet httpGet = new HttpGet(url);
@@ -127,14 +126,15 @@ public class ApacheHttpClient extends AbstractClient {
                 httpUriRequest = httpDelete;
                 break;
             default:
-                result.setMessage("request method is not supported");
-                return result;
+                throw new EasyHttpException("Request method is not supported");
         }
 
         //添加请求头
         if (headers != null) {
             headers.forEach(e-> httpUriRequest.addHeader(e.getName(), e.getValue()));
         }
+        // 返回数据
+        HttpResponse result = new HttpResponse();
         try (CloseableHttpResponse response = httpClient.execute(httpUriRequest)){
             // 响应头
             Header[] allHeaders = response.getAllHeaders();

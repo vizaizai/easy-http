@@ -1,17 +1,17 @@
 package com.github.vizaizai.client;
 
+import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpRequestConfig;
 import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.entity.body.InputStreamBody;
 import com.github.vizaizai.entity.body.RequestBody;
 import com.github.vizaizai.entity.body.RequestBodyType;
-import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
 import com.github.vizaizai.util.value.StringNameValues;
-import com.github.vizaizai.util.VUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -80,6 +80,13 @@ public class DefaultURLClient extends AbstractClient{
         connection.setReadTimeout(config.getRequestTimeout());
         connection.setAllowUserInteraction(false);
         connection.setInstanceFollowRedirects(false);
+        // 如果为PATCH请求，则应该这样写
+        // conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+        // conn.setRequestMethod("POST");
+        if (HttpMethod.PATCH.equals(request.getMethod())) {
+            request.setMethod(HttpMethod.POST);
+            connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+        }
         connection.setRequestMethod(request.getMethod().name());
 
 

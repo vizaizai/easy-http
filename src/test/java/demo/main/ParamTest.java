@@ -2,6 +2,7 @@ package demo.main;
 
 import com.github.vizaizai.EasyHttp;
 import com.github.vizaizai.client.ApacheHttpClient;
+import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.entity.form.FileContent;
 import com.github.vizaizai.entity.form.FormData;
 import com.github.vizaizai.interceptor.LogInterceptor;
@@ -26,8 +27,8 @@ public class ParamTest {
     public void init() {
         paramService = EasyHttp.builder()
                 .url("127.0.0.1:8888")
-                //.client(DefaultURLClient.getInstance())
-                .client(ApacheHttpClient.getInstance())
+                .client(DefaultURLClient.getInstance())
+                //.client(ApacheHttpClient.getInstance())
                 .withInterceptor(new LogInterceptor())
                 .build(ParamService.class);
     }
@@ -82,19 +83,19 @@ public class ParamTest {
 
     @Test
     public void test6() {
-        Book1 book = new Book1();
-        book.setAuthor("吴承恩");
-        book.setLang("chinese");
-        book.setName("西游记");
-        System.out.println(paramService.test6(book));
-
+//        Book1 book = new Book1();
+//        book.setAuthor("吴承恩");
+//        book.setLang("chinese");
+//        book.setName("西游记");
+//        System.out.println(paramService.test6(book));
+//
         Map<String,Object> map = new HashMap<>();
         map.put("author","吴承恩");
         map.put("name","西游记");
         map.put("lang","chinese");
-        System.out.println(paramService.test6_1(map));
-        System.out.println(paramService.test6_1(map));
-        System.out.println(paramService.test6_1(map));
+//        System.out.println(paramService.test6_1(map));
+
+        System.out.println(paramService.test6_2(map));
     }
 
     @Test
