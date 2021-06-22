@@ -1,6 +1,6 @@
 package com.github.vizaizai.entity;
 
-import org.apache.commons.collections.CollectionUtils;
+import com.github.vizaizai.util.VUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +36,7 @@ public class ExcludePath {
         if (!containPath) {
             return false;
         }
-        if (CollectionUtils.isNotEmpty(this.methods)) {
+        if (VUtils.isNotEmpty(this.methods)) {
             return this.methods.stream().anyMatch(e -> e.equals(method));
         }
         return true;

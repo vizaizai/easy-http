@@ -1,7 +1,7 @@
 package com.github.vizaizai.entity.body;
 
 import com.github.vizaizai.entity.ContentType;
-import com.github.vizaizai.util.StringUtils;
+import com.github.vizaizai.util.VUtils;
 
 /**
  * 请求体类型
@@ -37,7 +37,7 @@ public enum RequestBodyType {
     public boolean check(String contentType) {
         switch (this) {
             case NONE:
-               return StringUtils.isBlank(contentType);
+               return VUtils.isBlank(contentType);
             case FORM_DATA:
                 return contentType != null && contentType.contains(ContentType.FORM_DATA);
             case X_WWW_FROM_URL_ENCODED:

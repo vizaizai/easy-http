@@ -7,8 +7,6 @@ import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
 import com.github.vizaizai.util.value.StringNameValue;
 import com.github.vizaizai.util.value.StringNameValues;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 
 import java.beans.BeanInfo;
@@ -91,7 +89,7 @@ public class Utils {
      * @return String
      */
     public static String asUrlEncoded(StringNameValues source, String encode) {
-        if (CollectionUtils.isEmpty(source)) {
+        if (VUtils.isEmpty(source)) {
             return null;
         }
         Iterator<NameValue<String,String>> iterator = source.iterator();
@@ -133,7 +131,7 @@ public class Utils {
     }
 
     public static Charset getCharset(String contentType) {
-        if (StringUtils.isBlank(contentType)) {
+        if (VUtils.isBlank(contentType)) {
             return UTF_8;
         }
         int index = contentType.indexOf(CHARSET_S_F);
@@ -152,7 +150,7 @@ public class Utils {
      * @return path
      */
     public static String formatPlaceholder(String source, Map<String,String> params) {
-        if (MapUtils.isEmpty(params)) {
+        if (VUtils.isEmpty(params)) {
             return source;
         }
         StringBuilder buf = new StringBuilder(source);
@@ -198,7 +196,7 @@ public class Utils {
                                                 .map(Utils::genKeyValue)
                                                 .flatMap(Collection::stream)
                                                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(nameValues)) {
+        if (VUtils.isEmpty(nameValues)) {
             return null;
         }
         HeadersNameValues headersNameValues = new HeadersNameValues();

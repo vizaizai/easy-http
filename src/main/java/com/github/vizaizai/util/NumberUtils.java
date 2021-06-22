@@ -22,7 +22,7 @@ public class NumberUtils {
         if (str == null) {
             return null;
         }
-        if (StringUtils.isBlank(str)) {
+        if (VUtils.isBlank(str)) {
             throw new NumberFormatException("A blank string is not a valid number");
         }
         // Need to deal with all possible hex prefixes here
@@ -292,14 +292,14 @@ public class NumberUtils {
             return null;
         }
         // handle JDK1.3.1 bug where "" throws IndexOutOfBoundsException
-        if (StringUtils.isBlank(str)) {
+        if (VUtils.isBlank(str)) {
             throw new NumberFormatException("A blank string is not a valid number");
         }
         return new BigDecimal(str);
     }
 
     public static boolean isDigits(final String str) {
-        if (StringUtils.isBlank(str)) {
+        if (VUtils.isBlank(str)) {
             return false;
         }
         final int sz = str.length();

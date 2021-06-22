@@ -13,7 +13,7 @@ import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
-import org.apache.commons.collections.CollectionUtils;
+import com.github.vizaizai.util.VUtils;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -168,7 +168,7 @@ public class ApacheHttpClient extends AbstractClient {
      * @return String
      */
     private String convertUrl(String url,  List<BasicNameValuePair> queryParams, RequestBodyType bodyType) {
-        if (CollectionUtils.isEmpty(queryParams) || RequestBodyType.X_WWW_FROM_URL_ENCODED.equals(bodyType)) {
+        if (VUtils.isEmpty(queryParams) || RequestBodyType.X_WWW_FROM_URL_ENCODED.equals(bodyType)) {
             return url;
         }
         try {

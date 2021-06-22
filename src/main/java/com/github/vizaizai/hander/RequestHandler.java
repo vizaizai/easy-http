@@ -21,8 +21,8 @@ import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
-import org.apache.commons.collections.CollectionUtils;
-import com.github.vizaizai.util.StringUtils;
+import com.github.vizaizai.util.VUtils;
+import com.github.vizaizai.util.VUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -209,7 +209,7 @@ public class RequestHandler implements Handler<HttpResponse>{
     private void handleParam() {
         List<Arg> args = argsParser.getArgs(Param.TYPE);
         for (Arg arg : args) {
-            if (arg.isBaseType() && StringUtils.isBlank(arg.getVarName())) {
+            if (arg.isBaseType() && VUtils.isBlank(arg.getVarName())) {
                 throw new IllegalArgumentException("The value of @Param is empty");
             }
             request.addParams(Utils.encodeNameValue(arg.getVarName(),arg.getSource(),arg.getDataType()));
@@ -227,7 +227,7 @@ public class RequestHandler implements Handler<HttpResponse>{
             case RAW:
                 Assert.notNull(arg);
                 // 存在warpRoot
-                if (StringUtils.isNotBlank(arg.getVarName())) {
+                if (VUtils.isNotBlank(arg.getVarName())) {
                     Map<String,Object> wrap = new HashMap<>(1);
                     wrap.put(arg.getVarName(), arg.getSource());
                     this.request.setBody(RequestBody.create(encoder.encode(wrap,arg.getDataType()), arg.getSource(),type));
@@ -311,7 +311,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         if (this.url == null) {
             this.url = "";
         }
-        if (StringUtils.isNotBlank(url) &&
+        if (VUtils.isNotBlank(url) &&
                 !url.startsWith( "http://") && !url.startsWith("https://")) {
             url = "http://" + url;
         }
@@ -330,7 +330,7 @@ public class RequestHandler implements Handler<HttpResponse>{
             bodyType =  this.analysisBodyType();
         }
         // 重设contentType
-        if (StringUtils.isBlank(request.getContentType())) {
+        if (VUtils.isBlank(request.getContentType())) {
             this.setContentType(bodyType);
         }
         // 校验bodyType
@@ -344,7 +344,7 @@ public class RequestHandler implements Handler<HttpResponse>{
     private RequestBodyType analysisBodyType() {
         // 优先根据contentType判断bodyType
         String contentType = methodParser.getContentType();
-        if (StringUtils.isNotBlank(contentType)) {
+        if (VUtils.isNotBlank(contentType)) {
             if (contentType.contains(ContentType.APPLICATION_FORM_URLENCODED)) {
                 // form-urlEncode
                 return RequestBodyType.X_WWW_FROM_URL_ENCODED;
@@ -411,7 +411,7 @@ public class RequestHandler implements Handler<HttpResponse>{
                 break;
             case BINARY:
                 List<Arg> args = argsParser.getArgs(Body.TYPE);
-                if (CollectionUtils.isEmpty(args)) {
+                if (VUtils.isEmpty(args)) {
                     request.setContentType(ContentType.STREAM);
                     break;
                 }

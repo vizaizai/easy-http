@@ -11,7 +11,7 @@ import com.github.vizaizai.util.StreamUtils;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
-import org.apache.commons.collections.CollectionUtils;
+import com.github.vizaizai.util.VUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class LogInterceptor implements HttpInterceptor {
 
         String method = request.getMethod() == null ? "" : request.getMethod().name();
         log.info("请求行: {} {}",method, request.getUrl());
-        if (CollectionUtils.isNotEmpty(request.getHeaders())) {
+        if (VUtils.isNotEmpty(request.getHeaders())) {
             StringBuilder sb = new StringBuilder();
             HeadersNameValues headers = request.getHeaders();
             Set<String> names = headers.names();
@@ -51,7 +51,7 @@ public class LogInterceptor implements HttpInterceptor {
             }
             log.info("请求头: {}", sb);
         }
-        if (CollectionUtils.isNotEmpty(request.getParams())) {
+        if (VUtils.isNotEmpty(request.getParams())) {
             log.info("查询参数: {}", Utils.asUrlEncoded(request.getParams()));
         }
         this.printResponseBody(request);
@@ -141,11 +141,11 @@ public class LogInterceptor implements HttpInterceptor {
             return;
         }
         HeadersNameValues headers = response.getHeaders();
-        if (CollectionUtils.isEmpty(headers)) {
+        if (VUtils.isEmpty(headers)) {
             return;
         }
         List<String> contentTypeHeaders = headers.getHeaders(Utils.CONTENT_TYPE);
-        if (CollectionUtils.isEmpty(contentTypeHeaders)) {
+        if (VUtils.isEmpty(contentTypeHeaders)) {
             return;
         }
         String contentType = contentTypeHeaders.get(0);

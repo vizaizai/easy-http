@@ -7,7 +7,7 @@ import com.github.vizaizai.annotation.Param;
 import com.github.vizaizai.annotation.Var;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.TypeUtils;
-import com.github.vizaizai.util.StringUtils;
+import com.github.vizaizai.util.VUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -142,7 +142,7 @@ public class Arg {
         }else {
             name = "";
         }
-        return StringUtils.isNotBlank(name) ? name : this.argName;
+        return VUtils.isNotBlank(name) ? name : this.argName;
     }
 
     public Object getSource() {
