@@ -80,15 +80,8 @@ public class DefaultURLClient extends AbstractClient{
         connection.setReadTimeout(config.getRequestTimeout());
         connection.setAllowUserInteraction(false);
         connection.setInstanceFollowRedirects(false);
-        // 如果为PATCH请求，则应该这样写
-        // conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
-        // conn.setRequestMethod("POST");
-        if (HttpMethod.PATCH.equals(request.getMethod())) {
-            request.setMethod(HttpMethod.POST);
-            connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
-        }
+        // 不支持PATCH请求
         connection.setRequestMethod(request.getMethod().name());
-
 
         for (NameValue<String,String> nameValue : headers) {
             connection.addRequestProperty(nameValue.getName(), nameValue.getValue());

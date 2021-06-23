@@ -11,10 +11,9 @@ import com.github.vizaizai.entity.body.InputStreamBody;
 import com.github.vizaizai.entity.body.RequestBody;
 import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.exception.EasyHttpException;
+import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
-import com.github.vizaizai.util.VUtils;
-import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -125,8 +124,29 @@ public class ApacheHttpClient extends AbstractClient {
                 httpDelete.setConfig(config);
                 httpUriRequest = httpDelete;
                 break;
+            case PATCH:
+                HttpPatch httpPatch = new HttpPatch(url);
+                httpPatch.setEntity(assembleEntity(request));
+                httpPatch.setConfig(config);
+                httpUriRequest = httpPatch;
+                break;
+            case HEAD:
+                HttpHead httpHead = new HttpHead(url);
+                httpHead.setConfig(config);
+                httpUriRequest = httpHead;
+                break;
+            case OPTIONS:
+                HttpOptions httpOptions = new HttpOptions(url);
+                httpOptions.setConfig(config);
+                httpUriRequest = httpOptions;
+                break;
+            case TRACE:
+                HttpTrace httpTrace = new HttpTrace(url);
+                httpTrace.setConfig(config);
+                httpUriRequest = httpTrace;
+                break;
             default:
-                throw new EasyHttpException("Request method is not supported");
+                throw new EasyHttpException("Request method '" + method.name() +"' is not supported");
         }
 
         //添加请求头

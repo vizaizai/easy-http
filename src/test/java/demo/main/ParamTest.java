@@ -8,6 +8,8 @@ import com.github.vizaizai.entity.form.FormData;
 import com.github.vizaizai.interceptor.LogInterceptor;
 import demo.model.Book1;
 import demo.service.ParamService;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,8 +29,8 @@ public class ParamTest {
     public void init() {
         paramService = EasyHttp.builder()
                 .url("127.0.0.1:8888")
-                .client(DefaultURLClient.getInstance())
-                //.client(ApacheHttpClient.getInstance())
+                //.client(DefaultURLClient.getInstance())
+                .client(ApacheHttpClient.getInstance())
                 .withInterceptor(new LogInterceptor())
                 .build(ParamService.class);
     }
@@ -94,7 +96,7 @@ public class ParamTest {
         map.put("name","西游记");
         map.put("lang","chinese");
 //        System.out.println(paramService.test6_1(map));
-
+        System.out.println(paramService.test6_2(map));
         System.out.println(paramService.test6_2(map));
     }
 
