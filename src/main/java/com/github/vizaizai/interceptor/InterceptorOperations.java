@@ -4,7 +4,7 @@ import com.github.vizaizai.exception.HttpInterceptorException;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpResponse;
-import org.apache.commons.collections.CollectionUtils;
+import com.github.vizaizai.util.VUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ public class InterceptorOperations {
     }
 
     public void addInterceptors(List<HttpInterceptor> interceptors) {
-        if (CollectionUtils.isEmpty(interceptors)) {
+        if (VUtils.isEmpty(interceptors)) {
             return;
         }
         if (this.interceptors.isEmpty()) {
@@ -51,7 +51,7 @@ public class InterceptorOperations {
      * 拦截器排除
      */
     public void exclude(String url, HttpMethod method) {
-        if (CollectionUtils.isEmpty(interceptors)) {
+        if (VUtils.isEmpty(interceptors)) {
             return;
         }
         interceptors.removeIf(e-> e.excludes().stream().anyMatch( n -> n.match(url, method)));
@@ -61,7 +61,7 @@ public class InterceptorOperations {
      * 拦截器排序
      */
     public void ordered() {
-        if (CollectionUtils.isEmpty(interceptors)) {
+        if (VUtils.isEmpty(interceptors)) {
             return;
         }
         this.interceptors = this.interceptors.stream()

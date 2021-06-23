@@ -4,7 +4,7 @@ import com.github.vizaizai.annotation.*;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.MappingInfo;
 import com.github.vizaizai.entity.RetrySettings;
-import org.apache.commons.lang3.StringUtils;
+import com.github.vizaizai.util.VUtils;
 
 import java.lang.annotation.Annotation;
 
@@ -62,7 +62,7 @@ public class Mappings {
             MappingInfo info = new MappingInfo();
             Mapping mapping = ((Mapping) annotation);
             info.setPath(mapping.value());
-            if (StringUtils.isNotBlank(mapping.contentType())) {
+            if (VUtils.isNotBlank(mapping.contentType())) {
                 info.setContentType(mapping.contentType());
             }
             info.setBodyType(mapping.bodyType());
@@ -97,7 +97,7 @@ public class Mappings {
             info.setHttpMethod(HttpMethod.POST);
             info.setInterceptors(post.interceptors());
             info.setBodyType(post.bodyType());
-            if (StringUtils.isNotBlank(post.contentType())) {
+            if (VUtils.isNotBlank(post.contentType())) {
                 info.setContentType(post.contentType());
             }
 
@@ -115,7 +115,7 @@ public class Mappings {
             info.setHttpMethod(HttpMethod.PUT);
             info.setInterceptors(put.interceptors());
             info.setBodyType(put.bodyType());
-            if (StringUtils.isNotBlank(put.contentType())) {
+            if (VUtils.isNotBlank(put.contentType())) {
                 info.setContentType(put.contentType());
             }
 
@@ -133,7 +133,7 @@ public class Mappings {
             info.setHttpMethod(HttpMethod.DELETE);
             info.setInterceptors(delete.interceptors());
             info.setBodyType(delete.bodyType());
-            if (StringUtils.isNotBlank(delete.contentType())) {
+            if (VUtils.isNotBlank(delete.contentType())) {
                 info.setContentType(delete.contentType());
             }
 

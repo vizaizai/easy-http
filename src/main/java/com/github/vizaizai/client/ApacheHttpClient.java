@@ -11,10 +11,9 @@ import com.github.vizaizai.entity.body.InputStreamBody;
 import com.github.vizaizai.entity.body.RequestBody;
 import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.exception.EasyHttpException;
+import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -101,7 +100,6 @@ public class ApacheHttpClient extends AbstractClient {
         }
         url = this.convertUrl(url, queryParams, bodyType);
         HttpUriRequest httpUriRequest;
-        HttpResponse result = new HttpResponse();
         switch (method) {
             case GET:
                 HttpGet httpGet = new HttpGet(url);
@@ -126,15 +124,37 @@ public class ApacheHttpClient extends AbstractClient {
                 httpDelete.setConfig(config);
                 httpUriRequest = httpDelete;
                 break;
+            case PATCH:
+                HttpPatch httpPatch = new HttpPatch(url);
+                httpPatch.setEntity(assembleEntity(request));
+                httpPatch.setConfig(config);
+                httpUriRequest = httpPatch;
+                break;
+            case HEAD:
+                HttpHead httpHead = new HttpHead(url);
+                httpHead.setConfig(config);
+                httpUriRequest = httpHead;
+                break;
+            case OPTIONS:
+                HttpOptions httpOptions = new HttpOptions(url);
+                httpOptions.setConfig(config);
+                httpUriRequest = httpOptions;
+                break;
+            case TRACE:
+                HttpTrace httpTrace = new HttpTrace(url);
+                httpTrace.setConfig(config);
+                httpUriRequest = httpTrace;
+                break;
             default:
-                result.setMessage("request method is not supported");
-                return result;
+                throw new EasyHttpException("Request method '" + method.name() +"' is not supported");
         }
 
         //添加请求头
         if (headers != null) {
             headers.forEach(e-> httpUriRequest.addHeader(e.getName(), e.getValue()));
         }
+        // 返回数据
+        HttpResponse result = new HttpResponse();
         try (CloseableHttpResponse response = httpClient.execute(httpUriRequest)){
             // 响应头
             Header[] allHeaders = response.getAllHeaders();
@@ -168,7 +188,7 @@ public class ApacheHttpClient extends AbstractClient {
      * @return String
      */
     private String convertUrl(String url,  List<BasicNameValuePair> queryParams, RequestBodyType bodyType) {
-        if (CollectionUtils.isEmpty(queryParams) || RequestBodyType.X_WWW_FROM_URL_ENCODED.equals(bodyType)) {
+        if (VUtils.isEmpty(queryParams) || RequestBodyType.X_WWW_FROM_URL_ENCODED.equals(bodyType)) {
             return url;
         }
         try {

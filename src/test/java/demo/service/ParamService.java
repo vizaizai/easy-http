@@ -1,6 +1,7 @@
 package demo.service;
 
 import com.github.vizaizai.annotation.*;
+import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.entity.form.BodyContent;
 import com.github.vizaizai.entity.form.FormBodyParts;
@@ -51,6 +52,9 @@ public interface ParamService {
 
     @Post("/addBookUseJSON")
     String test6_1(@Body Map<String,Object> book);
+
+    @Mapping(value = "/addBookUseJSON", httpMethod = HttpMethod.PATCH)
+    String test6_2(@Body Map<String,Object> book);
 
     @Get("/listBookByIds")
     String test7(String[] ids);

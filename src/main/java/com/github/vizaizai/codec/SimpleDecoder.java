@@ -2,8 +2,8 @@ package com.github.vizaizai.codec;
 
 import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.exception.CodecException;
+import com.github.vizaizai.util.NumberUtils;
 import com.github.vizaizai.util.TypeUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;

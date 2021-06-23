@@ -1,5 +1,6 @@
 package com.github.vizaizai.client;
 
+import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpRequestConfig;
 import com.github.vizaizai.entity.HttpResponse;
@@ -7,11 +8,10 @@ import com.github.vizaizai.entity.body.InputStreamBody;
 import com.github.vizaizai.entity.body.RequestBody;
 import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
 import com.github.vizaizai.util.value.StringNameValues;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -80,8 +80,8 @@ public class DefaultURLClient extends AbstractClient{
         connection.setReadTimeout(config.getRequestTimeout());
         connection.setAllowUserInteraction(false);
         connection.setInstanceFollowRedirects(false);
+        // 不支持PATCH请求
         connection.setRequestMethod(request.getMethod().name());
-
 
         for (NameValue<String,String> nameValue : headers) {
             connection.addRequestProperty(nameValue.getName(), nameValue.getValue());
@@ -118,7 +118,7 @@ public class DefaultURLClient extends AbstractClient{
         }
         // 响应头
         Map<String, List<String>> allHeaders = connection.getHeaderFields();
-        if (MapUtils.isNotEmpty(allHeaders)) {
+        if (VUtils.isNotEmpty(allHeaders)) {
             Set<Map.Entry<String, List<String>>> entries = allHeaders.entrySet();
             HeadersNameValues headersNameValues = new HeadersNameValues();
             for (Map.Entry<String, List<String>> entry : entries) {
@@ -144,7 +144,7 @@ public class DefaultURLClient extends AbstractClient{
      */
     private void addHeaders(HttpRequest request, HeadersNameValues headers) {
 
-        if (CollectionUtils.isNotEmpty(request.getHeaders())) {
+        if (VUtils.isNotEmpty(request.getHeaders())) {
             headers.addAll(request.getHeaders());
         }
         if (request.getContentType() != null) {

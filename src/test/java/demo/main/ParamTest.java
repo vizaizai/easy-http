@@ -4,17 +4,16 @@ import com.github.vizaizai.EasyHttp;
 import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.entity.form.FileContent;
-import com.github.vizaizai.entity.form.FormBodyParts;
 import com.github.vizaizai.entity.form.FormData;
 import com.github.vizaizai.interceptor.LogInterceptor;
 import demo.model.Book1;
-import demo.model.QueryForm;
 import demo.service.ParamService;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,19 +85,19 @@ public class ParamTest {
 
     @Test
     public void test6() {
-        Book1 book = new Book1();
-        book.setAuthor("吴承恩");
-        book.setLang("chinese");
-        book.setName("西游记");
-        System.out.println(paramService.test6(book));
-
+//        Book1 book = new Book1();
+//        book.setAuthor("吴承恩");
+//        book.setLang("chinese");
+//        book.setName("西游记");
+//        System.out.println(paramService.test6(book));
+//
         Map<String,Object> map = new HashMap<>();
         map.put("author","吴承恩");
         map.put("name","西游记");
         map.put("lang","chinese");
-        System.out.println(paramService.test6_1(map));
-        System.out.println(paramService.test6_1(map));
-        System.out.println(paramService.test6_1(map));
+//        System.out.println(paramService.test6_1(map));
+        System.out.println(paramService.test6_2(map));
+        System.out.println(paramService.test6_2(map));
     }
 
     @Test
