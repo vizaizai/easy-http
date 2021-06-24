@@ -48,7 +48,7 @@ public class HttpRequestConfig {
     }
 
     public Charset getEncoding() {
-        return encoding;
+        return encoding == null ? Utils.UTF_8 : encoding;
     }
 
     public void setEncoding(Charset encoding) {

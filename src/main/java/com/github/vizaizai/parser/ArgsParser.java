@@ -1,7 +1,6 @@
 package com.github.vizaizai.parser;
 
 import com.github.vizaizai.annotation.Body;
-import com.github.vizaizai.annotation.Headers;
 import com.github.vizaizai.annotation.Param;
 
 import java.util.List;
