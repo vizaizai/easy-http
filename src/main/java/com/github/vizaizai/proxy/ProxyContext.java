@@ -3,6 +3,7 @@ package com.github.vizaizai.proxy;
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.Encoder;
+import com.github.vizaizai.hander.mapping.PathConverter;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.entity.HttpRequestConfig;
 import com.github.vizaizai.entity.RetrySettings;
@@ -25,6 +26,7 @@ public class ProxyContext<T> {
     private List<HttpInterceptor> interceptors;
     private Executor executor;
     private RetrySettings retrySettings;
+    private PathConverter pathConverter;
 
     public ProxyContext(Class<T> targetClazz) {
         this.targetClazz = targetClazz;
@@ -96,5 +98,13 @@ public class ProxyContext<T> {
 
     public void setRetrySettings(RetrySettings retrySettings) {
         this.retrySettings = retrySettings;
+    }
+
+    public PathConverter getPathConverter() {
+        return pathConverter;
+    }
+
+    public void setPathConverter(PathConverter pathConverter) {
+        this.pathConverter = pathConverter;
     }
 }

@@ -3,6 +3,7 @@ package com.github.vizaizai.parser;
 import com.github.vizaizai.annotation.Mapping;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.hander.mapping.Mappings;
+import com.github.vizaizai.hander.mapping.PathConverter;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.MappingInfo;
@@ -68,13 +69,19 @@ public class MethodParser {
      * 重试设置
      */
     private RetrySettings retrySettings;
+    /**
+     * 路径转换器
+     */
+    private PathConverter pathConverter;
 
-    public static MethodParser doParse(Method target) {
-        return new MethodParser(target);
+    public static MethodParser doParse(Method target, PathConverter pathConverter) {
+        MethodParser methodParser = new MethodParser(target);
+        methodParser.pathConverter = pathConverter;
+        methodParser.parse();
+        return methodParser;
     }
     private MethodParser(Method target) {
         this.target = target;
-        this.parse();
     }
     private void parse() {
         Annotation[] annotations = this.target.getAnnotations();
@@ -94,6 +101,10 @@ public class MethodParser {
         // 解析映射注解上的参数
         MappingInfo mappingInfo = Mappings.getMappingInfo(methodAnnotation);
         this.path = mappingInfo.getPath();
+        // 使用转化器将路径转化
+        if (this.pathConverter != null) {
+            this.path = this.pathConverter.get(path);
+        }
         this.contentType = mappingInfo.getContentType();
         this.httpMethod = mappingInfo.getHttpMethod();
         this.retrySettings = mappingInfo.getRetrySettings();

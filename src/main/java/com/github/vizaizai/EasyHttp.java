@@ -3,6 +3,7 @@ package com.github.vizaizai;
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.codec.*;
+import com.github.vizaizai.hander.mapping.PathConverter;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.entity.HttpRequestConfig;
 import com.github.vizaizai.entity.RetrySettings;
@@ -33,6 +34,7 @@ public class EasyHttp {
         private final List<HttpInterceptor> interceptors;
         private Executor executor;
         private RetrySettings retrySettings;
+        private PathConverter pathConverter;
         public Builder() {
             this.client = ApacheHttpClient.getInstance();
             this.encoder = new JacksonEncoder();
@@ -90,6 +92,10 @@ public class EasyHttp {
             return this.retryable(retries,interval, null);
         }
 
+        public Builder pathConverter(PathConverter pathConverter) {
+            this.pathConverter = pathConverter;
+            return this;
+        }
 
         public <T> T build(Class<T> clazz) {
             ProxyHandler<T> proxyHandler = new ProxyHandler<>(clazz);
@@ -100,6 +106,7 @@ public class EasyHttp {
                              .requestConfig(config)
                              .interceptors(interceptors)
                              .enableRetry(retrySettings)
+                             .pathConverter(pathConverter)
                              .executor(executor);
             return proxyHandler.getProxyImpl();
         }

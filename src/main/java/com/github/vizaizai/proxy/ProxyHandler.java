@@ -4,6 +4,7 @@ package com.github.vizaizai.proxy;
 import com.github.vizaizai.client.AbstractClient;
 import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.Encoder;
+import com.github.vizaizai.hander.mapping.PathConverter;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.entity.HttpRequestConfig;
 import com.github.vizaizai.entity.RetrySettings;
@@ -55,6 +56,10 @@ public class ProxyHandler<T>{
     }
     public ProxyHandler<T> enableRetry(RetrySettings retrySettings) {
         this.proxyContext.setRetrySettings(retrySettings);
+        return this;
+    }
+    public ProxyHandler<T> pathConverter(PathConverter pathConverter) {
+        this.proxyContext.setPathConverter(pathConverter);
         return this;
     }
 }
