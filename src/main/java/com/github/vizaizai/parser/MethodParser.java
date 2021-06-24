@@ -100,11 +100,7 @@ public class MethodParser {
 
         // 解析映射注解上的参数
         MappingInfo mappingInfo = Mappings.getMappingInfo(methodAnnotation);
-        this.path = mappingInfo.getPath();
-        // 使用转化器将路径转化
-        if (this.pathConverter != null) {
-            this.path = this.pathConverter.get(path);
-        }
+        this.path = mappingInfo.getPath(pathConverter);
         this.contentType = mappingInfo.getContentType();
         this.httpMethod = mappingInfo.getHttpMethod();
         this.retrySettings = mappingInfo.getRetrySettings();
