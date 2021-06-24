@@ -1,7 +1,9 @@
 package com.github.vizaizai.entity;
 
+import com.github.vizaizai.hander.mapping.PathConverter;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.entity.body.RequestBodyType;
+import com.github.vizaizai.util.Assert;
 
 /**
  * 映射信息
@@ -34,7 +36,12 @@ public class MappingInfo {
      */
     private RetrySettings retrySettings;
 
-    public String getPath() {
+    public String getPath(PathConverter pathConverter) {
+        // 使用转化器将路径转化
+        if (pathConverter != null) {
+            this.path = pathConverter.get(path);
+        }
+        Assert.notNull(path,"Path must be not null");
         return path;
     }
 
