@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface ReturnService {
 
-    @Get("/listAllBooks")
+    @Get("/listAllBooks1")
     HttpResponse test1();
 
     @Get("/listAllBooks")

@@ -7,6 +7,7 @@ import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.entity.form.FileContent;
 import com.github.vizaizai.entity.form.FormData;
 import com.github.vizaizai.hander.mapping.PathConverter;
+import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book1;
@@ -37,9 +38,10 @@ public class ReturnTest {
             }
         };
         returnService = EasyHttp.builder()
-                .url("127.0.0.1:8888")
+                .url("127.0.0.1:1888")
                 .client(DefaultURLClient.getInstance())
                 //.client(ApacheHttpClient.getInstance())
+                .withInterceptor(new ErrorInterceptor())
                 .withInterceptor(new LogInterceptor())
                 //.pathConverter(pathConverter)
                 .build(ReturnService.class);

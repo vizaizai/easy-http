@@ -47,7 +47,7 @@ public class HttpHandler implements Handler<Object>, Context{
             try {
                 result = new RetryHandler(this).execute();
                 RetryLimiter.delete(url);
-            }catch (Exception e) {
+            }catch (RuntimeException | Error e) {
                 // 重试全部失败，记录失败时间
                 RetryLimiter.add(url);
                 throw e;

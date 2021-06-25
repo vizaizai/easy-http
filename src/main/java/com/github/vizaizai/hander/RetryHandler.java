@@ -38,7 +38,7 @@ public class RetryHandler implements Handler<Object>{
             Object result = httpHandler.doHttp();
             // 执行触发器，判断是否重试
             if (retryTrigger.retryable(context)) {
-                throw new EasyHttpException(context.getResponse().getMessage());
+                throw new EasyHttpException(context.getResponse().getCause());
             }
             return result;
         });
