@@ -38,8 +38,8 @@ public class ReturnTest {
             }
         };
         returnService = EasyHttp.builder()
-                .url("127.0.0.1:1888")
-                .client(DefaultURLClient.getInstance())
+                .url("127.0.0.1:8888")
+                .client(ApacheHttpClient.getInstance())
                 //.client(ApacheHttpClient.getInstance())
                 .withInterceptor(new ErrorInterceptor())
                 .withInterceptor(new LogInterceptor())
