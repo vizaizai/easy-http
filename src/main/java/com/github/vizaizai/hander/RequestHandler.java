@@ -22,7 +22,6 @@ import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.VUtils;
-import com.github.vizaizai.util.VUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -39,6 +38,8 @@ import java.util.Map;
  * @date 2020/7/30 17:11
  */
 public class RequestHandler implements Handler<HttpResponse>{
+    public static final String HTTP = "http://";
+    public static final String HTTPS = "https://";
     /**
      * 请求基本路径
      */
@@ -200,7 +201,12 @@ public class RequestHandler implements Handler<HttpResponse>{
                 pathParams.put(key,value);
             }
         }
-        this.request.setUrl(this.url + Utils.formatPlaceholder(path,pathParams));
+        String formatPath = Utils.formatPlaceholder(path, pathParams);
+        if(VUtils.isNotBlank(formatPath) && (formatPath.startsWith(HTTP) || formatPath.startsWith(HTTPS))) {
+            this.request.setUrl(formatPath);
+            return;
+        }
+        this.request.setUrl(this.url + formatPath);
     }
 
     /**
@@ -312,8 +318,8 @@ public class RequestHandler implements Handler<HttpResponse>{
             this.url = "";
         }
         if (VUtils.isNotBlank(url) &&
-                !url.startsWith( "http://") && !url.startsWith("https://")) {
-            url = "http://" + url;
+                !url.startsWith(HTTP) && !url.startsWith(HTTPS)) {
+            url = HTTP + url;
         }
     }
 
