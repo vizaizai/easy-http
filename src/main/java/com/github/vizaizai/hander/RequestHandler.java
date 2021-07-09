@@ -90,7 +90,7 @@ public class RequestHandler implements Handler<HttpResponse>{
         // 接口解析
         InterfaceParser interfaceParser = InterfaceParser.doParse(proxyContext.getTargetClazz());
         // 方法解析
-        MethodParser methodParser = MethodParser.doParse(method, proxyContext.getPathConverter());
+        MethodParser methodParser = MethodParser.doParse(method, proxyContext);
         // 参数解析
         List<Arg> argList = new LinkedList<>();
         for (int i = 0; args != null && i < args.length; i++) {

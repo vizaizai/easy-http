@@ -1,17 +1,6 @@
 package com.github.vizaizai.proxy;
 
 
-import com.github.vizaizai.client.AbstractClient;
-import com.github.vizaizai.codec.Decoder;
-import com.github.vizaizai.codec.Encoder;
-import com.github.vizaizai.hander.mapping.PathConverter;
-import com.github.vizaizai.interceptor.HttpInterceptor;
-import com.github.vizaizai.entity.HttpRequestConfig;
-import com.github.vizaizai.entity.RetrySettings;
-
-import java.util.List;
-import java.util.concurrent.Executor;
-
 /**
  * @author liaochongwei
  * @date 2020/7/30 14:09
@@ -22,44 +11,12 @@ public class ProxyHandler<T>{
         proxyContext = new ProxyContext<>(targetClazz);
     }
 
+    public ProxyContext<T> getProxyContext() {
+        return proxyContext;
+    }
+
     public T getProxyImpl() {
         return new JDKProxy<>(this.proxyContext).getProxy();
     }
 
-    public ProxyHandler<T> client(AbstractClient client) {
-        this.proxyContext.setClient(client);
-        return this;
-    }
-    public ProxyHandler<T> url(String url) {
-        this.proxyContext.setUrl(url);
-        return this;
-    }
-    public ProxyHandler<T> encoder(Encoder encoder) {
-        this.proxyContext.setEncoder(encoder);
-        return this;
-    }
-    public ProxyHandler<T> decoder(Decoder decoder) {
-        this.proxyContext.setDecoder(decoder);
-        return this;
-    }
-    public ProxyHandler<T> requestConfig(HttpRequestConfig requestConfig) {
-        this.proxyContext.setRequestConfig(requestConfig);
-        return this;
-    }
-    public ProxyHandler<T> interceptors(List<HttpInterceptor> interceptors) {
-        this.proxyContext.setInterceptors(interceptors);
-        return this;
-    }
-    public ProxyHandler<T> executor(Executor executor) {
-        this.proxyContext.setExecutor(executor);
-        return this;
-    }
-    public ProxyHandler<T> enableRetry(RetrySettings retrySettings) {
-        this.proxyContext.setRetrySettings(retrySettings);
-        return this;
-    }
-    public ProxyHandler<T> pathConverter(PathConverter pathConverter) {
-        this.proxyContext.setPathConverter(pathConverter);
-        return this;
-    }
 }

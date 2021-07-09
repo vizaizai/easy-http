@@ -5,7 +5,10 @@ import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.entity.form.FileContent;
 import com.github.vizaizai.entity.form.FormData;
+import com.github.vizaizai.interceptor.HttpInterceptor;
+import com.github.vizaizai.interceptor.InterceptorGenerator;
 import com.github.vizaizai.interceptor.LogInterceptor;
+import demo.interceptor.ResultInterceptor;
 import demo.model.Book1;
 import demo.service.ParamService;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -31,12 +34,16 @@ public class ParamTest {
                 .url("127.0.0.1:8888")
                 //.client(DefaultURLClient.getInstance())
                 .client(ApacheHttpClient.getInstance())
-                .withInterceptor(new LogInterceptor())
+                //.withInterceptor(new LogInterceptor())
                 .build(ParamService.class);
     }
     @Test
     public void test1() {
-        System.out.println(paramService.test1());
+        long s = System.currentTimeMillis();
+        for (int i = 0; i < 2; i++) {
+            paramService.test1();
+        }
+        System.out.println("总耗时：" + (System.currentTimeMillis() - s)  + "ms");
     }
     @Test
     public void test2() {

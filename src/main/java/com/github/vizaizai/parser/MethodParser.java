@@ -1,14 +1,17 @@
 package com.github.vizaizai.parser;
 
 import com.github.vizaizai.annotation.Mapping;
-import com.github.vizaizai.exception.EasyHttpException;
-import com.github.vizaizai.hander.mapping.Mappings;
-import com.github.vizaizai.hander.mapping.PathConverter;
-import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.MappingInfo;
 import com.github.vizaizai.entity.RetrySettings;
 import com.github.vizaizai.entity.body.RequestBodyType;
+import com.github.vizaizai.exception.EasyHttpException;
+import com.github.vizaizai.hander.mapping.Mappings;
+import com.github.vizaizai.hander.mapping.PathConverter;
+import com.github.vizaizai.interceptor.DefaultInterceptorGenerator;
+import com.github.vizaizai.interceptor.HttpInterceptor;
+import com.github.vizaizai.interceptor.InterceptorGenerator;
+import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.util.TypeUtils;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.value.HeadersNameValues;
@@ -69,21 +72,17 @@ public class MethodParser {
      * 重试设置
      */
     private RetrySettings retrySettings;
-    /**
-     * 路径转换器
-     */
-    private PathConverter pathConverter;
 
-    public static MethodParser doParse(Method target, PathConverter pathConverter) {
+
+    public static MethodParser doParse(Method target, ProxyContext<?> proxyContext) {
         MethodParser methodParser = new MethodParser(target);
-        methodParser.pathConverter = pathConverter;
-        methodParser.parse();
+        methodParser.parse(proxyContext);
         return methodParser;
     }
     private MethodParser(Method target) {
         this.target = target;
     }
-    private void parse() {
+    private void parse(ProxyContext<?> proxyContext) {
         Annotation[] annotations = this.target.getAnnotations();
 
         List<Annotation> methodAnnotations = this.selectMethodAnnotations(annotations);
@@ -100,7 +99,7 @@ public class MethodParser {
 
         // 解析映射注解上的参数
         MappingInfo mappingInfo = Mappings.getMappingInfo(methodAnnotation);
-        this.path = mappingInfo.getPath(pathConverter);
+        this.path = mappingInfo.getPath(proxyContext.getPathConverter());
         this.contentType = mappingInfo.getContentType();
         this.httpMethod = mappingInfo.getHttpMethod();
         this.retrySettings = mappingInfo.getRetrySettings();
@@ -108,7 +107,7 @@ public class MethodParser {
         interceptorClasses = mappingInfo.getInterceptors();
 
         // 添加拦截器
-        this.addInterceptorsOnPath(interceptorClasses);
+        this.addInterceptorsFromPath(interceptorClasses, proxyContext.getInterceptorGenerator());
         // 请求头注解
         this.headers = Utils.getHeaders(annotations);
         // 计算路径变量
@@ -121,23 +120,20 @@ public class MethodParser {
      * 添加路径上的拦截器
      * @param classes classes
      */
-    private void addInterceptorsOnPath(Class<? extends HttpInterceptor>[] classes){
+    private void addInterceptorsFromPath(Class<? extends HttpInterceptor>[] classes, InterceptorGenerator interceptorGenerator){
         if (classes == null || classes.length == 0) {
             return;
         }
-        try {
-            for (Class<? extends HttpInterceptor> clazz : classes) {
-                if (this.interceptors == null) {
-                    this.interceptors = new ArrayList<>();
-                }
-                this.interceptors.add(clazz.newInstance());
-
-            }
-        }catch (Exception ex) {
-            throw new EasyHttpException("Instance 'interceptor' creation error", ex);
+        if (interceptorGenerator == null) {
+            interceptorGenerator = DefaultInterceptorGenerator.getGenerator();
         }
 
-
+        for (Class<? extends HttpInterceptor> clazz : classes) {
+            if (this.interceptors == null) {
+                this.interceptors = new ArrayList<>();
+            }
+            this.interceptors.add(interceptorGenerator.get(clazz));
+        }
     }
     /**
      * 选择请求方式注解

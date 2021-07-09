@@ -7,6 +7,8 @@ import com.github.vizaizai.hander.mapping.PathConverter;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.entity.HttpRequestConfig;
 import com.github.vizaizai.entity.RetrySettings;
+import com.github.vizaizai.interceptor.InterceptorGenerator;
+import com.github.vizaizai.proxy.ProxyContext;
 import com.github.vizaizai.proxy.ProxyHandler;
 import com.github.vizaizai.retry.RetryTrigger;
 
@@ -35,6 +37,7 @@ public class EasyHttp {
         private Executor executor;
         private RetrySettings retrySettings;
         private PathConverter pathConverter;
+        private InterceptorGenerator interceptorGenerator;
         public Builder() {
             this.client = ApacheHttpClient.getInstance();
             this.encoder = new JacksonEncoder();
@@ -97,17 +100,26 @@ public class EasyHttp {
             return this;
         }
 
+        public Builder interceptorGenerator(InterceptorGenerator interceptorGenerator) {
+            this.interceptorGenerator = interceptorGenerator;
+            return this;
+        }
+
         public <T> T build(Class<T> clazz) {
             ProxyHandler<T> proxyHandler = new ProxyHandler<>(clazz);
-            proxyHandler.client(client)
-                             .url(url)
-                             .decoder(decoder)
-                             .encoder(encoder)
-                             .requestConfig(config)
-                             .interceptors(interceptors)
-                             .enableRetry(retrySettings)
-                             .pathConverter(pathConverter)
-                             .executor(executor);
+            ProxyContext<T> proxyContext = proxyHandler.getProxyContext();
+
+            proxyContext.setClient(client);
+            proxyContext.setUrl(url);
+            proxyContext.setDecoder(decoder);
+            proxyContext.setEncoder(encoder);
+            proxyContext.setRequestConfig(config);
+            proxyContext.setInterceptors(interceptors);
+            proxyContext.setRetrySettings(retrySettings);
+            proxyContext.setPathConverter(pathConverter);
+            proxyContext.setExecutor(executor);
+            proxyContext.setInterceptorGenerator(interceptorGenerator);
+
             return proxyHandler.getProxyImpl();
         }
 
