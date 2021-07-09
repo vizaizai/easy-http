@@ -6,6 +6,10 @@ import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.entity.form.BodyContent;
 import com.github.vizaizai.entity.form.FormBodyParts;
 import com.github.vizaizai.entity.form.FormData;
+import com.github.vizaizai.hander.RequestHandler;
+import com.github.vizaizai.interceptor.ErrorInterceptor;
+import com.github.vizaizai.interceptor.LogInterceptor;
+import demo.interceptor.RequestHeadersInterceptor;
 import demo.model.Book1;
 import demo.model.QueryForm;
 
@@ -20,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 public interface ParamService {
 
     @Headers("key: 123123")
-    @Get("/listAllBooks")
+    @Get(value = "/listAllBooks",interceptors = {LogInterceptor.class, ErrorInterceptor.class, RequestHeadersInterceptor.class})
     String test1();
 
     @Get("/getBookById/{id}")
