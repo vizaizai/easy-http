@@ -58,6 +58,7 @@ public interface ParamService {
     String test6_1(@Body Map<String,Object> book);
 
     @Mapping(value = "/addBookUseJSON", httpMethod = HttpMethod.PATCH)
+    @Headers("key: 1231231")
     String test6_2(@Body Map<String,Object> book);
 
     @Get("/listBookByIds")

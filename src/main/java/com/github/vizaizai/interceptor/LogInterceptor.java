@@ -9,11 +9,12 @@ import com.github.vizaizai.entity.form.FormBodyParts;
 import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.util.StreamUtils;
 import com.github.vizaizai.util.Utils;
+import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
-import com.github.vizaizai.util.VUtils;
 import org.slf4j.Logger;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ public class LogInterceptor implements HttpInterceptor {
     private static final String[] TEXT_TYPES = new String[] {
             "text/xml","application/xm", "text/plain","application/json"
     };
+    private static final String LINE_SEPARATOR = System.lineSeparator();
     @Override
     public boolean preHandle(HttpRequest request) {
         request.setStartTime(System.currentTimeMillis());
@@ -36,7 +38,13 @@ public class LogInterceptor implements HttpInterceptor {
         }
 
         String method = request.getMethod() == null ? "" : request.getMethod().name();
-        log.info("请求行: {} {}",method, request.getUrl());
+
+        StringBuilder logText = new StringBuilder();
+        // 请求行
+        logText.append(LINE_SEPARATOR);
+        logText.append(MessageFormat.format("> 请求行: {0} {1}",method, request.getUrl()));
+
+        // 请求头
         if (VUtils.isNotEmpty(request.getHeaders())) {
             StringBuilder sb = new StringBuilder();
             HeadersNameValues headers = request.getHeaders();
@@ -49,12 +57,17 @@ public class LogInterceptor implements HttpInterceptor {
                 sb.deleteCharAt(sb.length() - 1);
                 sb.append(" ");
             }
-            log.info("请求头: {}", sb);
+            logText.append(LINE_SEPARATOR);
+            logText.append(MessageFormat.format("> 请求头: {0}", sb.toString()));
         }
+        // 查询参数
         if (VUtils.isNotEmpty(request.getParams())) {
-            log.info("查询参数: {}", Utils.asUrlEncoded(request.getParams()));
+            logText.append(LINE_SEPARATOR);
+            logText.append(MessageFormat.format("> 查询参数: {0}", Utils.asUrlEncoded(request.getParams())));
         }
-        this.printResponseBody(request);
+        // 请求体
+        this.printResponseBody(request,logText);
+        log.info(Utils.unicodeToString(logText.toString()));
         return true;
     }
 
@@ -64,9 +77,18 @@ public class LogInterceptor implements HttpInterceptor {
         if (!log.isInfoEnabled()) {
             return;
         }
-        log.info("请求响应: {} [{}]:{} ",request.getUrl(), response.getStatusCode(), text(response.getMessage()));
-        this.printResponseBody(response);
-        log.info("耗时: {}ms", endTime - request.getStartTime());
+        StringBuilder logText = new StringBuilder();
+        // 响应头
+        logText.append(LINE_SEPARATOR);
+        logText.append(MessageFormat.format("> 请求响应: {0} [{1}]:{2} ",request.getUrl(), response.getStatusCode(), text(response.getMessage())));
+
+        // 响应体
+        this.printResponseBody(response, logText);
+
+        // 耗时
+        logText.append(LINE_SEPARATOR);
+        logText.append(MessageFormat.format("> 耗时: {0}ms", endTime - request.getStartTime()));
+        log.info(Utils.unicodeToString(logText.toString()));
     }
 
     private static String text(Object o) {
@@ -76,7 +98,7 @@ public class LogInterceptor implements HttpInterceptor {
     /**
      * 打印请求体
      */
-    private void printResponseBody(HttpRequest request) {
+    private void printResponseBody(HttpRequest request,StringBuilder logText) {
         if (request.getBody() == null || RequestBodyType.NONE.equals(request.getBody().getType())) {
             return;
         }
@@ -86,14 +108,16 @@ public class LogInterceptor implements HttpInterceptor {
                 if (request.getBody().getContent() == null) {
                     return;
                 }
-                log.info("请求体: {}", request.getBody().getContent().asString(request.getEncoding()));
+                logText.append(LINE_SEPARATOR);
+                logText.append(MessageFormat.format("> 请求体: {0}", request.getBody().getContent().asString(request.getEncoding())));
                 return;
             }
             if (RequestBodyType.X_WWW_FROM_URL_ENCODED.equals(type)) {
                 if (request.getBody().getContent() == null) {
                     return;
                 }
-                log.info("请求体: x-www-form-urlencoded[{}]", request.getBody().getContent().asString(request.getEncoding()));
+                logText.append(LINE_SEPARATOR);
+                logText.append(MessageFormat.format("> 请求体: x-www-form-urlencoded[{0}]", request.getBody().getContent().asString(request.getEncoding())));
                 return;
             }
 
@@ -102,33 +126,34 @@ public class LogInterceptor implements HttpInterceptor {
                     return;
                 }
                 FormBodyParts parts = (FormBodyParts) request.getBody().getSource();
-                StringBuilder logText = new StringBuilder("请求体: form-data[");
+                logText.append(LINE_SEPARATOR);
+                logText.append("> 请求体: form-data[");
                 for (NameValue<String, BodyContent> nameValue : parts) {
                     BodyContent bodyContent = nameValue.getValue();
                     String name = nameValue.getName();
                     logText.append(name);
-                    logText.append("=");
                     if (bodyContent.isFile()) {
-                        logText.append("\"FILE");
+                        logText.append("(File)");
+                        logText.append("=");
                         if (bodyContent.getFilename() != null) {
-                            logText.append("-");
                             logText.append(bodyContent.getFilename());
                         }
-                        logText.append("\"");
                     }else {
+                        logText.append("=");
                         logText.append(StreamUtils.copyToString(bodyContent.getInputStream(), request.getEncoding()));
                     }
-                    logText.append(" ");
+                    logText.append(",");
                 }
-                if (logText.substring(logText.length() - 1).equals(" ")) {
+                if (logText.substring(logText.length() - 1).equals(",")) {
                     logText.deleteCharAt(logText.length() - 1);
                 }
                 logText.append("]");
-                log.info("{},长度：{}",logText, parts.getLength(request.getEncoding()));
+                logText.append(MessageFormat.format(", 大小: {0}字节", parts.getLength(request.getEncoding())));
                 return;
             }
             if (RequestBodyType.BINARY.equals(type)) {
-                log.info("请求体: binary");
+                logText.append(LINE_SEPARATOR);
+                logText.append("> 请求体: binary");
             }
         }catch (Exception ignored) {}
     }
@@ -136,7 +161,7 @@ public class LogInterceptor implements HttpInterceptor {
     /**
      * 打印响应体
      */
-    private void printResponseBody(HttpResponse response) {
+    private void printResponseBody(HttpResponse response,StringBuilder logText) {
         if (response.getBody()== null || !response.getBody().isRepeatable()) {
             return;
         }
@@ -152,7 +177,8 @@ public class LogInterceptor implements HttpInterceptor {
         for (String textType : TEXT_TYPES) {
            if ( contentType!= null && contentType.contains(textType)) {
                try {
-                   log.info("响应体: {}", text(response.getBody().asString(response.getEncoding())));
+                   logText.append(LINE_SEPARATOR);
+                   logText.append(MessageFormat.format("> 响应体: {0}", text(response.getBody().asString(response.getEncoding()))));
                }catch (Exception ignored) {
                }
                return;

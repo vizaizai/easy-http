@@ -17,6 +17,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +36,7 @@ public class ParamTest {
                 .url("127.0.0.1:8888")
                 //.client(DefaultURLClient.getInstance())
                 .client(ApacheHttpClient.getInstance())
-                //.withInterceptor(new LogInterceptor())
+                .withInterceptor(new LogInterceptor())
                 .build(ParamService.class);
     }
     @Test
@@ -117,14 +119,15 @@ public class ParamTest {
     }
 
     @Test
-    public void test8() {
+    public void test8() throws FileNotFoundException {
         FormData formData = new FormData();
         formData.addText("author","吴承恩");
         formData.addText("name","西游记");
         formData.addText("lang","chinese");
         formData.addFile("files", new File("C:\\Users\\dell\\Desktop\\logo.png"));
-        formData.addFile("files", new File("C:\\Users\\dell\\Desktop\\Dingtalk_20210317145859.jpg"));
-        formData.addFile("files", new File("C:\\Users\\dell\\Desktop\\jsd_pro_back.rar"));
+        formData.addInputStream("files", new FileInputStream("C:\\Users\\dell\\Desktop\\logo.png"));
+//        formData.addFile("files", new File("C:\\Users\\dell\\Desktop\\Dingtalk_20210317145859.jpg"));
+//        formData.addFile("files", new File("C:\\Users\\dell\\Desktop\\jsd_pro_back.rar"));
         System.out.println(paramService.test8(formData));
     }
 

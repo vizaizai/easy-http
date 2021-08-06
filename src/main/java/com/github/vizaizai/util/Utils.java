@@ -7,6 +7,8 @@ import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
 import com.github.vizaizai.util.value.StringNameValue;
 import com.github.vizaizai.util.value.StringNameValues;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.StrBuilder;
 import org.slf4j.Logger;
 
 import java.beans.BeanInfo;
@@ -356,5 +358,46 @@ public class Utils {
             buffer.append(MULTIPART_CHARS[rand.nextInt(MULTIPART_CHARS.length)]);
         }
         return buffer.toString();
+    }
+
+
+    /**
+     * unicode字符串转化成普通字符串
+     * @param unicode unicode
+     * @return 普通字符串
+     */
+    public static String unicodeToString(String unicode) {
+        if (StringUtils.isBlank(unicode)) {
+            return unicode;
+        }
+
+        final int len = unicode.length();
+        StringBuilder sb = new StringBuilder();
+        int i;
+        int pos = 0;
+        while ((i = StringUtils.indexOfIgnoreCase(unicode, "\\u", pos)) != -1) {
+            sb.append(unicode, pos, i);//写入Unicode符之前的部分
+            pos = i;
+            if (i + 5 < len) {
+                char c;
+                try {
+                    c = (char) Integer.parseInt(unicode.substring(i + 2, i + 6), 16);
+                    sb.append(c);
+                    pos = i + 6;//跳过整个Unicode符
+                } catch (NumberFormatException e) {
+                    //非法Unicode符，跳过
+                    sb.append(unicode, pos, i + 2);//写入"\\u"
+                    pos = i + 2;
+                }
+            } else {
+                pos = i;//非Unicode符，结束
+                break;
+            }
+        }
+
+        if (pos < len) {
+            sb.append(unicode, pos, len);
+        }
+        return sb.toString();
     }
 }
