@@ -75,4 +75,10 @@ public interface ParamService {
 
     @Post("/upload/e-book/{id}")
     String test9(@Var String id, @Body BodyContent bodyContent);
+
+    @Post("/upload/e-book")
+    String test10(@Param String id1,@Param String id2,@Body Book1 book1);
+
+    @Post("/upload/e-book")
+    String test10_1(@Param Book1 book,@Body Book1 book1);
 }

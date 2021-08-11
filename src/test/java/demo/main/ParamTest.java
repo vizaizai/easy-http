@@ -135,4 +135,20 @@ public class ParamTest {
     public void test9() {
         System.out.println(paramService.test9("123",FileContent.of(new File("C:\\Users\\dell\\Desktop\\jsd_pro_back.rar"))));
     }
+
+    @Test
+    public void test10() {
+        Book1 book1 = new Book1();
+        book1.setName("123123");
+        //System.out.println(paramService.test10("123","456",book1));
+
+        Book1 book = new Book1();
+        book.setId("egeg");
+        book.setLang("www");
+        book.setName("ss");
+        book.setAuthor("wfg");
+
+        System.out.println(paramService.test10_1(book,book1));
+    }
+
 }
