@@ -15,16 +15,15 @@ import java.util.stream.Collectors;
  * @date 2020/8/31 17:11
  */
 public class InterceptorOperations {
-    private List<HttpInterceptor> interceptors;
+    private List<HttpInterceptor> interceptors = new ArrayList<>();
     private InterceptorOperations() {
     }
     public static InterceptorOperations create(List<HttpInterceptor> interceptors) {
         InterceptorOperations operation = new InterceptorOperations();
         if (interceptors == null) {
-            operation.interceptors = Collections.emptyList();
-        }else {
-            operation.interceptors = interceptors;
+            return operation;
         }
+        operation.interceptors.addAll(interceptors);
         return operation;
     }
 
@@ -32,18 +31,12 @@ public class InterceptorOperations {
         if (interceptors == null) {
             return;
         }
-        if (this.interceptors.isEmpty()) {
-            this.interceptors = new ArrayList<>();
-        }
         this.interceptors.addAll(Arrays.asList(interceptors));
     }
 
     public void addInterceptors(List<HttpInterceptor> interceptors) {
         if (VUtils.isEmpty(interceptors)) {
             return;
-        }
-        if (this.interceptors.isEmpty()) {
-            this.interceptors = new ArrayList<>();
         }
         this.interceptors.addAll(interceptors);
     }

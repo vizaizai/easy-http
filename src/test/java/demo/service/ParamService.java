@@ -33,7 +33,7 @@ public interface ParamService {
     @Get(value = "/listBooks")
     String test3(@Param String author, @Param String lang);
 
-    @Get(value = "/listBooks")
+    @Get(value = "/listBooks", interceptors = LogInterceptor.class)
     String test3_1(Map<String,String> params);
 
     @Get(value = "/listBooks")

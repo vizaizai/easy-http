@@ -5,6 +5,7 @@ import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.entity.form.FileContent;
 import com.github.vizaizai.entity.form.FormData;
+import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.interceptor.InterceptorGenerator;
 import com.github.vizaizai.interceptor.LogInterceptor;
@@ -36,7 +37,7 @@ public class ParamTest {
                 .url("127.0.0.1:8888")
                 //.client(DefaultURLClient.getInstance())
                 .client(ApacheHttpClient.getInstance())
-                .withInterceptor(new LogInterceptor())
+                .withInterceptor(new ErrorInterceptor())
                 .build(ParamService.class);
     }
     @Test
