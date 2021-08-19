@@ -12,7 +12,7 @@ import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.entity.form.BodyContent;
 import com.github.vizaizai.entity.form.FormBodyParts;
 import com.github.vizaizai.entity.form.FormData;
-import com.github.vizaizai.interceptor.InterceptorOperations;
+import com.github.vizaizai.interceptor.InterceptorExecutor;
 import com.github.vizaizai.parser.Arg;
 import com.github.vizaizai.parser.ArgsParser;
 import com.github.vizaizai.parser.InterfaceParser;
@@ -65,9 +65,9 @@ public class RequestHandler implements Handler<HttpResponse>{
      */
     private HttpRequest request;
     /**
-     * 拦截操作
+     * 拦截执行器
      */
-    private InterceptorOperations interceptorOps;
+    private InterceptorExecutor interceptorExecutor;
     /**
      * 请求配置
      */
@@ -108,11 +108,10 @@ public class RequestHandler implements Handler<HttpResponse>{
         handler.methodParser = methodParser;
         handler.retrySettings = proxyContext.getRetrySettings();
 
-        // 拦截器
-        handler.interceptorOps = InterceptorOperations.create(proxyContext.getInterceptors());
-
+        // 拦截执行器
+        handler.interceptorExecutor = InterceptorExecutor.create(proxyContext.getInterceptors());
         // 添加方法级别的拦截器
-        handler.interceptorOps.addInterceptors(methodParser.getInterceptors());
+        handler.interceptorExecutor.addInterceptors(methodParser.getInterceptors());
 
         // 初始化请求
         handler.initRequest();
@@ -180,11 +179,11 @@ public class RequestHandler implements Handler<HttpResponse>{
      */
     private void doInterceptor() {
         // 排除
-        interceptorOps.exclude(this.request.getUrl(), this.request.getMethod());
+        interceptorExecutor.exclude(this.request.getUrl(), this.request.getMethod());
         // 排序
-        interceptorOps.ordered();
+        interceptorExecutor.ordered();
         // 执行前置过滤器
-        interceptorOps.doPreInterceptors(this.request);
+        interceptorExecutor.doPreInterceptors(this.request);
     }
     /**
      * 处理path
@@ -468,8 +467,8 @@ public class RequestHandler implements Handler<HttpResponse>{
         return client;
     }
 
-    public InterceptorOperations getInterceptorOps() {
-        return interceptorOps;
+    public InterceptorExecutor getInterceptorExecutor() {
+        return interceptorExecutor;
     }
 
     public RetrySettings getRetrySettings() {

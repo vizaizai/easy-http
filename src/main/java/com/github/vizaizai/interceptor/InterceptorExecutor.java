@@ -1,52 +1,41 @@
 package com.github.vizaizai.interceptor;
 
-import com.github.vizaizai.exception.HttpInterceptorException;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpResponse;
+import com.github.vizaizai.exception.HttpInterceptorException;
 import com.github.vizaizai.util.VUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 拦截器执行工具
+ * 拦截执行器
  * @author liaochongwei
  * @date 2020/8/31 17:11
  */
-public class InterceptorOperations {
-    private List<HttpInterceptor> interceptors;
-    private InterceptorOperations() {
+public class InterceptorExecutor {
+    private List<HttpInterceptor> interceptors = new ArrayList<>();
+    private InterceptorExecutor() {
     }
-    public static InterceptorOperations create(List<HttpInterceptor> interceptors) {
-        InterceptorOperations operation = new InterceptorOperations();
+    public static InterceptorExecutor create(List<HttpInterceptor> interceptors) {
+        InterceptorExecutor operation = new InterceptorExecutor();
         if (interceptors == null) {
-            operation.interceptors = Collections.emptyList();
-        }else {
-            operation.interceptors = interceptors;
+            return operation;
         }
+        operation.interceptors.addAll(interceptors);
         return operation;
-    }
-
-    public void addInterceptors(HttpInterceptor ...interceptors) {
-        if (interceptors == null) {
-            return;
-        }
-        if (this.interceptors.isEmpty()) {
-            this.interceptors = new ArrayList<>();
-        }
-        this.interceptors.addAll(Arrays.asList(interceptors));
     }
 
     public void addInterceptors(List<HttpInterceptor> interceptors) {
         if (VUtils.isEmpty(interceptors)) {
             return;
         }
-        if (this.interceptors.isEmpty()) {
-            this.interceptors = new ArrayList<>();
-        }
         this.interceptors.addAll(interceptors);
     }
+
     /**
      * 拦截器排除
      */

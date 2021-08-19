@@ -3,7 +3,7 @@ package com.github.vizaizai.hander;
 import com.github.vizaizai.codec.Decoder;
 import com.github.vizaizai.codec.SimpleDecoder;
 import com.github.vizaizai.exception.EasyHttpException;
-import com.github.vizaizai.interceptor.InterceptorOperations;
+import com.github.vizaizai.interceptor.InterceptorExecutor;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.proxy.ProxyContext;
@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 public class ResponseHandler implements Handler<Object>{
     private HttpRequest request;
     private HttpResponse response;
-    private InterceptorOperations interceptorOps;
+    private InterceptorExecutor interceptorExecutor;
     private Decoder decoder;
     private Type returnType;
 
@@ -44,7 +44,7 @@ public class ResponseHandler implements Handler<Object>{
         handler.request = requestHandler.getRequest();
         handler.returnType = TypeUtils.getDecodeType(returnType);
         handler.decoder = proxyContext.getDecoder();
-        handler.interceptorOps = requestHandler.getInterceptorOps();
+        handler.interceptorExecutor = requestHandler.getInterceptorExecutor();
         return handler;
     }
 
@@ -54,7 +54,7 @@ public class ResponseHandler implements Handler<Object>{
             throw new EasyHttpException("Response is null");
         }
         // 执行后置拦截
-        interceptorOps.doPostInterceptors(this.request, this.response);
+        interceptorExecutor.doPostInterceptors(this.request, this.response);
         // 返回类型为HttpResponse
         if (TypeUtils.equals(this.returnType, HttpResponse.class)) {
             return response;

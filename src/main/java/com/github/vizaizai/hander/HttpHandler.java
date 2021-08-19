@@ -104,7 +104,7 @@ public class HttpHandler implements Handler<Object>, Context{
 
     @Override
     public List<HttpInterceptor> getInterceptors() {
-        return requestHandler.getInterceptorOps().getInterceptors();
+        return requestHandler.getInterceptorExecutor().getInterceptors();
     }
 
     @Override

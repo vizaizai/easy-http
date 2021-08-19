@@ -26,9 +26,7 @@ import java.util.Set;
 
 public class LogInterceptor implements HttpInterceptor {
     private static final Logger log = LoggerFactory.getLogger(LogInterceptor.class);
-    private static final String[] TEXT_TYPES = new String[] {
-            "text/xml","application/xm", "text/plain","application/json"
-    };
+    private static final String[] TEXT_TYPES = new String[] { "html","xml", "text","json"};
     private static final String LINE_SEPARATOR = System.lineSeparator();
     @Override
     public boolean preHandle(HttpRequest request) {
@@ -175,7 +173,7 @@ public class LogInterceptor implements HttpInterceptor {
         }
         String contentType = contentTypeHeaders.get(0);
         for (String textType : TEXT_TYPES) {
-           if ( contentType!= null && contentType.contains(textType)) {
+           if ( contentType!= null && contentType.toLowerCase().contains(textType)) {
                try {
                    logText.append(LINE_SEPARATOR);
                    logText.append(MessageFormat.format("> 响应体: {0}", text(response.getBody().asString(response.getEncoding()))));
