@@ -27,7 +27,19 @@ import java.util.Set;
 public class LogInterceptor implements HttpInterceptor {
     private static final Logger log = LoggerFactory.getLogger(LogInterceptor.class);
     private static final String[] TEXT_TYPES = new String[] { "html","xml", "text","json"};
-    private static final String LINE_SEPARATOR = System.lineSeparator();
+    private final String itemPrefix;
+    private final String itemSuffix;
+
+    public LogInterceptor() {
+        this.itemPrefix =  System.lineSeparator() + "> ";
+        this.itemSuffix = "";
+    }
+
+    public LogInterceptor(String itemPrefix, String itemSuffix) {
+        this.itemPrefix = itemPrefix;
+        this.itemSuffix = itemSuffix;
+    }
+
     @Override
     public boolean preHandle(HttpRequest request) {
         request.setStartTime(System.currentTimeMillis());
@@ -39,8 +51,9 @@ public class LogInterceptor implements HttpInterceptor {
 
         StringBuilder logText = new StringBuilder();
         // 请求行
-        logText.append(LINE_SEPARATOR);
-        logText.append(MessageFormat.format("> 请求行: {0} {1}",method, request.getUrl()));
+        logText.append(itemPrefix);
+        logText.append(MessageFormat.format("请求行: {0} {1}",method, request.getUrl()));
+        logText.append(itemSuffix);
 
         // 请求头
         if (VUtils.isNotEmpty(request.getHeaders())) {
@@ -55,13 +68,15 @@ public class LogInterceptor implements HttpInterceptor {
                 sb.deleteCharAt(sb.length() - 1);
                 sb.append(" ");
             }
-            logText.append(LINE_SEPARATOR);
-            logText.append(MessageFormat.format("> 请求头: {0}", sb.toString()));
+            logText.append(itemPrefix);
+            logText.append(MessageFormat.format("请求头: {0}", sb.toString()));
+            logText.append(itemSuffix);
         }
         // 查询参数
         if (VUtils.isNotEmpty(request.getParams())) {
-            logText.append(LINE_SEPARATOR);
-            logText.append(MessageFormat.format("> 查询参数: {0}", Utils.asUrlEncoded(request.getParams())));
+            logText.append(itemPrefix);
+            logText.append(MessageFormat.format("查询参数: {0}", Utils.asUrlEncoded(request.getParams())));
+            logText.append(itemSuffix);
         }
         // 请求体
         this.printResponseBody(request,logText);
@@ -77,15 +92,17 @@ public class LogInterceptor implements HttpInterceptor {
         }
         StringBuilder logText = new StringBuilder();
         // 响应头
-        logText.append(LINE_SEPARATOR);
-        logText.append(MessageFormat.format("> 请求响应: {0} [{1}]:{2} ",request.getUrl(), response.getStatusCode(), text(response.getMessage())));
+        logText.append(itemPrefix);
+        logText.append(MessageFormat.format("请求响应: {0} [{1}]:{2} ",request.getUrl(), response.getStatusCode(), text(response.getMessage())));
+        logText.append(itemSuffix);
 
         // 响应体
         this.printResponseBody(response, logText);
 
         // 耗时
-        logText.append(LINE_SEPARATOR);
-        logText.append(MessageFormat.format("> 耗时: {0}ms", endTime - request.getStartTime()));
+        logText.append(itemPrefix);
+        logText.append(MessageFormat.format("耗时: {0}ms", endTime - request.getStartTime()));
+        logText.append(itemSuffix);
         log.info(Utils.unicodeToString(logText.toString()));
     }
 
@@ -106,16 +123,18 @@ public class LogInterceptor implements HttpInterceptor {
                 if (request.getBody().getContent() == null) {
                     return;
                 }
-                logText.append(LINE_SEPARATOR);
-                logText.append(MessageFormat.format("> 请求体: {0}", request.getBody().getContent().asString(request.getEncoding())));
+                logText.append(itemPrefix);
+                logText.append(MessageFormat.format("请求体: {0}", request.getBody().getContent().asString(request.getEncoding())));
+                logText.append(itemSuffix);
                 return;
             }
             if (RequestBodyType.X_WWW_FROM_URL_ENCODED.equals(type)) {
                 if (request.getBody().getContent() == null) {
                     return;
                 }
-                logText.append(LINE_SEPARATOR);
-                logText.append(MessageFormat.format("> 请求体: x-www-form-urlencoded[{0}]", request.getBody().getContent().asString(request.getEncoding())));
+                logText.append(itemPrefix);
+                logText.append(MessageFormat.format("请求体: x-www-form-urlencoded[{0}]", request.getBody().getContent().asString(request.getEncoding())));
+                logText.append(itemSuffix);
                 return;
             }
 
@@ -124,8 +143,8 @@ public class LogInterceptor implements HttpInterceptor {
                     return;
                 }
                 FormBodyParts parts = (FormBodyParts) request.getBody().getSource();
-                logText.append(LINE_SEPARATOR);
-                logText.append("> 请求体: form-data[");
+                logText.append(itemPrefix);
+                logText.append("请求体: form-data[");
                 for (NameValue<String, BodyContent> nameValue : parts) {
                     BodyContent bodyContent = nameValue.getValue();
                     String name = nameValue.getName();
@@ -147,11 +166,13 @@ public class LogInterceptor implements HttpInterceptor {
                 }
                 logText.append("]");
                 logText.append(MessageFormat.format(", 大小: {0}字节", parts.getLength(request.getEncoding())));
+                logText.append(itemSuffix);
                 return;
             }
             if (RequestBodyType.BINARY.equals(type)) {
-                logText.append(LINE_SEPARATOR);
-                logText.append("> 请求体: binary");
+                logText.append(itemPrefix);
+                logText.append("请求体: binary");
+                logText.append(itemSuffix);
             }
         }catch (Exception ignored) {}
     }
@@ -173,10 +194,11 @@ public class LogInterceptor implements HttpInterceptor {
         }
         String contentType = contentTypeHeaders.get(0);
         for (String textType : TEXT_TYPES) {
-           if ( contentType!= null && contentType.toLowerCase().contains(textType)) {
+           if (contentType!= null && contentType.toLowerCase().contains(textType)) {
                try {
-                   logText.append(LINE_SEPARATOR);
-                   logText.append(MessageFormat.format("> 响应体: {0}", text(response.getBody().asString(response.getEncoding()))));
+                   logText.append(itemPrefix);
+                   logText.append(MessageFormat.format("响应体: {0}", text(response.getBody().asString(response.getEncoding()))));
+                   logText.append(itemSuffix);
                }catch (Exception ignored) {
                }
                return;
