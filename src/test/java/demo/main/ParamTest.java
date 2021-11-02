@@ -38,6 +38,7 @@ public class ParamTest {
                 //.client(DefaultURLClient.getInstance())
                 .client(ApacheHttpClient.getInstance())
                 .withInterceptor(new ErrorInterceptor())
+                .withInterceptor(new LogInterceptor("【","】"))
                 .build(ParamService.class);
     }
     @Test
