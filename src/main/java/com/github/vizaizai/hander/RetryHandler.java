@@ -4,8 +4,8 @@ import com.github.vizaizai.entity.RetrySettings;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.retry.DefaultRule;
 import com.github.vizaizai.retry.RetryTrigger;
-import com.github.vizaizai.retry.attempt.Modes;
 import com.github.vizaizai.retry.core.Retry;
+import com.github.vizaizai.retry.mode.Modes;
 
 import java.time.temporal.ChronoUnit;
 

@@ -6,7 +6,7 @@
 
     <groupId>com.github.vizaizai</groupId>
     <artifactId>easy-http</artifactId>
-    <version>4.1.9</version>
+    <version>4.1.11</version>
     <packaging>jar</packaging>
     <name>easy-http</name>
     <url>https://github.com/vizaizai/easy-http</url>
@@ -45,10 +45,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <httpclient.version>4.5.12</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <slf4j-jul.version>1.0.1</slf4j-jul.version>
-        <retry.version>1.1.4</retry.version>
-        <jackson.version>2.12.1</jackson.version>
+        <retry.version>1.2.0</retry.version>
+        <jackson.version>2.13.2.2</jackson.version>
         <gpg.passphrase>easyhttp123</gpg.passphrase>
         <!-- gpg.exe的绝对路径，在gpg安装目录下的bin目录中 -->
         <gpg.executable>C:\Program Files (x86)\gnupg\bin\gpg.exe</gpg.executable>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>[4.13.1,)</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
 
