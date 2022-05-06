@@ -10,8 +10,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.vizaizai.exception.CodecException;
 import com.github.vizaizai.entity.body.Body;
 import com.github.vizaizai.entity.body.ByteArrayBody;
+import com.github.vizaizai.util.Utils;
 
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 /**
@@ -45,7 +47,7 @@ public class JacksonEncoder implements Encoder {
         }
         JavaType javaType = mapper.getTypeFactory().constructType(bodyType);
         try {
-            return ByteArrayBody.ofNullable(mapper.writerFor(javaType).writeValueAsBytes(object));
+            return ByteArrayBody.ofNullable(mapper.writerFor(javaType).writeValueAsString(object).getBytes(Utils.UTF_8));
         }catch (JsonProcessingException e) {
             throw new CodecException(e);
         }
