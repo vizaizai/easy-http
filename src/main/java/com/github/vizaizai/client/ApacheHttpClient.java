@@ -24,6 +24,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
@@ -54,6 +55,14 @@ public class ApacheHttpClient extends AbstractClient {
         if (hostnameVerifier != null) {
             httpClientBuilder.setSSLHostnameVerifier(hostnameVerifier);
         }
+        // 创建连接池管理器
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        // 设置最大连接
+        connectionManager.setMaxTotal(500);
+        // 设置每个主机的最大连接数
+        connectionManager.setDefaultMaxPerRoute(20);
+
+        httpClientBuilder.setConnectionManager(connectionManager);
         this.httpClient  = httpClientBuilder.build();
 
     }
