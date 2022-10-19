@@ -48,7 +48,7 @@
         <httpclient.version>4.5.13</httpclient.version>
         <slf4j-jul.version>1.0.1</slf4j-jul.version>
         <retry.version>1.2.0</retry.version>
-        <jackson.version>2.13.2.2</jackson.version>
+        <jackson.version>2.13.4.1</jackson.version>
     </properties>
 
     <dependencies>
