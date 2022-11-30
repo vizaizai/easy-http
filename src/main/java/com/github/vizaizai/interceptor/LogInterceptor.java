@@ -12,6 +12,7 @@ import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
+import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 
 import java.text.MessageFormat;
@@ -29,9 +30,11 @@ public class LogInterceptor implements HttpInterceptor {
     private static final String[] TEXT_TYPES = new String[] { "html","xml", "text","json"};
     private final String itemPrefix;
     private final String itemSuffix;
+    private final static String REQ_SEQ = "> ";
+    private final static String RESP_SEQ = "< ";
 
     public LogInterceptor() {
-        this.itemPrefix =  System.lineSeparator() + "> ";
+        this.itemPrefix =  System.lineSeparator();
         this.itemSuffix = "";
     }
 
@@ -52,6 +55,7 @@ public class LogInterceptor implements HttpInterceptor {
         StringBuilder logText = new StringBuilder();
         // 请求行
         logText.append(itemPrefix);
+        logText.append(REQ_SEQ);
         logText.append(MessageFormat.format("请求行: {0} {1}",method, request.getUrl()));
         logText.append(itemSuffix);
 
@@ -69,12 +73,14 @@ public class LogInterceptor implements HttpInterceptor {
                 sb.append(" ");
             }
             logText.append(itemPrefix);
+            logText.append(REQ_SEQ);
             logText.append(MessageFormat.format("请求头: {0}", sb.toString()));
             logText.append(itemSuffix);
         }
         // 查询参数
         if (VUtils.isNotEmpty(request.getParams())) {
             logText.append(itemPrefix);
+            logText.append(REQ_SEQ);
             logText.append(MessageFormat.format("查询参数: {0}", Utils.asUrlEncoded(request.getParams())));
             logText.append(itemSuffix);
         }
@@ -93,6 +99,7 @@ public class LogInterceptor implements HttpInterceptor {
         StringBuilder logText = new StringBuilder();
         // 响应头
         logText.append(itemPrefix);
+        logText.append(RESP_SEQ);
         logText.append(MessageFormat.format("请求响应: {0} [{1}]:{2} ",request.getUrl(), response.getStatusCode(), text(response.getMessage())));
         logText.append(itemSuffix);
 
@@ -101,6 +108,7 @@ public class LogInterceptor implements HttpInterceptor {
 
         // 耗时
         logText.append(itemPrefix);
+        logText.append(RESP_SEQ);
         logText.append(MessageFormat.format("耗时: {0}ms", endTime - request.getStartTime()));
         logText.append(itemSuffix);
         log.info(Utils.unicodeToString(logText.toString()));
@@ -124,6 +132,7 @@ public class LogInterceptor implements HttpInterceptor {
                     return;
                 }
                 logText.append(itemPrefix);
+                logText.append(REQ_SEQ);
                 logText.append(MessageFormat.format("请求体: {0}", request.getBody().getContent().asString(request.getEncoding())));
                 logText.append(itemSuffix);
                 return;
@@ -133,6 +142,7 @@ public class LogInterceptor implements HttpInterceptor {
                     return;
                 }
                 logText.append(itemPrefix);
+                logText.append(REQ_SEQ);
                 logText.append(MessageFormat.format("请求体: x-www-form-urlencoded[{0}]", request.getBody().getContent().asString(request.getEncoding())));
                 logText.append(itemSuffix);
                 return;
@@ -144,6 +154,7 @@ public class LogInterceptor implements HttpInterceptor {
                 }
                 FormBodyParts parts = (FormBodyParts) request.getBody().getSource();
                 logText.append(itemPrefix);
+                logText.append(REQ_SEQ);
                 logText.append("请求体: form-data[");
                 for (NameValue<String, BodyContent> nameValue : parts) {
                     BodyContent bodyContent = nameValue.getValue();
@@ -171,7 +182,8 @@ public class LogInterceptor implements HttpInterceptor {
             }
             if (RequestBodyType.BINARY.equals(type)) {
                 logText.append(itemPrefix);
-                logText.append("请求体: binary");
+                logText.append(REQ_SEQ);
+                logText.append(MessageFormat.format("请求体: {0}字节", request.getBody().length(request.getEncoding())));
                 logText.append(itemSuffix);
             }
         }catch (Exception ignored) {}
@@ -197,6 +209,7 @@ public class LogInterceptor implements HttpInterceptor {
            if (contentType!= null && contentType.toLowerCase().contains(textType)) {
                try {
                    logText.append(itemPrefix);
+                   logText.append(RESP_SEQ);
                    logText.append(MessageFormat.format("响应体: {0}", text(response.getBody().asString(response.getEncoding()))));
                    logText.append(itemSuffix);
                }catch (Exception ignored) {
