@@ -4,9 +4,9 @@ package demo.main;
 import com.github.vizaizai.EasyHttp;
 import com.github.vizaizai.client.ApacheHttpClient;
 import com.github.vizaizai.client.DefaultURLClient;
+import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
-import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.retry.DefaultRule;
 import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
@@ -31,7 +31,7 @@ public class BookServiceTest {
     public void init() {
         bookHttpService = EasyHttp.builder()
                                     .url("127.0.0.1:8888")
-                                    .client(DefaultURLClient.getInstance())
+                                    .client(ApacheHttpClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
                                     .retryable(3,1000, new DefaultRule())
@@ -176,6 +176,19 @@ public class BookServiceTest {
         s.join();
         System.out.println(s);
 
+    }
+
+    @Test
+    public void addBooks() {
+        Book book = new Book();
+        book.setId(uuid());
+        book.setPrice(BigDecimal.valueOf(17.40));
+        book.setName("零基础学Python（全彩版）2");
+        book.setAuthor("明日科技(Mingri Soft)2");
+        book.setDescription("Python3全新升级！超20万读者认可的彩色书，从基本概念到完整项目开发，助您快速掌握Python编程。");
+
+        ApiResult<Void> bookRet = bookHttpService.addBooks(Arrays.asList(book));
+        System.out.println(bookRet.getCode());
     }
 
     public static String uuid() {

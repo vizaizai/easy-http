@@ -1,12 +1,13 @@
 package com.github.vizaizai.client;
 
 
-import com.github.vizaizai.apache.BodyEntity;
-import com.github.vizaizai.apache.HttpDeleteWithBody;
+import com.github.vizaizai.client.apache.BodyEntity;
+import com.github.vizaizai.client.apache.HttpDeleteWithBody;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpRequestConfig;
 import com.github.vizaizai.entity.HttpResponse;
+import com.github.vizaizai.entity.body.Body;
 import com.github.vizaizai.entity.body.InputStreamBody;
 import com.github.vizaizai.entity.body.RequestBody;
 import com.github.vizaizai.entity.body.RequestBodyType;
@@ -22,8 +23,10 @@ import org.apache.http.client.methods.*;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
@@ -54,6 +57,14 @@ public class ApacheHttpClient extends AbstractClient {
         if (hostnameVerifier != null) {
             httpClientBuilder.setSSLHostnameVerifier(hostnameVerifier);
         }
+        // 创建连接池管理器
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        // 设置最大连接
+        connectionManager.setMaxTotal(500);
+        // 设置每个主机的最大连接数
+        connectionManager.setDefaultMaxPerRoute(20);
+
+        httpClientBuilder.setConnectionManager(connectionManager);
         this.httpClient  = httpClientBuilder.build();
 
     }
@@ -218,8 +229,11 @@ public class ApacheHttpClient extends AbstractClient {
                 || RequestBodyType.FORM_DATA.equals(body.getType())) {
             return new BodyEntity(body, request.getEncoding(), request.getContentType());
         }
+        // 文本类型
         if (body.getContent()!= null) {
-            return new InputStreamEntity(body.getContent().asInputStream(), ContentType.create(request.getContentType()));
+            Body content = body.getContent();
+            return new InputStreamEntity(content.asInputStream(), content.length(),
+                    ContentType.create(request.getContentType(), request.getEncoding()));
         }
         return null;
     }

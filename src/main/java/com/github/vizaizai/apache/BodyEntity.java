@@ -1,4 +1,4 @@
-package com.github.vizaizai.apache;
+package com.github.vizaizai.client.apache;
 
 import com.github.vizaizai.entity.body.RequestBody;
 import org.apache.http.entity.AbstractHttpEntity;
