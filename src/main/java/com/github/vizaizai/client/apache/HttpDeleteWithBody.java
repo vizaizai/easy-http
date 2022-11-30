@@ -1,4 +1,4 @@
-package com.github.vizaizai.apache;
+package com.github.vizaizai.client.apache;
 
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 

@@ -64,4 +64,8 @@ public interface BookHttpService {
 
     @Get(value = "/management-center/jsd-management/opsAloneStoreAudit/qryByStoreId")
     Book man(@Param("platformId") String platformId, @Param("storeId") String storeId);
+
+
+    @Post("/books/batch")
+    ApiResult<Void> addBooks(@Body List<Book> books);
 }
