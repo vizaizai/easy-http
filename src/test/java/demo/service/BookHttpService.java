@@ -68,4 +68,7 @@ public interface BookHttpService {
 
     @Post("/books/batch")
     ApiResult<Void> addBooks(@Body List<Book> books);
+
+    @Post("/user/login")
+    String login(@Body Map<String,String> body);
 }

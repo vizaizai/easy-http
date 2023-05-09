@@ -30,7 +30,7 @@ public class BookServiceTest {
     @Before
     public void init() {
         bookHttpService = EasyHttp.builder()
-                                    .url("127.0.0.1:8888")
+                                    .url("127.0.0.1:1141")
                                     .client(ApacheHttpClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
@@ -189,6 +189,15 @@ public class BookServiceTest {
 
         ApiResult<Void> bookRet = bookHttpService.addBooks(Arrays.asList(book));
         System.out.println(bookRet.getCode());
+    }
+
+    @Test
+    public void login() {
+        Map<String, String> body = new HashMap<>();
+        body.put("userName","admin");
+        body.put("password","123456");
+        String  ret = bookHttpService.login(body);
+        System.out.println(ret);
     }
 
     public static String uuid() {

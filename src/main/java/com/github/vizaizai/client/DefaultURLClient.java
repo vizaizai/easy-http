@@ -75,26 +75,25 @@ public class DefaultURLClient extends AbstractClient{
                 sslConnection.setHostnameVerifier(this.hostnameVerifier);
             }
         }
-
+        connection.setDoOutput(true);
+        connection.setDoInput(true);
         connection.setConnectTimeout(config.getConnectTimeout());
         connection.setReadTimeout(config.getRequestTimeout());
         connection.setAllowUserInteraction(false);
         connection.setInstanceFollowRedirects(false);
         // 不支持PATCH请求
         connection.setRequestMethod(request.getMethod().name());
+        connection.setChunkedStreamingMode(8192);
 
         for (NameValue<String,String> nameValue : headers) {
             connection.addRequestProperty(nameValue.getName(), nameValue.getValue());
         }
-
+        connection.connect();
         if (entity.body != null) {
-            connection.setChunkedStreamingMode(8192);
-            connection.setDoOutput(true);
             try (OutputStream out = connection.getOutputStream()) {
                 entity.body.writeTo(out, request.getEncoding());
             }
         }
-        connection.connect();
         return this.convertResponse(connection);
 
     }

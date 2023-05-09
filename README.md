@@ -24,7 +24,7 @@ Java版本: 最低 `8`
    <dependency>
      <groupId>com.github.vizaizai</groupId>
      <artifactId>easy-http</artifactId>
-     <version>4.1.8</version>
+     <version>最新版</version>
    </dependency>
    ```
 

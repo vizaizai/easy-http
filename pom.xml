@@ -6,7 +6,7 @@
 
     <groupId>com.github.vizaizai</groupId>
     <artifactId>easy-http</artifactId>
-    <version>4.1.13</version>
+    <version>4.1.14</version>
     <packaging>jar</packaging>
     <name>easy-http</name>
     <url>https://github.com/vizaizai/easy-http</url>
@@ -45,8 +45,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <httpclient.version>4.5.13</httpclient.version>
-        <slf4j-jul.version>1.0.1</slf4j-jul.version>
+        <httpclient.version>4.5.14</httpclient.version>
+        <slf4j-jul.version>1.0.2</slf4j-jul.version>
         <retry.version>1.2.0</retry.version>
         <jackson.version>2.14.0</jackson.version>
     </properties>
