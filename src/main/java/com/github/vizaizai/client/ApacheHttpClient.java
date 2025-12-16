@@ -2,7 +2,6 @@ package com.github.vizaizai.client;
 
 
 import com.github.vizaizai.client.apache.BodyEntity;
-import com.github.vizaizai.client.apache.HttpDeleteWithBody;
 import com.github.vizaizai.entity.HttpMethod;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpRequestConfig;
@@ -15,80 +14,66 @@ import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.StringNameValues;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.*;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.util.TimeValue;
 
-import javax.net.ssl.HostnameVerifier;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author liaochongwei
  * @date 2020/7/30 17:28
  */
 public class ApacheHttpClient extends AbstractClient {
-    private RequestConfig config;
-    private final CloseableHttpClient httpClient;
-    private final SSLConnectionSocketFactory sslConnectionSocketFactory;
-    private final HostnameVerifier hostnameVerifier;
+    private CloseableHttpClient httpClient;
+    private final PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
 
-    private ApacheHttpClient(SSLConnectionSocketFactory sslConnectionSocketFactory, HostnameVerifier hostnameVerifier) {
-        this.sslConnectionSocketFactory = sslConnectionSocketFactory;
-        this.hostnameVerifier = hostnameVerifier;
-
-        // SSL
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        if (sslConnectionSocketFactory != null) {
-            httpClientBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
-        }
-        if (hostnameVerifier != null) {
-            httpClientBuilder.setSSLHostnameVerifier(hostnameVerifier);
-        }
-        // 创建连接池管理器
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        // 设置最大连接
-        connectionManager.setMaxTotal(500);
-        // 设置每个主机的最大连接数
-        connectionManager.setDefaultMaxPerRoute(20);
-
-        httpClientBuilder.setConnectionManager(connectionManager);
-        this.httpClient  = httpClientBuilder.build();
-
+    private ApacheHttpClient(PoolingHttpClientConnectionManager poolingHttpClientConnectionManager) {
+        this.poolingHttpClientConnectionManager = poolingHttpClientConnectionManager;
     }
 
     public static ApacheHttpClient getInstance() {
-        return new ApacheHttpClient(null, null);
+        PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setMaxConnTotal(500)
+                .setMaxConnPerRoute(20)
+                .build();
+        return new ApacheHttpClient(connectionManager);
     }
-    public static ApacheHttpClient getInstance(SSLConnectionSocketFactory sslConnectionSocketFactory) {
-        return new ApacheHttpClient(sslConnectionSocketFactory, null);
-    }
-    public static ApacheHttpClient getInstance(SSLConnectionSocketFactory sslConnectionSocketFactory, HostnameVerifier hostnameVerifier) {
-        return new ApacheHttpClient(sslConnectionSocketFactory, hostnameVerifier);
+
+    public static ApacheHttpClient getInstance(PoolingHttpClientConnectionManager poolingHttpClientConnectionManager) {
+        return new ApacheHttpClient(poolingHttpClientConnectionManager);
     }
 
     @Override
-    public void setConfig(HttpRequestConfig httpConfig) {
-       super.setConfig(httpConfig);
-       if (config == null) {
-           config = RequestConfig.custom()
-                   .setConnectTimeout(httpConfig.getConnectTimeout()) //设置连接超时时间
-                   .setConnectionRequestTimeout(15000) // 获取连接超时时间
-                   .setSocketTimeout(httpConfig.getRequestTimeout()) //请求超时时间
-                   .build();
+    public void init(HttpRequestConfig httpConfig) {
+       super.init(httpConfig);
+       if (httpConfig == null) {
+           throw new EasyHttpException("HttpClient request configuration is null");
        }
+        ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                .setConnectTimeout(httpConfig.getConnectTimeout(), TimeUnit.MILLISECONDS)
+                .setSocketTimeout(httpConfig.getRequestTimeout(), TimeUnit.MILLISECONDS)
+                .setTimeToLive(TimeValue.ofMinutes(5))
+                .build();
+       poolingHttpClientConnectionManager.setDefaultConnectionConfig(connectionConfig);
+
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        httpClientBuilder.setConnectionManager(poolingHttpClientConnectionManager);
+        this.httpClient  = httpClientBuilder.build();
     }
 
     @Override
@@ -98,9 +83,6 @@ public class ApacheHttpClient extends AbstractClient {
         HeadersNameValues headers = request.getHeaders();
         StringNameValues params = request.getParams();
         RequestBodyType bodyType = request.getBody() == null ? null : request.getBody().getType();
-        if (config == null) {
-            throw new EasyHttpException("HttpClient request configuration is null");
-        }
         if (method == null) {
             throw new EasyHttpException("HttpClient request method is not supported");
         }
@@ -113,48 +95,36 @@ public class ApacheHttpClient extends AbstractClient {
         HttpUriRequest httpUriRequest;
         switch (method) {
             case GET:
-                HttpGet httpGet = new HttpGet(url);
-                httpGet.setConfig(config);
-                httpUriRequest = httpGet;
+                httpUriRequest = new HttpGet(url);
                 break;
             case POST:
                 HttpPost httpPost = new HttpPost(url);
                 httpPost.setEntity(assembleEntity(request));
-                httpPost.setConfig(config);
                 httpUriRequest = httpPost;
                 break;
             case PUT:
                 HttpPut httpPut = new HttpPut(url);
                 httpPut.setEntity(assembleEntity(request));
-                httpPut.setConfig(config);
                 httpUriRequest = httpPut;
                 break;
             case DELETE:
-                HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(url);
+                HttpDelete httpDelete = new HttpDelete(url);
                 httpDelete.setEntity(assembleEntity(request));
-                httpDelete.setConfig(config);
                 httpUriRequest = httpDelete;
                 break;
             case PATCH:
                 HttpPatch httpPatch = new HttpPatch(url);
                 httpPatch.setEntity(assembleEntity(request));
-                httpPatch.setConfig(config);
                 httpUriRequest = httpPatch;
                 break;
             case HEAD:
-                HttpHead httpHead = new HttpHead(url);
-                httpHead.setConfig(config);
-                httpUriRequest = httpHead;
+                httpUriRequest = new HttpHead(url);
                 break;
             case OPTIONS:
-                HttpOptions httpOptions = new HttpOptions(url);
-                httpOptions.setConfig(config);
-                httpUriRequest = httpOptions;
+                httpUriRequest = new HttpOptions(url);
                 break;
             case TRACE:
-                HttpTrace httpTrace = new HttpTrace(url);
-                httpTrace.setConfig(config);
-                httpUriRequest = httpTrace;
+                httpUriRequest = new HttpTrace(url);
                 break;
             default:
                 throw new EasyHttpException("Request method '" + method.name() +"' is not supported");
@@ -164,11 +134,12 @@ public class ApacheHttpClient extends AbstractClient {
         if (headers != null) {
             headers.forEach(e-> httpUriRequest.addHeader(e.getName(), e.getValue()));
         }
-        // 返回数据
-        HttpResponse result = new HttpResponse();
-        try (CloseableHttpResponse response = httpClient.execute(httpUriRequest)){
+
+        return httpClient.execute(httpUriRequest, response->{
+            // 返回数据
+            HttpResponse result = new HttpResponse();
             // 响应头
-            Header[] allHeaders = response.getAllHeaders();
+            Header[] allHeaders = response.getHeaders();
             if (allHeaders != null && allHeaders.length > 0) {
                 HeadersNameValues headersNameValues = new HeadersNameValues();
                 for (Header header : allHeaders) {
@@ -184,12 +155,11 @@ public class ApacheHttpClient extends AbstractClient {
                 result.setMessage("Response body is null");
                 return result;
             }
-            result.setBody(InputStreamBody.ofNullable(httpEntity.getContent(),(int) httpEntity.getContentLength()));
-            result.setStatusCode(response.getStatusLine().getStatusCode());
-            result.setMessage(response.getStatusLine().getReasonPhrase());
-        }
-        return result;
-
+            result.setBody(InputStreamBody.ofNullable(httpEntity.getContent(), httpEntity.getContentLength()));
+            result.setStatusCode(response.getCode());
+            result.setMessage(response.getReasonPhrase());
+            return result;
+        });
     }
 
     /**
@@ -210,7 +180,7 @@ public class ApacheHttpClient extends AbstractClient {
                 url = url + "?" + urlParam;
             }
             return url;
-        }catch (IOException e) {
+        }catch (Exception e) {
             return url;
         }
     }
@@ -238,11 +208,8 @@ public class ApacheHttpClient extends AbstractClient {
         return null;
     }
 
-    public SSLConnectionSocketFactory getSslConnectionSocketFactory() {
-        return sslConnectionSocketFactory;
+    public PoolingHttpClientConnectionManager getConnectionManager() {
+        return this.poolingHttpClientConnectionManager;
     }
 
-    public HostnameVerifier getHostnameVerifier() {
-        return hostnameVerifier;
-    }
 }

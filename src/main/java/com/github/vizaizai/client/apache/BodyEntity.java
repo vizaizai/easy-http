@@ -1,7 +1,7 @@
 package com.github.vizaizai.client.apache;
 
 import com.github.vizaizai.entity.body.RequestBody;
-import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.hc.core5.http.io.entity.AbstractHttpEntity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,14 +13,13 @@ import java.nio.charset.Charset;
  * @date 2021/2/18 16:32
  */
 public class BodyEntity extends AbstractHttpEntity {
-
     private final RequestBody requestBody;
     private final Charset charset;
 
     public BodyEntity(RequestBody requestBody, Charset charset, String contentType) {
+        super(contentType, charset.name(), false);
         this.requestBody = requestBody;
         this.charset = charset;
-        super.setContentType(contentType);
     }
 
     @Override
@@ -46,5 +45,10 @@ public class BodyEntity extends AbstractHttpEntity {
     @Override
     public boolean isStreaming() {
         return false;
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

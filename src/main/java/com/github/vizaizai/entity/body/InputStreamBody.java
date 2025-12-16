@@ -3,6 +3,9 @@ package com.github.vizaizai.entity.body;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.StreamUtils;
+import org.apache.hc.core5.http.io.EofSensorInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -12,12 +15,13 @@ import java.nio.charset.Charset;
  * @date 2021/1/11 14:57
  */
 public class InputStreamBody implements Body {
+    private static final Logger log = LoggerFactory.getLogger(InputStreamBody.class);
     private final InputStream source;
-    private Integer length;
+    private long length = -1;
     private byte[] copyBytes;
     private final boolean repeatable;
 
-    private InputStreamBody(InputStream inputStream, Integer length, boolean repeatable) {
+    private InputStreamBody(InputStream inputStream, long length, boolean repeatable) {
         this.source = inputStream;
         this.length = length;
         this.repeatable = repeatable;
@@ -26,9 +30,14 @@ public class InputStreamBody implements Body {
             if (this.repeatable) {
                 this.copyBytes = StreamUtils.copyToByteArray(inputStream);
             }
-            // 长度为空
-            if (length == null) {
-                 this.length = inputStream.available();
+
+            // 长度
+            if (length == -1) {
+                 try {
+                     this.length = inputStream.available();
+                 }catch (Exception e) {
+                     log.warn("read length fail,", e);
+                 }
             }
 
         }catch (IOException e) {
@@ -36,13 +45,13 @@ public class InputStreamBody implements Body {
         }
 
     }
-    public static Body ofNullable(InputStream inputStream, Integer length) {
+    public static Body ofNullable(InputStream inputStream, long length) {
         if (inputStream == null) {
             return null;
         }
         return new InputStreamBody(inputStream, length,true);
     }
-    public static Body ofNullable(InputStream inputStream, Integer length, boolean repeatable) {
+    public static Body ofNullable(InputStream inputStream, long length, boolean repeatable) {
         if (inputStream == null) {
             return null;
         }

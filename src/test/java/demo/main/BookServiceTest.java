@@ -30,17 +30,17 @@ public class BookServiceTest {
     @Before
     public void init() {
         bookHttpService = EasyHttp.builder()
-                                    .url("127.0.0.1:1141")
+                                    .url("127.0.0.1:8888")
                                     .client(ApacheHttpClient.getInstance())
                                     .withInterceptor(new LogInterceptor())
                                     .withInterceptor(new ErrorInterceptor())
-                                    .retryable(3,1000, new DefaultRule())
                                     .build(BookHttpService.class);
     }
 
 
     @Test
     public void addBook() {
+
         Book book = new Book();
         book.setId(uuid());
         book.setPrice(BigDecimal.valueOf(17.40));

@@ -23,7 +23,7 @@ public abstract class AbstractClient {
         return httpRequestConfig;
     }
 
-    public void setConfig(HttpRequestConfig config) {
+    public void init(HttpRequestConfig config) {
         this.httpRequestConfig = config;
     }
 }

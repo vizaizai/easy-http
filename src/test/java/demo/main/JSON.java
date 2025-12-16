@@ -1,7 +1,7 @@
 package demo.main;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.vizaizai.exception.CodecException;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author liaochongwei
@@ -9,7 +9,7 @@ import com.github.vizaizai.exception.CodecException;
  */
 public class JSON {
     public static String toJSONString(Object o) {
-        ObjectMapper mapper = new ObjectMapper();
+        JsonMapper mapper = JsonMapper.builder().build();
         try {
             return mapper.writeValueAsString(o);
         }catch (Exception e) {

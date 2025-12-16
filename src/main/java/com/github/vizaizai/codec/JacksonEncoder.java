@@ -1,19 +1,18 @@
 package com.github.vizaizai.codec;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.vizaizai.exception.CodecException;
 import com.github.vizaizai.entity.body.Body;
 import com.github.vizaizai.entity.body.ByteArrayBody;
 import com.github.vizaizai.util.Utils;
+import tools.jackson.core.util.MinimalPrettyPrinter;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -22,21 +21,21 @@ import java.util.Collections;
  * @date 2020/7/31 9:53
  */
 public class JacksonEncoder implements Encoder {
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     public JacksonEncoder() {
-        this(Collections.<Module>emptyList());
+        this(Collections.emptyList());
     }
 
-    public JacksonEncoder(Iterable<Module> modules) {
-        this(new ObjectMapper()
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .configure(SerializationFeature.INDENT_OUTPUT, true)
-                .setDefaultPrettyPrinter(new MinimalPrettyPrinter()) // 最小输出
-                .registerModules(modules));
+    public JacksonEncoder(Collection<Class<?>> subtypes) {
+        this(JsonMapper.builder()
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .defaultPrettyPrinter(new MinimalPrettyPrinter())
+                .registerSubtypes(subtypes)
+                .build());
     }
 
-    public JacksonEncoder(ObjectMapper mapper) {
+    public JacksonEncoder(JsonMapper mapper) {
         this.mapper = mapper;
     }
 
@@ -46,10 +45,6 @@ public class JacksonEncoder implements Encoder {
             return null;
         }
         JavaType javaType = mapper.getTypeFactory().constructType(bodyType);
-        try {
-            return ByteArrayBody.ofNullable(mapper.writerFor(javaType).writeValueAsString(object).getBytes(Utils.UTF_8));
-        }catch (JsonProcessingException e) {
-            throw new CodecException(e);
-        }
+        return ByteArrayBody.ofNullable(mapper.writerFor(javaType).writeValueAsString(object).getBytes(Utils.UTF_8));
     }
 }

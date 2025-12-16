@@ -1,15 +1,17 @@
 package com.github.vizaizai.codec;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.exception.CodecException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.NamedType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -19,18 +21,21 @@ import java.util.Collections;
  */
 public class JacksonDecoder implements Decoder {
 
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     public JacksonDecoder() {
-        this(Collections.<Module>emptyList());
+        this(Collections.emptyList());
     }
 
-    public JacksonDecoder(Iterable<Module> modules) {
-        this(new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .registerModules(modules));
+    public JacksonDecoder(Collection<Class<?>> subtypes) {
+         this(JsonMapper
+                 .builder()
+                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
+                 .registerSubtypes(subtypes)
+                 .build());
     }
 
-    public JacksonDecoder(ObjectMapper mapper) {
+    public JacksonDecoder(JsonMapper mapper) {
         this.mapper = mapper;
     }
 

@@ -1,24 +1,26 @@
 package demo.interceptor;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.interceptor.HttpInterceptor;
 import com.github.vizaizai.entity.HttpRequest;
 import com.github.vizaizai.entity.HttpResponse;
 import demo.model.ApiResult;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author liaochongwei
  * @date 2020/8/3 13:46
  */
 public class ResultInterceptor implements HttpInterceptor {
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     public ResultInterceptor() {
-        this.mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.mapper = JsonMapper
+                .builder()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
+                .build();
     }
 
     @Override

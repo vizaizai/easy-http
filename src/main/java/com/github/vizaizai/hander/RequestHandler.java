@@ -171,7 +171,7 @@ public class RequestHandler implements Handler<HttpResponse>{
     public HttpResponse execute() throws IOException {
         // 执行过滤
         this.doInterceptor();
-        client.setConfig(this.request.getConfig());
+        client.init(this.request.getConfig());
         return client.request(this.request);
     }
     /**

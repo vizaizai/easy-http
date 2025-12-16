@@ -12,7 +12,6 @@ import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
-import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 
 import java.text.MessageFormat;

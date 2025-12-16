@@ -51,7 +51,7 @@ public class RequestBody {
         Assert.notNull(source,"The source must be not null");
         RequestBody requestBody = new RequestBody(source,type);
         try {
-            requestBody.content = InputStreamBody.ofNullable(source.getInputStream(),null,false);
+            requestBody.content = InputStreamBody.ofNullable(source.getInputStream(),-1,false);
         }catch (IOException e) {
             throw new EasyHttpException(e);
         }
