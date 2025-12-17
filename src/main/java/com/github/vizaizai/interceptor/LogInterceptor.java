@@ -6,13 +6,13 @@ import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.entity.body.RequestBodyType;
 import com.github.vizaizai.entity.form.BodyContent;
 import com.github.vizaizai.entity.form.FormBodyParts;
-import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.util.StreamUtils;
 import com.github.vizaizai.util.Utils;
 import com.github.vizaizai.util.VUtils;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.List;

@@ -3,7 +3,6 @@ package com.github.vizaizai.entity.body;
 import com.github.vizaizai.exception.EasyHttpException;
 import com.github.vizaizai.util.Assert;
 import com.github.vizaizai.util.StreamUtils;
-import org.apache.hc.core5.http.io.EofSensorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,9 @@ public class InputStreamBody implements Body {
                  try {
                      this.length = inputStream.available();
                  }catch (Exception e) {
-                     log.warn("read length fail,", e);
+                     if (log.isDebugEnabled()) {
+                         log.debug("read length fail: {}", e.getMessage());
+                     }
                  }
             }
 

@@ -2,14 +2,13 @@ package com.github.vizaizai.util;
 
 import com.github.vizaizai.annotation.Headers;
 import com.github.vizaizai.exception.EasyHttpException;
-import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.util.value.HeadersNameValues;
 import com.github.vizaizai.util.value.NameValue;
 import com.github.vizaizai.util.value.StringNameValue;
 import com.github.vizaizai.util.value.StringNameValues;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -23,7 +22,6 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -118,7 +116,9 @@ public class Utils {
         try {
             return URLEncoder.encode(source, encode);
         } catch (UnsupportedEncodingException e) {
-            logger.error("URL encode error: {}", e.getMessage());
+            if (logger.isErrorEnabled()) {
+                logger.error("URL encode error: {}", e.getMessage());
+            }
             return source;
         }
     }
@@ -168,7 +168,9 @@ public class Utils {
                     buf.replace(startIndex, endIndex + PLACEHOLDER_SUFFIX.length(), propVal);
                     nextIndex = startIndex + propVal.length();
                 } else {
-                    logger.warn("Could not resolve placeholder {} in [{}]", placeholder, source);
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("Could not resolve placeholder {} in [{}]", placeholder, source);
+                    }
                 }
                 startIndex = buf.indexOf(PLACEHOLDER_PREFIX, nextIndex);
             } else {
@@ -197,7 +199,7 @@ public class Utils {
                                                 })
                                                 .map(Utils::genKeyValue)
                                                 .flatMap(Collection::stream)
-                                                .collect(Collectors.toList());
+                                                .toList();
         if (VUtils.isEmpty(nameValues)) {
             return null;
         }
@@ -329,7 +331,9 @@ public class Utils {
     private static List<StringNameValue> genKeyValue(String header) {
         String[] split = header.split(COLON+" ");
         if (split.length != 2 ) {
-            logger.error("Formatting error: {}", header);
+            if (logger.isErrorEnabled()) {
+                logger.error("Formatting error: {}", header);
+            }
             throw new IllegalArgumentException("Formatting error");
         }
         String name =  split[0].trim();

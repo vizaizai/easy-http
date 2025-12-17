@@ -7,7 +7,6 @@ import com.github.vizaizai.client.DefaultURLClient;
 import com.github.vizaizai.entity.HttpResponse;
 import com.github.vizaizai.interceptor.ErrorInterceptor;
 import com.github.vizaizai.interceptor.LogInterceptor;
-import com.github.vizaizai.retry.DefaultRule;
 import demo.interceptor.ResultInterceptor;
 import demo.model.ApiResult;
 import demo.model.Book;
